@@ -1,0 +1,46 @@
+{
+  "extends": [
+    "next/core-web-vitals",
+    "eslint:recommended"
+  ],
+  "plugins": ["import"],
+  "rules": {
+    "no-console": 1,
+    "no-unused-vars": "warn",
+    "no-lonely-if": 1,
+    "no-trailing-spaces": "error",
+    "no-multi-spaces": "error",
+    "no-multiple-empty-lines": ["error", { "max": 1, "maxEOF": 0 }],
+    "space-before-blocks": ["error", "always"],
+    "object-curly-spacing": ["error", "always"],
+    "indent": ["error", 2],
+    "semi": [1, "never"],
+    "quotes": ["error", "single"],
+    "array-bracket-spacing": ["error", "never"],
+    "linebreak-style": 0,
+    "no-unexpected-multiline": "warn",
+    "keyword-spacing": "error",
+    "comma-dangle": 1,
+    "comma-spacing": 1,
+    "arrow-spacing": 1,
+    "no-undef": "error",
+    "import/order": [
+      "error",
+      {
+        "groups": [
+          "builtin",
+          "external",
+          "internal",
+          "parent",
+          "sibling",
+          "index"
+        ],
+        "newlines-between": "always",
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        }
+      }
+    ]
+  }
+}
