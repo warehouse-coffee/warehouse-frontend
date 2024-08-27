@@ -1,21 +1,31 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import * as React from 'react'
 
 import { Navbar } from '@/types'
 
-export default function HomeNavbar({ navbars }: { navbars: Navbar[] }) {
+export default function HomeNavbar({ navItems }: { navItems: Navbar[] }) {
+  const pathname = usePathname()
+
   return (
     <nav className="w-full h-16 fixed top-[.5rem] flex items-center justify-between">
       <div className="w-1/3 text-[1.75rem] uppercase font-bold ml-[2rem]">cofee td.</div>
       <div className="w-1/3 flex justify-center">
         <div className="flex items-center gap-5">
-          {navbars.map(({ name, href }) => (
+          {navItems.map(({ name, href }) => (
             <div key={href} className="relative group">
-              <Link href={href} className="text-[.95rem] text-white font-light">
+              <Link
+                href={href}
+                className={`text-[.95rem] transition-all duration-250 ease-in-out font-light
+                  ${pathname === href ? 'text-[#62c5ff]' : 'text-white hover:text-[#62c5ff]'}`}
+              >
                 {name}
-                <span className="absolute left-0 -bottom-[.08rem] w-0 h-[.05rem] bg-white transition-all duration-200 ease-in-out group-hover:w-full" />
+                <span
+                  className={`absolute left-0 -bottom-[.08rem] h-[.05rem] bg-[#62c5ff] transition-all duration-250 ease-in-out
+                    ${pathname === href ? 'w-full' : 'w-0 group-hover:w-full'}`}
+                />
               </Link>
             </div>
           ))}

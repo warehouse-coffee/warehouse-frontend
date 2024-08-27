@@ -1,9 +1,19 @@
 import * as React from 'react'
 
 import HomeNavbar from '@/components/Home/HomeNavbar'
+import PageWrapper from '@/components/PageWrapper'
 
-export default function HomeLayout({ children }: { children: React.ReactNode }) {
-  const navbars = [
+interface HomeLayoutProps {
+  children: React.ReactNode
+}
+
+/**
+ * HomeLayout component
+ * Renders the main layout for public pages including the navbar and children content
+*/
+
+export default function HomeLayout({ children }: HomeLayoutProps) {
+  const navItems = [
     {
       name: 'Home',
       href: '/'
@@ -23,9 +33,9 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   ]
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <HomeNavbar navbars={navbars} />
+    <PageWrapper>
+      <HomeNavbar navItems={navItems} />
       {children}
-    </main>
+    </PageWrapper>
   )
 }
