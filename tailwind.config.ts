@@ -19,7 +19,8 @@ const config = {
     },
     extend: {
       fontFamily: {
-        sans: ['var(--font-sans)', ...fontFamily.sans]
+        sans: ['var(--font-sans)', ...fontFamily.sans],
+        italiana: ['var(--font-italiana)', ...fontFamily.sans]
       },
       colors: {
         border: 'hsl(var(--border))',
@@ -60,6 +61,12 @@ const config = {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)'
+      },
+      backgroundPosition: {
+        'center-center': 'center center'
+      },
+      backgroundSize: {
+        'full-screen': '100% 100%'
       },
       keyframes: {
         'accordion-down': {
