@@ -18,7 +18,7 @@ export default function HomeNavbar({ navItems }: { navItems: Navbar[] }) {
             <div key={href} className="relative group">
               <Link
                 href={href}
-                className={`text-[.9rem] uppercase transition-all duration-250 ease-in-out font-light
+                className={`text-[.9rem] uppercase transition-all duration-250 ease-in-out font-normal
                   ${pathname === href ? 'text-[#62c5ff]' : 'text-white hover:text-[#62c5ff]'}`}
               >
                 {name}
