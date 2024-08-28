@@ -1,24 +1,11 @@
 import type { Metadata } from 'next'
-import { Noto_Sans, Italiana } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import React from 'react'
 
-import './globals.css'
-
+import { fontSans, fontItaliana } from '@/lib/fonts'
 import { cn } from '@/lib/utils'
 
-const fontSans = Noto_Sans({
-  subsets: ['latin'],
-  style: ['normal', 'italic'],
-  weight: ['200', '300', '400', '500', '600', '700', '800', '900'],
-  variable: '--font-sans'
-})
-
-const fontItaliana = Italiana({
-  subsets: ['latin'],
-  weight: ['400'],
-  variable: '--font-italiana'
-})
+import './globals.css'
 
 export const metadata: Metadata = {
   title: 'Create Next App',
