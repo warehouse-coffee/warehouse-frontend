@@ -35,8 +35,8 @@ export default function HomePage() {
           </button>
         </Link>
       </div>
-      <div className="absolute top-[30rem] left-[42.85%] -translate-x-1/2 -translate-y-1/2 z-10">
-        <div className='w-[41rem] h-[41rem] flex items-center justify-center animate-float'>
+      <div className="absolute top-[29.85rem] left-[46%] -translate-x-1/2 -translate-y-1/2 z-10">
+        <div className='w-[37.5rem] h-[37.5rem] flex items-center justify-center animate-float'>
           <ThreeDModel
             className="w-full h-full"
             scene="https://prod.spline.design/OKtLOLGJJQIjJ4rI/scene.splinecode"
