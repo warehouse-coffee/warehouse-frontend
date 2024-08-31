@@ -1,9 +1,10 @@
 import { LoginForm } from '@/components/Auth/LoginForm'
+import { LoginMain } from '@/components/Auth/LoginMain'
 
 export default function LoginPage() {
   return (
-    <div className="w-full h-screen flex items-center overflow-hidden relative">
+    <LoginMain>
       <LoginForm />
-    </div>
+    </LoginMain>
   )
 }

@@ -42,7 +42,7 @@ export function LoginForm() {
   }
 
   return (
-    <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-7 shadow-input bg-white dark:bg-black">
+    <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-7 shadow-input bg-white dark:bg-black relative z-10">
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
         Welcome back
       </h2>
@@ -60,6 +60,7 @@ export function LoginForm() {
             placeholder="test@gmail.com"
             type="email"
             {...register('email')}
+            autoComplete="off"
           />
           {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
         </LabelInputContainer>
@@ -70,6 +71,7 @@ export function LoginForm() {
             placeholder="••••••••"
             type="password"
             {...register('password')}
+            autoComplete="off"
           />
           {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
         </LabelInputContainer>

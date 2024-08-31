@@ -80,12 +80,21 @@ const config = {
         'float': {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-1.25rem)' }
+        },
+        'aurora': {
+          from: {
+            backgroundPosition: '50% 50%, 50% 50%'
+          },
+          to: {
+            backgroundPosition: '350% 50%, 350% 50%'
+          }
         }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        'float': 'float 3s ease infinite'
+        'float': 'float 3s ease infinite',
+        'aurora': 'aurora 60s linear infinite'
       },
       transitionDuration: {
         '250': '250ms'
