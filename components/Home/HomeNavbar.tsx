@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import * as React from 'react'
 
+import HyperText from '@/components/magicui/hyper-text'
 import { Navbar } from '@/types'
 
 export default function HomeNavbar({ navItems }: { navItems: Navbar[] }) {
@@ -11,7 +12,9 @@ export default function HomeNavbar({ navItems }: { navItems: Navbar[] }) {
 
   return (
     <nav className="w-full h-16 fixed top-[.5rem] z-[1000] flex items-center justify-between">
-      <div className="w-1/3 text-[1.75rem] uppercase font-bold ml-[2rem]">cofee td.</div>
+      <div className="w-1/3 ml-[2rem]">
+        <HyperText className='text-[1.75rem] uppercase font-bold font-sans' text='cofee td.' />
+      </div>
       <div className="w-1/3 flex justify-center">
         <div className="flex items-center gap-6">
           {navItems.map(({ name, href }) => (

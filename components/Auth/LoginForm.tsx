@@ -11,6 +11,7 @@ import { setToken } from '@/lib/auth'
 import { cn } from '@/lib/utils'
 import { LoginFormData } from '@/types'
 
+import { BorderBeam } from '../magicui/border-beam'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 
@@ -42,7 +43,7 @@ export function LoginForm() {
   }
 
   return (
-    <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-7 shadow-input bg-white dark:bg-black relative z-10">
+    <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-7 shadow-input bg-transparent backdrop-filter backdrop-blur-lg bg-opacity-30 border border-gray-200 dark:border-gray-800 relative z-10">
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
         Welcome back
       </h2>
@@ -87,6 +88,7 @@ export function LoginForm() {
           <BottomGradient />
         </button>
       </form>
+      <BorderBeam size={120} duration={12} delay={9} />
     </div>
   )
 }

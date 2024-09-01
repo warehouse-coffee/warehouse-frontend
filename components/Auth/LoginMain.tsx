@@ -3,11 +3,12 @@
 import { motion } from 'framer-motion'
 import * as React from 'react'
 
-import { BackgroundBeams } from '../ui/background-beams'
+import DotPattern from '@/components/magicui/dot-pattern'
+import { cn } from '@/lib/utils'
 
 export function LoginMain({ children }: { children: React.ReactNode }) {
   return (
-    <div className="w-full min-h-screen rounded-md bg-neutral-950 relative flex flex-col items-center justify-center">
+    <div className="w-full min-h-screen overflow-hidden rounded-md bg-neutral-950 relative flex flex-col items-center justify-center">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -15,7 +16,11 @@ export function LoginMain({ children }: { children: React.ReactNode }) {
       >
         {children}
       </motion.div>
-      <BackgroundBeams />
+      <DotPattern
+        className={cn(
+          '[mask-image:radial-gradient(300px_circle_at_center,white,transparent)]'
+        )}
+      />
     </div>
   )
 }
