@@ -18,6 +18,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
       defaultTheme="dark"
       storageKey="auth-theme"
     >
+      {children}
     </ThemeProvider>
   )
 }
