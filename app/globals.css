@@ -59,7 +59,7 @@
   }
 
   * {
-    @apply border-border;
+    @apply border-border focus:outline-none focus:ring-0;
   }
 
   body {

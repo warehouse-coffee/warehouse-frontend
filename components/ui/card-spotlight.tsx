@@ -1,14 +1,15 @@
-"use client";
+'use client'
 
-import { useMotionValue, motion, useMotionTemplate } from "framer-motion";
-import React, { MouseEvent as ReactMouseEvent, useState } from "react";
-import { CanvasRevealEffect } from "@/components/ui/canvas-reveal-effect";
-import { cn } from "@/lib/utils";
+import { useMotionValue, motion, useMotionTemplate } from 'framer-motion'
+import React, { MouseEvent as ReactMouseEvent, useState } from 'react'
+
+import { CanvasRevealEffect } from '@/components/ui/canvas-reveal-effect'
+import { cn } from '@/lib/utils'
 
 export const CardSpotlight = ({
   children,
   radius = 350,
-  color = "#262626",
+  color = '#262626',
   className,
   ...props
 }: {
@@ -16,26 +17,26 @@ export const CardSpotlight = ({
   color?: string;
   children: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>) => {
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
+  const mouseX = useMotionValue(0)
+  const mouseY = useMotionValue(0)
   function handleMouseMove({
     currentTarget,
     clientX,
-    clientY,
+    clientY
   }: ReactMouseEvent<HTMLDivElement>) {
-    let { left, top } = currentTarget.getBoundingClientRect();
+    let { left, top } = currentTarget.getBoundingClientRect()
 
-    mouseX.set(clientX - left);
-    mouseY.set(clientY - top);
+    mouseX.set(clientX - left)
+    mouseY.set(clientY - top)
   }
 
-  const [isHovering, setIsHovering] = useState(false);
-  const handleMouseEnter = () => setIsHovering(true);
-  const handleMouseLeave = () => setIsHovering(false);
+  const [isHovering, setIsHovering] = useState(false)
+  const handleMouseEnter = () => setIsHovering(true)
+  const handleMouseLeave = () => setIsHovering(false)
   return (
     <div
       className={cn(
-        "group/spotlight p-10 rounded-md relative border border-neutral-800 bg-black dark:border-neutral-800",
+        'group/spotlight p-10 rounded-md relative border border-neutral-800 bg-black dark:border-neutral-800',
         className
       )}
       onMouseMove={handleMouseMove}
@@ -44,7 +45,7 @@ export const CardSpotlight = ({
       {...props}
     >
       <motion.div
-        className="pointer-events-none absolute z-0 -inset-px rounded-md opacity-0 transition duration-300 group-hover/spotlight:opacity-100"
+        className="pointer-events-none absolute z-0 -inset-px rounded-md opacity-0 transition duration-250 group-hover/spotlight:opacity-100"
         style={{
           backgroundColor: color,
           maskImage: useMotionTemplate`
@@ -53,7 +54,7 @@ export const CardSpotlight = ({
               white,
               transparent 80%
             )
-          `,
+          `
         }}
       >
         {isHovering && (
@@ -62,7 +63,7 @@ export const CardSpotlight = ({
             containerClassName="bg-transparent absolute inset-0 pointer-events-none"
             colors={[
               [59, 130, 246],
-              [139, 92, 246],
+              [139, 92, 246]
             ]}
             dotSize={3}
           />
@@ -70,5 +71,5 @@ export const CardSpotlight = ({
       </motion.div>
       {children}
     </div>
-  );
-};
+  )
+}

@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import { ThemeProvider } from 'next-themes'
 import React from 'react'
 
 import { fontSans, fontItaliana } from '@/lib/fonts'
@@ -23,9 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
         suppressHydrationWarning
       >
-        <ThemeProvider attribute="class" defaultTheme="dark">
-          {children}
-        </ThemeProvider>
+        {children}
       </body>
     </html>
   )
