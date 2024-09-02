@@ -3,7 +3,7 @@ import React from 'react'
 import DashboardMain from '@/components/Dashboard/DashboardMain'
 import { ThemeProvider } from '@/components/ThemeProvider'
 
-export default function MainLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider
       attribute="class"
