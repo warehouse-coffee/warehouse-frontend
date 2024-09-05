@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { loginSchema } from '../config/ZodSchema'
+import { loginSchema } from '../config/zod-schema'
 
 export type Navbar = {
   name: string

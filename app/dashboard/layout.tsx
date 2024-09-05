@@ -1,7 +1,7 @@
 import React from 'react'
 
-import DashboardMain from '@/components/Dashboard/DashboardMain'
-import { ThemeProvider } from '@/components/ThemeProvider'
+import DashboardMain from '@/components/dashboard/dashboard-main'
+import { ThemeProvider } from '@/components/theme-provider'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (

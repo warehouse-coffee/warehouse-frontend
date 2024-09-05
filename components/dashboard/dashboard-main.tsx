@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react'
 
-import DashboardHeader from './DashboardHeader'
-import DashboardSidebar from './DashboardSidebar'
+import DashboardHeader from './dashboard-header'
+import DashboardSidebar from './dashboard-sidebar'
 
 export default function DashboardMain({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true)

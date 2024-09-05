@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { ThemeProvider } from '@/components/ThemeProvider'
+import { ThemeProvider } from '@/components/theme-provider'
 
 interface AuthLayoutProps {
   children: React.ReactNode

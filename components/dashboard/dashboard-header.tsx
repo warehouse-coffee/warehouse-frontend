@@ -1,7 +1,7 @@
 import { PanelRight, PanelLeftClose, Bell, LogOut, User, Settings } from 'lucide-react'
 import React from 'react'
 
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
@@ -13,8 +13,10 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
+import { useAuth } from '@/hooks/useAuth'
 
 export default function DashboardHeader({ toggleSidebar, sidebarOpen }: { toggleSidebar: () => void, sidebarOpen: boolean }) {
+  const { userInfo } = useAuth()
   return (
     <header className="flex items-center justify-between p-4 border-b dark:border-b-[#202020] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex items-center space-x-4">
@@ -46,7 +48,7 @@ export default function DashboardHeader({ toggleSidebar, sidebarOpen }: { toggle
               <div className="flex flex-col space-y-2">
                 <p className="text-sm font-medium leading-none">John Doe</p>
                 <p className="text-xs leading-none text-gray-500 dark:text-[#8a8a8a]">
-                  john@example.com
+                  {userInfo?.email}
                 </p>
               </div>
             </DropdownMenuLabel>

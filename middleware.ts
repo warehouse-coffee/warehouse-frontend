@@ -1,30 +1,29 @@
+import { jwtDecode } from 'jwt-decode'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-import { isTokenValid } from '@/lib/auth'
-
 const protectedRoutes = ['/dashboard']
-// const publicRoutes = ['/login', '/']
 
-export function middleware(req: NextRequest) {
-  const path = req.nextUrl.pathname
+export function middleware(request: NextRequest) {
+  const path = request.nextUrl.pathname
   const isProtectedRoute = protectedRoutes.includes(path)
-  // const isPublicRoute = publicRoutes.includes(path)
-
-  if (process.env.NODE_ENV === 'development') {
-    return NextResponse.next()
-  }
 
   if (isProtectedRoute) {
-    const token = req.cookies.get('token')?.value
-    if (!token || !isTokenValid()) {
-      return NextResponse.redirect(new URL('/login', req.url))
+    const token = request.cookies.get('token')?.value
+    if (!token) return NextResponse.redirect(new URL('/login', request.url))
+
+    try {
+      const decodedToken = jwtDecode(token)
+      if (decodedToken.exp && Date.now() >= decodedToken.exp * 1000) return NextResponse.redirect(new URL('/login', request.url))
+    } catch (error) {
+      return NextResponse.redirect(new URL('/login', request.url))
     }
   }
-
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*']
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|assets|images|icons|fonts|css|js|robots.txt|favicon.ico|login).*)'
+  ]
 }

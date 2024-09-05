@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import React from 'react'
 
+import { Toaster } from '@/components/ui/toaster'
 import { fontSans, fontItaliana } from '@/lib/fonts'
 import { cn } from '@/lib/utils'
 
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         suppressHydrationWarning
       >
         {children}
+        <Toaster />
       </body>
     </html>
   )

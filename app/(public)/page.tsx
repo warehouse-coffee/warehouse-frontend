@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 import Icon from '@/components/Icon'
-import ThreeDModel from '@/components/ThreeDModel'
+import ThreeDModel from '@/components/threed-model'
 import { FlipWords } from '@/components/ui/flip-words'
 import { ShootingStars } from '@/components/ui/shooting-stars'
 import { StarsBackground } from '@/components/ui/stars-background'

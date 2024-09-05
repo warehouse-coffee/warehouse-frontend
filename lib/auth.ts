@@ -1,41 +1,86 @@
-import { jwtDecode } from 'jwt-decode'
+import axios from 'axios'
+import { jwtDecode, JwtPayload } from 'jwt-decode'
 
-export interface DecodedToken {
-  exp: number;
-  [key: string]: any;
+// const TOKEN_EXPIRATION_TIME = 3600
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'
+
+export interface UserInfo extends JwtPayload {
+  email?: string;
+  role?: string;
 }
 
-export const setToken = (token: string) => {
-  localStorage.setItem('token', token)
-}
+const api = axios.create({
+  baseURL: API_URL,
+  withCredentials: true
+})
 
-export const getToken = (): string | null => {
-  return localStorage.getItem('token')
-}
-
-export const removeToken = () => {
-  localStorage.removeItem('token')
-}
-
-export const isTokenValid = (): boolean => {
-  const token = getToken()
-  if (!token) return false
-
+export async function login(email: string, password: string): Promise<UserInfo> {
   try {
-    const decodedToken = jwtDecode<DecodedToken>(token)
-    return decodedToken.exp * 1000 > Date.now()
-  } catch {
-    return false
+    const response = await api.post('/login', { email, password })
+    if (response.status !== 200 || !response.data.user) {
+      throw new Error(response.data.error || 'Login Failed!!!')
+    }
+    const userInfo = response.data.user
+    setUserInfo(userInfo)
+    return userInfo
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.error || 'Login Failed!!!')
+    }
+    throw error
   }
 }
 
-export const getDecodedToken = (): DecodedToken | null => {
-  const token = getToken()
-  if (!token) return null
+export async function logout(): Promise<void> {
+  await api.post('/logout')
+  removeUserInfo()
+}
 
+export async function refreshToken(): Promise<void> {
   try {
-    return jwtDecode<DecodedToken>(token)
-  } catch {
-    return null
+    const response = await api.post('/refresh-token')
+    const userInfo = jwtDecode<UserInfo>(response.data.token)
+    setUserInfo(userInfo)
+  } catch (error) {
+    removeUserInfo()
+    throw error
   }
 }
+
+export function setUserInfo(userInfo: UserInfo): void {
+  sessionStorage.setItem('userInfo', JSON.stringify(userInfo))
+}
+
+export function getUserInfo(): UserInfo | null {
+  const userInfoString = sessionStorage.getItem('userInfo')
+  return userInfoString ? JSON.parse(userInfoString) : null
+}
+
+export function removeUserInfo(): void {
+  sessionStorage.removeItem('userInfo')
+}
+
+export function isTokenValid(): boolean {
+  const userInfo = getUserInfo()
+  if (!userInfo || !userInfo.exp) return false
+  const currentTime = Math.floor(Date.now() / 1000)
+  return currentTime < userInfo.exp
+}
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true
+      try {
+        await refreshToken()
+        return api(originalRequest)
+      } catch (refreshError) {
+        removeUserInfo()
+        throw refreshError
+      }
+    }
+    return Promise.reject(error)
+  }
+)

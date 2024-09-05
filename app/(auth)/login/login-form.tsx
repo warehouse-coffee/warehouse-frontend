@@ -1,28 +1,30 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import axios from 'axios'
-import { useRouter } from 'next/navigation'
+import { Eye, EyeOff, TriangleAlert } from 'lucide-react'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
-import { loginSchema } from '@/config/ZodSchema'
-import { setToken } from '@/lib/auth'
+import { BorderBeam } from '@/components/magicui/border-beam'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Loader } from '@/components/ui/loader'
+import { loginSchema } from '@/config/zod-schema'
+import { useToast } from '@/hooks/useToast'
+import { login } from '@/lib/auth'
 import { cn } from '@/lib/utils'
 import { LoginFormData } from '@/types'
 
-import { BorderBeam } from '../magicui/border-beam'
-import { Input } from '../ui/input'
-import { Label } from '../ui/label'
-
 export function LoginForm() {
   const [error, setError] = useState('')
-  const router = useRouter()
+  const [showPassword, setShowPassword] = useState(false)
+  const { toast } = useToast()
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting },
+    reset
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema)
   })
@@ -30,16 +32,25 @@ export function LoginForm() {
   const onSubmit = async (data: LoginFormData) => {
     setError('')
     try {
-      const response = await axios.post('/api/login', data)
-      setToken(response.data.token)
-      router.push('/dashboard')
+      const userInfo = await login(data.email, data.password)
+      toast({
+        title: 'Login successful',
+        description: 'Welcome to the dashboard'
+      })
+      window.location.href = '/dashboard'
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        setError(error.response?.data?.error || 'An error occurred during login')
+      if (error instanceof Error) {
+        setError(error.message || 'Login failed. Please check your credentials.')
       } else {
         setError('An unexpected error occurred')
       }
+    } finally {
+      reset({ password: '' })
     }
+  }
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword)
   }
 
   return (
@@ -51,7 +62,15 @@ export function LoginForm() {
         Please enter your login information to continue.
       </p>
 
-      {error && <p className="text-red-500 mt-4">{error}</p>}
+      {
+        error &&
+        <div className="w-full h-11 flex items-center gap-[.6rem] px-4 rounded-md bg-[#ff000025] mt-4">
+          <TriangleAlert className='w-4 h-4 text-red-500' />
+          <p className='text-red-500 font-medium text-sm'>
+            {error}
+          </p>
+        </div>
+      }
 
       <form className='mt-8' onSubmit={handleSubmit(onSubmit)}>
         <LabelInputContainer className="mb-4">
@@ -67,24 +86,38 @@ export function LoginForm() {
         </LabelInputContainer>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            placeholder="••••••••"
-            type="password"
-            {...register('password')}
-            autoComplete="off"
-          />
+          <div className="relative">
+            <Input
+              id="password"
+              placeholder="••••••••"
+              type={showPassword ? 'text' : 'password'}
+              {...register('password')}
+              autoComplete="off"
+              className='pr-[2.8rem]'
+            />
+            <button
+              type="button"
+              onClick={togglePasswordVisibility}
+              className="absolute inset-y-0 right-0 pr-[1.25rem] flex items-center text-sm leading-5"
+            >
+              {showPassword ? <EyeOff className="h-4 w-4 text-[#fff]" /> : <Eye className="h-4 w-4 text-[#fff]" />}
+            </button>
+          </div>
           {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
         </LabelInputContainer>
         <button
           className={cn(
-            'bg-gradient-to-br mt-6 relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-[.95rem] text-white rounded-md h-11 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]',
-            isSubmitting && 'opacity-50 cursor-not-allowed'
+            'bg-gradient-to-br mt-6 relative flex items-center gap-4 justify-center group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 dark:bg-zinc-800 w-full text-[.95rem] text-white rounded-md h-11 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]',
+            isSubmitting && 'cursor-not-allowed'
           )}
           type="submit"
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Logging in...' : 'Login'}
+          {isSubmitting ? (
+            <Loader size='1.35rem' />
+          ) : (
+            'Login'
+          )}
           <BottomGradient />
         </button>
       </form>

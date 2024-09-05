@@ -1,8 +1,8 @@
 import * as React from 'react'
 
-import HomeNavbar from '@/components/Home/HomeNavbar'
-import PageWrapper from '@/components/PageWrapper'
-import { ThemeProvider } from '@/components/ThemeProvider'
+import HomeNavbar from '@/components/home/home-navbar'
+import PageWrapper from '@/components/page-wrapper'
+import { ThemeProvider } from '@/components/theme-provider'
 
 interface HomeLayoutProps {
   children: React.ReactNode
