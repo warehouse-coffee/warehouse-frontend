@@ -1,38 +1,55 @@
-import { useState, useEffect } from 'react'
+'use client'
 
-import { getUserInfo, isTokenValid, removeUserInfo, refreshToken } from '@/lib/auth'
-import { UserInfo } from '@/lib/auth'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+
+import { useAuthStore } from '@/stores/auth-store'
 
 export function useAuth() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
+  const router = useRouter()
+  const { isAuthenticated, userInfo, setAuth, clearAuth } = useAuthStore()
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      if (isTokenValid()) {
-        setIsAuthenticated(true)
-        const info = getUserInfo()
-        setUserInfo(info)
+  const checkAuth = async () => {
+    try {
+      const response = await fetch('/api/auth/check', {
+        credentials: 'include'
+      })
+      const data = await response.json()
+      if (data.isAuthenticated) {
+        setAuth(true, data.userInfo)
+        localStorage.removeItem('hasShownExpiredMessage')
+        return true
       } else {
-        try {
-          await refreshToken()
-          setIsAuthenticated(true)
-          const info = getUserInfo()
-          setUserInfo(info)
-        } catch (error) {
-          setIsAuthenticated(false)
-          setUserInfo(null)
-          removeUserInfo()
-          window.location.href = '/login'
+        clearAuth()
+        const wasAuthenticated = localStorage.getItem('wasAuthenticated')
+        if (wasAuthenticated) {
+          const hasShownExpiredMessage = localStorage.getItem('hasShownExpiredMessage')
+          if (!hasShownExpiredMessage) {
+            toast.error('Your session has expired. Please log in again.', {
+              duration: 3000
+            })
+            localStorage.setItem('hasShownExpiredMessage', 'true')
+          }
         }
       }
+    } catch (error) {
+      console.error('Error checking auth:', error)
+      clearAuth()
+      return false
     }
+  }
 
-    checkAuth()
-    const intervalId = setInterval(checkAuth, 60000)
+  const initAuth = async () => {
+    const isAuth = await checkAuth()
+    if (isAuth && window.location.pathname === '/login') {
+      router.replace('/dashboard')
+    }
+  }
 
-    return () => clearInterval(intervalId)
-  }, [])
+  const clearExpiredMessage = () => {
+    localStorage.removeItem('hasShownExpiredMessage')
+    localStorage.setItem('wasAuthenticated', 'true')
+  }
 
-  return { isAuthenticated, userInfo }
+  return { isAuthenticated, userInfo, clearExpiredMessage, checkAuth, initAuth }
 }

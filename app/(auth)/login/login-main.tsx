@@ -1,7 +1,5 @@
-'use client'
-
 import { motion } from 'framer-motion'
-import * as React from 'react'
+import React from 'react'
 
 import DotPattern from '@/components/magicui/dot-pattern'
 import { cn } from '@/lib/utils'

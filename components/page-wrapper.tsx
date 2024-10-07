@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { usePathname } from 'next/navigation'
-import * as React from 'react'
+import React from 'react'
 
 export default function PageWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()

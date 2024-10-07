@@ -1,24 +1,26 @@
-'use client'
-
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff, TriangleAlert } from 'lucide-react'
+// import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 
 import { BorderBeam } from '@/components/magicui/border-beam'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader } from '@/components/ui/loader'
-import { loginSchema } from '@/config/zod-schema'
-import { useToast } from '@/hooks/useToast'
-import { login } from '@/lib/auth'
+import { loginSchema } from '@/configs/zod-schema'
+// import { useToast } from '@/hooks/useToast'
+import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
 import { LoginFormData } from '@/types'
 
 export function LoginForm() {
   const [error, setError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const { toast } = useToast()
+  // const router = useRouter()
+  const { clearExpiredMessage, checkAuth } = useAuth()
+  // const { toast } = useToast()
 
   const {
     register,
@@ -32,18 +34,31 @@ export function LoginForm() {
   const onSubmit = async (data: LoginFormData) => {
     setError('')
     try {
-      const userInfo = await login(data.email, data.password)
-      toast({
-        title: 'Login successful',
-        description: 'Welcome to the dashboard'
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
       })
-      window.location.href = '/dashboard'
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message || 'Login failed. Please check your credentials.')
+
+      const result = await response.json()
+
+      if (response.ok) {
+        clearExpiredMessage()
+        await checkAuth()
+
+        toast.success('Login successful', {
+          description: 'Redirecting to dashboard...',
+          duration: 3000
+        })
+        // router.push('/dashboard')
+        window.location.href = '/dashboard'
       } else {
-        setError('An unexpected error occurred')
+        setError(result.error || 'Login failed. Please check your credentials.')
       }
+    } catch (error) {
+      setError('An unexpected error occurred')
     } finally {
       reset({ password: '' })
     }
@@ -62,22 +77,21 @@ export function LoginForm() {
         Please enter your login information to continue.
       </p>
 
-      {
-        error &&
+      {error && (
         <div className="w-full h-11 flex items-center gap-[.6rem] px-4 rounded-md bg-[#ff000025] mt-4">
           <TriangleAlert className='w-4 h-4 text-red-500' />
           <p className='text-red-500 font-medium text-sm'>
             {error}
           </p>
         </div>
-      }
+      )}
 
       <form className='mt-8' onSubmit={handleSubmit(onSubmit)}>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="email">Email Address</Label>
           <Input
             id="email"
-            placeholder="test@gmail.com"
+            placeholder="user@example.com"
             type="email"
             {...register('email')}
             autoComplete="off"
@@ -92,7 +106,7 @@ export function LoginForm() {
               placeholder="••••••••"
               type={showPassword ? 'text' : 'password'}
               {...register('password')}
-              autoComplete="off"
+              autoComplete="current-password"
               className='pr-[2.8rem]'
             />
             <button
