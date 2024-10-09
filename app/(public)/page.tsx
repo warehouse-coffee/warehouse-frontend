@@ -1,10 +1,12 @@
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 
 import Icon from '@/components/Icon'
-import ThreeDModel from '@/components/threed-model'
 import { FlipWords } from '@/components/ui/flip-words'
 import { ShootingStars } from '@/components/ui/shooting-stars'
 import { StarsBackground } from '@/components/ui/stars-background'
+
+const ThreeDModel = dynamic(() => import('@/components/threed-model'), { ssr: false })
 
 const wordToFlip = [
   'management',

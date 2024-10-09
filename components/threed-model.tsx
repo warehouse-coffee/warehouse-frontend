@@ -1,8 +1,9 @@
 'use client'
 
 import Spline from '@splinetool/react-spline'
+import React from 'react'
 
-export default function ThreeDModel({ className, scene }: { className: string, scene: string }) {
+const ThreeDModel = ({ className, scene }: { className: string, scene: string }) => {
   return (
     <div className={className}>
       <Spline
@@ -12,3 +13,5 @@ export default function ThreeDModel({ className, scene }: { className: string, s
     </div>
   )
 }
+
+export default React.memo(ThreeDModel)
