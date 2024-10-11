@@ -7,6 +7,8 @@ import {
   BreadcrumbSeparator
 } from '@/components/ui/breadcrumb'
 
+import { UsersDataTable } from './users-data-table'
+
 export default function UsersPage() {
   return (
     <>
@@ -21,6 +23,15 @@ export default function UsersPage() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
+      <div className="mt-[.5rem]">
+        <div className="flex flex-col gap-[.3rem]">
+          <h1 className="text-[1.5rem] font-bold">Users Management</h1>
+          <p className="text-[.85rem] text-muted-foreground">
+            Manage users and assign their roles effectively here.
+          </p>
+        </div>
+      </div>
+      <UsersDataTable />
     </>
   )
 }

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { setAuthCookie } from '@/lib/auth'
 
-import { IdentityUserClient, SignInCommand } from './web-api-client'
+import { IdentityUserClient, SignInCommand } from '../../web-api-client'
 
 export async function POST(request: Request) {
   try {
