@@ -9,7 +9,7 @@ import {
 
 export default function LogsPage() {
   return (
-    <div>
+    <>
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -21,6 +21,14 @@ export default function LogsPage() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-    </div>
+      <div className="mt-[.5rem]">
+        <div className="flex flex-col gap-[.3rem]">
+          <h1 className="text-[1.5rem] font-bold">Logs Management</h1>
+          <p className="text-[.85rem] text-muted-foreground">
+            View and manage system logs here.
+          </p>
+        </div>
+      </div>
+    </>
   )
 }

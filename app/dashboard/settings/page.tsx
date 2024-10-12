@@ -9,7 +9,7 @@ import {
 
 export default function SettingsPage() {
   return (
-    <div>
+    <>
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -21,6 +21,14 @@ export default function SettingsPage() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-    </div>
+      <div className="mt-[.5rem]">
+        <div className="flex flex-col gap-[.3rem]">
+          <h1 className="text-[1.5rem] font-bold">Settings Management</h1>
+          <p className="text-[.85rem] text-muted-foreground">
+            Configure system settings here.
+          </p>
+        </div>
+      </div>
+    </>
   )
 }

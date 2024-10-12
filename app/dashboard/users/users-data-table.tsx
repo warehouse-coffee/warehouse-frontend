@@ -63,7 +63,7 @@ type User = {
 const data: User[] = [
   {
     id: '728ed52f',
-    avatar: 'https://github.com/shadcn.png',
+    avatar: 'https://cdn.tuoitre.vn/zoom/700_700/471584752817336320/2024/6/3/doraemon-3-17173722166781704981911-30-9-657-1207-crop-1717372336444425413969.jpeg',
     username: 'john_doe',
     email: 'john@example.com',
     status: 'active',
@@ -71,7 +71,7 @@ const data: User[] = [
   },
   {
     id: '489e1d42',
-    avatar: 'https://github.com/shadcn.png',
+    avatar: 'https://cdn.tuoitre.vn/zoom/700_700/471584752817336320/2024/6/3/doraemon-3-17173722166781704981911-30-9-657-1207-crop-1717372336444425413969.jpeg',
     username: 'jane_smith',
     email: 'jane@example.com',
     status: 'inactive',
@@ -79,7 +79,7 @@ const data: User[] = [
   },
   {
     id: '21312asd',
-    avatar: 'https://github.com/shadcn.png',
+    avatar: 'https://cdn.tuoitre.vn/zoom/700_700/471584752817336320/2024/6/3/doraemon-3-17173722166781704981911-30-9-657-1207-crop-1717372336444425413969.jpeg',
     username: 'test',
     email: 'test@example.com',
     status: 'inactive',
@@ -87,7 +87,7 @@ const data: User[] = [
   },
   {
     id: '123123',
-    avatar: 'https://github.com/shadcn.png',
+    avatar: 'https://cdn.tuoitre.vn/zoom/700_700/471584752817336320/2024/6/3/doraemon-3-17173722166781704981911-30-9-657-1207-crop-1717372336444425413969.jpeg',
     username: 'test2',
     email: 'test2@example.com',
     status: 'inactive',
@@ -95,7 +95,7 @@ const data: User[] = [
   },
   {
     id: 'asdvzxc1',
-    avatar: 'https://github.com/shadcn.png',
+    avatar: 'https://cdn.tuoitre.vn/zoom/700_700/471584752817336320/2024/6/3/doraemon-3-17173722166781704981911-30-9-657-1207-crop-1717372336444425413969.jpeg',
     username: 'test3',
     email: 'test3@example.com',
     status: 'inactive',

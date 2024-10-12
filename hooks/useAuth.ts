@@ -15,6 +15,7 @@ export function useAuth() {
         credentials: 'include'
       })
       const data = await response.json()
+      // console.log('data', data)
       if (data.isAuthenticated) {
         setAuth(true, data.userInfo)
         localStorage.removeItem('hasShownExpiredMessage')
