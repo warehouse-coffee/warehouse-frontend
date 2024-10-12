@@ -1,6 +1,5 @@
 'use client'
 
-// import { useRouter } from 'next/navigation'
 import React, { useState, useEffect } from 'react'
 
 import DashboardMain from '@/components/dashboard/dashboard-main'
@@ -11,14 +10,13 @@ import { useAuth } from '@/hooks/useAuth'
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const { initAuth } = useAuth()
-  // const router = useRouter()
 
   useEffect(() => {
     const initializeApp = async () => {
       try {
         await initAuth()
       } catch (error) {
-        console.error('Lỗi khi khởi tạo ứng dụng:', error)
+        // console.error('Lỗi khi khởi tạo ứng dụng:', error)
       } finally {
         setIsLoading(false)
       }

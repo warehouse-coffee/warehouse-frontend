@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import React from 'react'
 
-// import { Toaster } from '@/components/ui/toaster'
+import Providers from '@/app/providers'
 import { Toaster } from '@/components/ui/sonner'
 import { fontSans, fontItaliana } from '@/lib/fonts'
 import { cn } from '@/lib/utils'
@@ -24,8 +24,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
         suppressHydrationWarning
       >
-        {children}
-        <Toaster position='bottom-right' richColors />
+        <Providers>
+          {children}
+        </Providers>
+        <Toaster position="bottom-right" richColors />
       </body>
     </html>
   )
