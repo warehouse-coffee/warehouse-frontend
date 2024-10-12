@@ -44,7 +44,6 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
-import { User } from '@/types'
 import {
   Table,
   TableBody,
@@ -53,6 +52,7 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
+import { User } from '@/types'
 
 const fetchUsers = async (): Promise<User[]> => {
   const response = await fetch('/api/dashboard/superadmin/users/list')
