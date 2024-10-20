@@ -1,8 +1,26 @@
 export type User = {
   id: string
+  companyId: string
   avatar: string
-  username: string
+  userName: string
   email: string
-  status: 'active' | 'inactive'
-  role: 'Admin' | 'Customer'
+  phoneNumber: string
+  roleName: 'Super-Admin' | 'Admin' | 'Customer'
+  isActive: boolean
+}
+
+export type UpdateUser = User & {
+  password: string
+}
+
+export type UserDetail = User & {
+  userId: string
+  name: string
+  phone: string
+  companyPhone: string
+  companyEmail: string
+  companyName: string
+  companyAddress: string
+  storages: Storage[]
+  imageFile: string
 }

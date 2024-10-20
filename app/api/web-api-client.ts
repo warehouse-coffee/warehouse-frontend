@@ -11,11 +11,13 @@
 export class Client {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
+    private token: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string) {
          this.http = http || { fetch: fetch as any };
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+        this.token = token || "";
     }
 
     getAntiforgeryToken(): Promise<void> {
@@ -25,6 +27,7 @@ export class Client {
         let options_: RequestInit = {
             method: "GET",
             headers: {
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -34,7 +37,7 @@ export class Client {
     }
 
     protected processGetAntiforgeryToken(response: Response): Promise<void> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -53,11 +56,13 @@ export class Client {
 export class AreasClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
+    private token: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string) {
          this.http = http || { fetch: fetch as any };
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+        this.token = token || "";
     }
 
     createArea(command: CreateAreaCommand): Promise<ResponseDto> {
@@ -71,7 +76,8 @@ export class AreasClient {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -81,7 +87,7 @@ export class AreasClient {
     }
 
     protected processCreateArea(response: Response): Promise<ResponseDto> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -103,11 +109,13 @@ export class AreasClient {
 export class CategoriesClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
+    private token: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string) {
          this.http = http || { fetch: fetch as any };
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+        this.token = token || "";
     }
 
     createCategory(command: CreateCategoryCommand): Promise<ResponseDto> {
@@ -121,7 +129,8 @@ export class CategoriesClient {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -131,7 +140,7 @@ export class CategoriesClient {
     }
 
     protected processCreateCategory(response: Response): Promise<ResponseDto> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -148,16 +157,54 @@ export class CategoriesClient {
         }
         return Promise.resolve<ResponseDto>(null as any);
     }
+
+    getCategoryList(): Promise<CategoryListVM> {
+        let url_ = this.baseUrl + "/api/Categories";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetCategoryList(_response);
+        });
+    }
+
+    protected processGetCategoryList(response: Response): Promise<CategoryListVM> {
+        
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = CategoryListVM.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<CategoryListVM>(null as any);
+    }
 }
 
 export class CompaniesClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
+    private token: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string) {
          this.http = http || { fetch: fetch as any };
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+        this.token = token || "";
     }
 
     createCompany(command: CreateCompanyCommand): Promise<ResponseDto> {
@@ -171,7 +218,8 @@ export class CompaniesClient {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -181,7 +229,7 @@ export class CompaniesClient {
     }
 
     protected processCreateCompany(response: Response): Promise<ResponseDto> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -206,7 +254,8 @@ export class CompaniesClient {
         let options_: RequestInit = {
             method: "GET",
             headers: {
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -216,7 +265,7 @@ export class CompaniesClient {
     }
 
     protected processGetCompanyList(response: Response): Promise<CompanyListVM> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -238,11 +287,13 @@ export class CompaniesClient {
 export class CompanyOwnerClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
+    private token: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string) {
          this.http = http || { fetch: fetch as any };
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+        this.token = token || "";
     }
 
     create(command: CreateCompanyOwnerCommand): Promise<ResponseDto> {
@@ -256,7 +307,8 @@ export class CompanyOwnerClient {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -266,7 +318,7 @@ export class CompanyOwnerClient {
     }
 
     protected processCreate(response: Response): Promise<ResponseDto> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -291,7 +343,8 @@ export class CompanyOwnerClient {
         let options_: RequestInit = {
             method: "GET",
             headers: {
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -301,7 +354,7 @@ export class CompanyOwnerClient {
     }
 
     protected processGetAll(response: Response): Promise<CompanyOwnerListVM> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -329,7 +382,8 @@ export class CompanyOwnerClient {
         let options_: RequestInit = {
             method: "GET",
             headers: {
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -339,7 +393,7 @@ export class CompanyOwnerClient {
     }
 
     protected processGetDetail(response: Response): Promise<CompanyOwnerDetailDto> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -371,7 +425,8 @@ export class CompanyOwnerClient {
         let options_: RequestInit = {
             method: "PUT",
             headers: {
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -381,7 +436,7 @@ export class CompanyOwnerClient {
     }
 
     protected processUpdate(response: Response): Promise<ResponseDto> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -409,7 +464,8 @@ export class CompanyOwnerClient {
         let options_: RequestInit = {
             method: "DELETE",
             headers: {
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -419,7 +475,7 @@ export class CompanyOwnerClient {
     }
 
     protected processDelete(response: Response): Promise<boolean> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -439,14 +495,69 @@ export class CompanyOwnerClient {
     }
 }
 
+export class ConfigurationsClient {
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
+    private token: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string) {
+         this.http = http || { fetch: fetch as any };
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+        this.token = token || "";
+    }
+
+    createConfig(command: CreateConfigCommand): Promise<ResponseDto> {
+        let url_ = this.baseUrl + "/api/Configurations";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(command);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processCreateConfig(_response);
+        });
+    }
+
+    protected processCreateConfig(response: Response): Promise<ResponseDto> {
+        
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResponseDto.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<ResponseDto>(null as any);
+    }
+}
+
 export class CustomersClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
+    private token: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string) {
          this.http = http || { fetch: fetch as any };
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+        this.token = token || "";
     }
 
     createCustomer(command: CreateCustomerCommand): Promise<ResponseDto> {
@@ -460,7 +571,8 @@ export class CustomersClient {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -470,7 +582,7 @@ export class CustomersClient {
     }
 
     protected processCreateCustomer(response: Response): Promise<ResponseDto> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -499,7 +611,8 @@ export class CustomersClient {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -509,7 +622,7 @@ export class CustomersClient {
     }
 
     protected processUpdateCustomer(response: Response): Promise<ResponseDto> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -534,7 +647,8 @@ export class CustomersClient {
         let options_: RequestInit = {
             method: "GET",
             headers: {
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -544,7 +658,7 @@ export class CustomersClient {
     }
 
     protected processGetListCustomer(response: Response): Promise<CustomerListVM> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -572,7 +686,8 @@ export class CustomersClient {
         let options_: RequestInit = {
             method: "GET",
             headers: {
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -582,7 +697,7 @@ export class CustomersClient {
     }
 
     protected processGetCustomerDetail(response: Response): Promise<CustomerDetailVM> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -610,7 +725,8 @@ export class CustomersClient {
         let options_: RequestInit = {
             method: "DELETE",
             headers: {
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -620,7 +736,7 @@ export class CustomersClient {
     }
 
     protected processDeleteCustomer(response: Response): Promise<boolean> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -643,11 +759,13 @@ export class CustomersClient {
 export class IdentityUserClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
+    private token: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string) {
          this.http = http || { fetch: fetch as any };
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+        this.token = token || "";
     }
 
     signIn(query: SignInCommand): Promise<SignInVm> {
@@ -661,7 +779,8 @@ export class IdentityUserClient {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -671,7 +790,7 @@ export class IdentityUserClient {
     }
 
     protected processSignIn(response: Response): Promise<SignInVm> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -700,7 +819,8 @@ export class IdentityUserClient {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -710,7 +830,7 @@ export class IdentityUserClient {
     }
 
     protected processResetPassword(response: Response): Promise<ResetPasswordVm> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -732,11 +852,13 @@ export class IdentityUserClient {
 export class OrdersClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
+    private token: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string) {
          this.http = http || { fetch: fetch as any };
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+        this.token = token || "";
     }
 
     importProduct(command: ImportStogareCommand): Promise<ResponseDto> {
@@ -750,7 +872,8 @@ export class OrdersClient {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -760,7 +883,7 @@ export class OrdersClient {
     }
 
     protected processImportProduct(response: Response): Promise<ResponseDto> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -789,7 +912,8 @@ export class OrdersClient {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -799,7 +923,7 @@ export class OrdersClient {
     }
 
     protected processGetList(response: Response): Promise<OrderListVM> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -827,7 +951,8 @@ export class OrdersClient {
         let options_: RequestInit = {
             method: "DELETE",
             headers: {
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -837,7 +962,7 @@ export class OrdersClient {
     }
 
     protected processDeleteOrder(response: Response): Promise<boolean> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -866,7 +991,8 @@ export class OrdersClient {
         let options_: RequestInit = {
             method: "GET",
             headers: {
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -876,7 +1002,7 @@ export class OrdersClient {
     }
 
     protected processGetOrderDetail(response: Response): Promise<OrderDetailVM> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -898,11 +1024,13 @@ export class OrdersClient {
 export class ProductsClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
+    private token: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string) {
          this.http = http || { fetch: fetch as any };
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+        this.token = token || "";
     }
 
     getProductList(): Promise<ProductListVM> {
@@ -912,7 +1040,8 @@ export class ProductsClient {
         let options_: RequestInit = {
             method: "GET",
             headers: {
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -922,7 +1051,7 @@ export class ProductsClient {
     }
 
     protected processGetProductList(response: Response): Promise<ProductListVM> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -944,11 +1073,13 @@ export class ProductsClient {
 export class StorageClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
+    private token: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string) {
          this.http = http || { fetch: fetch as any };
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+        this.token = token || "";
     }
 
     createStorage(command: CreateStorageCommand): Promise<ResponseDto> {
@@ -962,7 +1093,8 @@ export class StorageClient {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -972,7 +1104,7 @@ export class StorageClient {
     }
 
     protected processCreateStorage(response: Response): Promise<ResponseDto> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -997,7 +1129,8 @@ export class StorageClient {
         let options_: RequestInit = {
             method: "GET",
             headers: {
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -1007,7 +1140,7 @@ export class StorageClient {
     }
 
     protected processGetStorageList(response: Response): Promise<StorageListVM> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -1029,11 +1162,13 @@ export class StorageClient {
 export class SuperAdminClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
+    private token: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
-         this.http = http || { fetch: fetch as any };
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string) {
+        this.http = http || { fetch: fetch as any };
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+        this.token = token || "";
     }
 
     userRegister(command: CreateUserCommand): Promise<ResponseDto> {
@@ -1047,7 +1182,8 @@ export class SuperAdminClient {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -1057,7 +1193,7 @@ export class SuperAdminClient {
     }
 
     protected processUserRegister(response: Response): Promise<ResponseDto> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -1086,7 +1222,8 @@ export class SuperAdminClient {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -1096,7 +1233,7 @@ export class SuperAdminClient {
     }
 
     protected processUpdateUser(response: Response): Promise<ResponseDto> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -1117,21 +1254,22 @@ export class SuperAdminClient {
     getAllUsers(): Promise<UserListVm> {
         let url_ = this.baseUrl + "/api/SuperAdmin/user/all";
         url_ = url_.replace(/[?&]$/, "");
-
+    
         let options_: RequestInit = {
             method: "GET",
             headers: {
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
-
+    
         return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processGetAllUsers(_response);
         });
     }
 
     protected processGetAllUsers(response: Response): Promise<UserListVm> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -1159,7 +1297,8 @@ export class SuperAdminClient {
         let options_: RequestInit = {
             method: "GET",
             headers: {
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -1169,7 +1308,7 @@ export class SuperAdminClient {
     }
 
     protected processGetUserDetail(response: Response): Promise<UserVM> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -1197,7 +1336,8 @@ export class SuperAdminClient {
         let options_: RequestInit = {
             method: "DELETE",
             headers: {
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
@@ -1207,7 +1347,7 @@ export class SuperAdminClient {
     }
 
     protected processDeleteUser(response: Response): Promise<boolean> {
-
+        
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -1463,6 +1603,94 @@ export interface IProductDto {
     areaId?: number | undefined;
 }
 
+export class CategoryListVM implements ICategoryListVM {
+    categories?: CategoryDto2[];
+
+    constructor(data?: ICategoryListVM) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["categories"])) {
+                this.categories = [] as any;
+                for (let item of _data["categories"])
+                    this.categories!.push(CategoryDto2.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): CategoryListVM {
+        data = typeof data === 'object' ? data : {};
+        let result = new CategoryListVM();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.categories)) {
+            data["categories"] = [];
+            for (let item of this.categories)
+                data["categories"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface ICategoryListVM {
+    categories?: CategoryDto2[];
+}
+
+export class CategoryDto2 implements ICategoryDto2 {
+    id?: number;
+    name?: string | undefined;
+    companyId?: string | undefined;
+
+    constructor(data?: ICategoryDto2) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.companyId = _data["companyId"];
+        }
+    }
+
+    static fromJS(data: any): CategoryDto2 {
+        data = typeof data === 'object' ? data : {};
+        let result = new CategoryDto2();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["companyId"] = this.companyId;
+        return data;
+    }
+}
+
+export interface ICategoryDto2 {
+    id?: number;
+    name?: string | undefined;
+    companyId?: string | undefined;
+}
+
 export class CreateCompanyCommand implements ICreateCompanyCommand {
     companyId?: string;
     companyName?: string;
@@ -1699,6 +1927,7 @@ export class UserDto implements IUserDto {
     phoneNumber?: string | undefined;
     roleName?: string | undefined;
     isActived?: boolean;
+    storages?: Storage[] | undefined;
 
     constructor(data?: IUserDto) {
         if (data) {
@@ -1718,6 +1947,11 @@ export class UserDto implements IUserDto {
             this.phoneNumber = _data["phoneNumber"];
             this.roleName = _data["roleName"];
             this.isActived = _data["isActived"];
+            if (Array.isArray(_data["storages"])) {
+                this.storages = [] as any;
+                for (let item of _data["storages"])
+                    this.storages!.push(Storage.fromJS(item));
+            }
         }
     }
 
@@ -1737,6 +1971,11 @@ export class UserDto implements IUserDto {
         data["phoneNumber"] = this.phoneNumber;
         data["roleName"] = this.roleName;
         data["isActived"] = this.isActived;
+        if (Array.isArray(this.storages)) {
+            data["storages"] = [];
+            for (let item of this.storages)
+                data["storages"].push(item.toJSON());
+        }
         return data;
     }
 }
@@ -1749,6 +1988,379 @@ export interface IUserDto {
     phoneNumber?: string | undefined;
     roleName?: string | undefined;
     isActived?: boolean;
+    storages?: Storage[] | undefined;
+}
+
+export abstract class BaseEntity implements IBaseEntity {
+    id?: number;
+    domainEvents?: BaseEvent[];
+
+    constructor(data?: IBaseEntity) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            if (Array.isArray(_data["domainEvents"])) {
+                this.domainEvents = [] as any;
+                for (let item of _data["domainEvents"])
+                    this.domainEvents!.push(BaseEvent.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): BaseEntity {
+        data = typeof data === 'object' ? data : {};
+        throw new Error("The abstract class 'BaseEntity' cannot be instantiated.");
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        if (Array.isArray(this.domainEvents)) {
+            data["domainEvents"] = [];
+            for (let item of this.domainEvents)
+                data["domainEvents"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IBaseEntity {
+    id?: number;
+    domainEvents?: BaseEvent[];
+}
+
+export abstract class BaseAuditableEntity extends BaseEntity implements IBaseAuditableEntity {
+    created?: Date;
+    createdBy?: string | undefined;
+    lastModified?: Date;
+    lastModifiedBy?: string | undefined;
+    isDeleted?: boolean;
+
+    constructor(data?: IBaseAuditableEntity) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.created = _data["created"] ? new Date(_data["created"].toString()) : <any>undefined;
+            this.createdBy = _data["createdBy"];
+            this.lastModified = _data["lastModified"] ? new Date(_data["lastModified"].toString()) : <any>undefined;
+            this.lastModifiedBy = _data["lastModifiedBy"];
+            this.isDeleted = _data["isDeleted"];
+        }
+    }
+
+    static override fromJS(data: any): BaseAuditableEntity {
+        data = typeof data === 'object' ? data : {};
+        throw new Error("The abstract class 'BaseAuditableEntity' cannot be instantiated.");
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["created"] = this.created ? this.created.toISOString() : <any>undefined;
+        data["createdBy"] = this.createdBy;
+        data["lastModified"] = this.lastModified ? this.lastModified.toISOString() : <any>undefined;
+        data["lastModifiedBy"] = this.lastModifiedBy;
+        data["isDeleted"] = this.isDeleted;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+export interface IBaseAuditableEntity extends IBaseEntity {
+    created?: Date;
+    createdBy?: string | undefined;
+    lastModified?: Date;
+    lastModifiedBy?: string | undefined;
+    isDeleted?: boolean;
+}
+
+export class Storage extends BaseAuditableEntity implements IStorage {
+    name?: string;
+    location?: string;
+    status?: StorageStatus;
+    areas?: Area[] | undefined;
+
+    constructor(data?: IStorage) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.name = _data["name"];
+            this.location = _data["location"];
+            this.status = _data["status"];
+            if (Array.isArray(_data["areas"])) {
+                this.areas = [] as any;
+                for (let item of _data["areas"])
+                    this.areas!.push(Area.fromJS(item));
+            }
+        }
+    }
+
+    static override fromJS(data: any): Storage {
+        data = typeof data === 'object' ? data : {};
+        let result = new Storage();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["location"] = this.location;
+        data["status"] = this.status;
+        if (Array.isArray(this.areas)) {
+            data["areas"] = [];
+            for (let item of this.areas)
+                data["areas"].push(item.toJSON());
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+export interface IStorage extends IBaseAuditableEntity {
+    name?: string;
+    location?: string;
+    status?: StorageStatus;
+    areas?: Area[] | undefined;
+}
+
+export enum StorageStatus {
+    Active = 0,
+    UnderMaintenance = 1,
+    Inactive = 2,
+    Closed = 3,
+}
+
+export class Area extends BaseAuditableEntity implements IArea {
+    name?: string;
+    products?: Product[];
+
+    constructor(data?: IArea) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.name = _data["name"];
+            if (Array.isArray(_data["products"])) {
+                this.products = [] as any;
+                for (let item of _data["products"])
+                    this.products!.push(Product.fromJS(item));
+            }
+        }
+    }
+
+    static override fromJS(data: any): Area {
+        data = typeof data === 'object' ? data : {};
+        let result = new Area();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        if (Array.isArray(this.products)) {
+            data["products"] = [];
+            for (let item of this.products)
+                data["products"].push(item.toJSON());
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+export interface IArea extends IBaseAuditableEntity {
+    name?: string;
+    products?: Product[];
+}
+
+export class Product extends BaseAuditableEntity implements IProduct {
+    name?: string;
+    units?: string;
+    amount?: number;
+    image?: string | undefined;
+    status?: ProductStatus;
+    expiration?: Date;
+    importDate?: Date;
+    exportDate?: Date;
+    safeStock?: number;
+    categoryId?: number;
+    areaId?: number;
+    category?: Category | undefined;
+    area?: Area | undefined;
+    storageId?: number;
+    storage?: Storage | undefined;
+
+    constructor(data?: IProduct) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.name = _data["name"];
+            this.units = _data["units"];
+            this.amount = _data["amount"];
+            this.image = _data["image"];
+            this.status = _data["status"];
+            this.expiration = _data["expiration"] ? new Date(_data["expiration"].toString()) : <any>undefined;
+            this.importDate = _data["importDate"] ? new Date(_data["importDate"].toString()) : <any>undefined;
+            this.exportDate = _data["exportDate"] ? new Date(_data["exportDate"].toString()) : <any>undefined;
+            this.safeStock = _data["safeStock"];
+            this.categoryId = _data["categoryId"];
+            this.areaId = _data["areaId"];
+            this.category = _data["category"] ? Category.fromJS(_data["category"]) : <any>undefined;
+            this.area = _data["area"] ? Area.fromJS(_data["area"]) : <any>undefined;
+            this.storageId = _data["storageId"];
+            this.storage = _data["storage"] ? Storage.fromJS(_data["storage"]) : <any>undefined;
+        }
+    }
+
+    static override fromJS(data: any): Product {
+        data = typeof data === 'object' ? data : {};
+        let result = new Product();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["units"] = this.units;
+        data["amount"] = this.amount;
+        data["image"] = this.image;
+        data["status"] = this.status;
+        data["expiration"] = this.expiration ? this.expiration.toISOString() : <any>undefined;
+        data["importDate"] = this.importDate ? this.importDate.toISOString() : <any>undefined;
+        data["exportDate"] = this.exportDate ? this.exportDate.toISOString() : <any>undefined;
+        data["safeStock"] = this.safeStock;
+        data["categoryId"] = this.categoryId;
+        data["areaId"] = this.areaId;
+        data["category"] = this.category ? this.category.toJSON() : <any>undefined;
+        data["area"] = this.area ? this.area.toJSON() : <any>undefined;
+        data["storageId"] = this.storageId;
+        data["storage"] = this.storage ? this.storage.toJSON() : <any>undefined;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+export interface IProduct extends IBaseAuditableEntity {
+    name?: string;
+    units?: string;
+    amount?: number;
+    image?: string | undefined;
+    status?: ProductStatus;
+    expiration?: Date;
+    importDate?: Date;
+    exportDate?: Date;
+    safeStock?: number;
+    categoryId?: number;
+    areaId?: number;
+    category?: Category | undefined;
+    area?: Area | undefined;
+    storageId?: number;
+    storage?: Storage | undefined;
+}
+
+export enum ProductStatus {
+    Available = 0,
+    Sold = 1,
+    Reserved = 2,
+    Damaged = 3,
+    Expired = 4,
+}
+
+export class Category extends BaseAuditableEntity implements ICategory {
+    name?: string | undefined;
+    companyId?: string | undefined;
+    products?: Product[];
+
+    constructor(data?: ICategory) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.name = _data["name"];
+            this.companyId = _data["companyId"];
+            if (Array.isArray(_data["products"])) {
+                this.products = [] as any;
+                for (let item of _data["products"])
+                    this.products!.push(Product.fromJS(item));
+            }
+        }
+    }
+
+    static override fromJS(data: any): Category {
+        data = typeof data === 'object' ? data : {};
+        let result = new Category();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["companyId"] = this.companyId;
+        if (Array.isArray(this.products)) {
+            data["products"] = [];
+            for (let item of this.products)
+                data["products"].push(item.toJSON());
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+export interface ICategory extends IBaseAuditableEntity {
+    name?: string | undefined;
+    companyId?: string | undefined;
+    products?: Product[];
+}
+
+export abstract class BaseEvent implements IBaseEvent {
+
+    constructor(data?: IBaseEvent) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+    }
+
+    static fromJS(data: any): BaseEvent {
+        data = typeof data === 'object' ? data : {};
+        throw new Error("The abstract class 'BaseEvent' cannot be instantiated.");
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        return data;
+    }
+}
+
+export interface IBaseEvent {
 }
 
 export class CompanyOwnerDetailDto implements ICompanyOwnerDetailDto {
@@ -1895,13 +2507,6 @@ export interface IStorageDto {
     areas?: AreaDto[] | undefined;
 }
 
-export enum StorageStatus {
-    Active = 0,
-    UnderMaintenance = 1,
-    Inactive = 2,
-    Closed = 3,
-}
-
 export class AreaDto implements IAreaDto {
     name?: string | undefined;
 
@@ -2008,6 +2613,50 @@ export interface IUpdateCompanyOwnerCommand {
     companyId?: string | undefined;
     storages?: StorageDto[] | undefined;
     avatarImage?: string | undefined;
+}
+
+export class CreateConfigCommand implements ICreateConfigCommand {
+    webServiceUrl?: string | undefined;
+    aiServiceKey?: string | undefined;
+    emailServiceKey?: string | undefined;
+
+    constructor(data?: ICreateConfigCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.webServiceUrl = _data["webServiceUrl"];
+            this.aiServiceKey = _data["aiServiceKey"];
+            this.emailServiceKey = _data["emailServiceKey"];
+        }
+    }
+
+    static fromJS(data: any): CreateConfigCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateConfigCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["webServiceUrl"] = this.webServiceUrl;
+        data["aiServiceKey"] = this.aiServiceKey;
+        data["emailServiceKey"] = this.emailServiceKey;
+        return data;
+    }
+}
+
+export interface ICreateConfigCommand {
+    webServiceUrl?: string | undefined;
+    aiServiceKey?: string | undefined;
+    emailServiceKey?: string | undefined;
 }
 
 export class CreateCustomerCommand implements ICreateCustomerCommand {

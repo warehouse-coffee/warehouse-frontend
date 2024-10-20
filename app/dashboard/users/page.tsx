@@ -7,7 +7,7 @@ import {
   BreadcrumbSeparator
 } from '@/components/ui/breadcrumb'
 
-import { UsersDataTable } from './users-data-table'
+import UsersTable from './users-table'
 
 export default function UsersPage() {
   return (
@@ -31,7 +31,7 @@ export default function UsersPage() {
           </p>
         </div>
       </div>
-      <UsersDataTable />
+      <UsersTable />
     </>
   )
 }

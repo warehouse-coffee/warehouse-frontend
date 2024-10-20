@@ -30,6 +30,7 @@ export function useAuth() {
               duration: 3000
             })
             localStorage.setItem('hasShownExpiredMessage', 'true')
+            // window.location.reload()
           }
         }
       }

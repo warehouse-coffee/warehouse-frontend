@@ -2,9 +2,7 @@ import { jwtDecode, JwtPayload } from 'jwt-decode'
 import { NextResponse } from 'next/server'
 
 export interface UserInfo extends JwtPayload {
-  email?: string;
-  username: string;
-  role?: string;
+  role: string;
 }
 
 export function setAuthCookie(response: NextResponse, token: string) {
