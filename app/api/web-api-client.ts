@@ -12,44 +12,44 @@ export class Client {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
     private token: string;
+    private XSRF: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string) {
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string, XSRF?: string) {
          this.http = http || { fetch: fetch as any };
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
         this.token = token || "";
+        this.XSRF = XSRF || "";
     }
 
-    getAntiforgeryToken(): Promise<void> {
+    getAntiforgeryToken(): Promise<string> {
         let url_ = this.baseUrl + "/antiforgery/token";
         url_ = url_.replace(/[?&]$/, "");
-
+    
         let options_: RequestInit = {
             method: "GET",
             headers: {
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
-
+    
         return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processGetAntiforgeryToken(_response);
         });
     }
-
-    protected processGetAntiforgeryToken(response: Response): Promise<void> {
-        
+    
+    protected processGetAntiforgeryToken(response: Response): Promise<string> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
-            return response.text().then((_responseText) => {
-            return;
-            });
+            return response.text();
         } else if (status !== 200 && status !== 204) {
             return response.text().then((_responseText) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+                throw new Error("An unexpected server error occurred.");
             });
         }
-        return Promise.resolve<void>(null as any);
+        return Promise.resolve("");
     }
 }
 
@@ -57,12 +57,14 @@ export class AreasClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
     private token: string;
+    private XSRF: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string) {
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string, XSRF?: string) {
          this.http = http || { fetch: fetch as any };
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
         this.token = token || "";
+        this.XSRF = XSRF || "";
     }
 
     createArea(command: CreateAreaCommand): Promise<ResponseDto> {
@@ -77,7 +79,8 @@ export class AreasClient {
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -87,7 +90,7 @@ export class AreasClient {
     }
 
     protected processCreateArea(response: Response): Promise<ResponseDto> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -110,12 +113,14 @@ export class CategoriesClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
     private token: string;
+    private XSRF: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string) {
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string, XSRF?: string) {
          this.http = http || { fetch: fetch as any };
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
         this.token = token || "";
+        this.XSRF = XSRF || "";
     }
 
     createCategory(command: CreateCategoryCommand): Promise<ResponseDto> {
@@ -130,7 +135,8 @@ export class CategoriesClient {
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -140,7 +146,7 @@ export class CategoriesClient {
     }
 
     protected processCreateCategory(response: Response): Promise<ResponseDto> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -166,7 +172,8 @@ export class CategoriesClient {
             method: "GET",
             headers: {
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -176,7 +183,7 @@ export class CategoriesClient {
     }
 
     protected processGetCategoryList(response: Response): Promise<CategoryListVM> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -199,12 +206,14 @@ export class CompaniesClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
     private token: string;
+    private XSRF: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string) {
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string, XSRF?: string) {
          this.http = http || { fetch: fetch as any };
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
         this.token = token || "";
+        this.XSRF = XSRF || "";
     }
 
     createCompany(command: CreateCompanyCommand): Promise<ResponseDto> {
@@ -219,7 +228,8 @@ export class CompaniesClient {
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -229,7 +239,7 @@ export class CompaniesClient {
     }
 
     protected processCreateCompany(response: Response): Promise<ResponseDto> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -255,7 +265,8 @@ export class CompaniesClient {
             method: "GET",
             headers: {
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -265,7 +276,7 @@ export class CompaniesClient {
     }
 
     protected processGetCompanyList(response: Response): Promise<CompanyListVM> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -288,12 +299,14 @@ export class CompanyOwnerClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
     private token: string;
+    private XSRF: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string) {
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string, XSRF?: string) {
          this.http = http || { fetch: fetch as any };
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
         this.token = token || "";
+        this.XSRF = XSRF || "";
     }
 
     create(command: CreateCompanyOwnerCommand): Promise<ResponseDto> {
@@ -308,7 +321,8 @@ export class CompanyOwnerClient {
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -318,7 +332,7 @@ export class CompanyOwnerClient {
     }
 
     protected processCreate(response: Response): Promise<ResponseDto> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -344,7 +358,8 @@ export class CompanyOwnerClient {
             method: "GET",
             headers: {
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -354,7 +369,7 @@ export class CompanyOwnerClient {
     }
 
     protected processGetAll(response: Response): Promise<CompanyOwnerListVM> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -383,7 +398,8 @@ export class CompanyOwnerClient {
             method: "GET",
             headers: {
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -393,7 +409,7 @@ export class CompanyOwnerClient {
     }
 
     protected processGetDetail(response: Response): Promise<CompanyOwnerDetailDto> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -426,7 +442,8 @@ export class CompanyOwnerClient {
             method: "PUT",
             headers: {
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -436,7 +453,7 @@ export class CompanyOwnerClient {
     }
 
     protected processUpdate(response: Response): Promise<ResponseDto> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -465,7 +482,8 @@ export class CompanyOwnerClient {
             method: "DELETE",
             headers: {
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -475,7 +493,7 @@ export class CompanyOwnerClient {
     }
 
     protected processDelete(response: Response): Promise<boolean> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -499,12 +517,14 @@ export class ConfigurationsClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
     private token: string;
+    private XSRF: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string) {
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string, XSRF?: string) {
          this.http = http || { fetch: fetch as any };
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
         this.token = token || "";
+        this.XSRF = XSRF || "";
     }
 
     createConfig(command: CreateConfigCommand): Promise<ResponseDto> {
@@ -519,7 +539,8 @@ export class ConfigurationsClient {
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -529,7 +550,7 @@ export class ConfigurationsClient {
     }
 
     protected processCreateConfig(response: Response): Promise<ResponseDto> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -552,12 +573,14 @@ export class CustomersClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
     private token: string;
+    private XSRF: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string) {
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string, XSRF?: string) {
          this.http = http || { fetch: fetch as any };
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
         this.token = token || "";
+        this.XSRF = XSRF || "";
     }
 
     createCustomer(command: CreateCustomerCommand): Promise<ResponseDto> {
@@ -572,7 +595,8 @@ export class CustomersClient {
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -582,7 +606,7 @@ export class CustomersClient {
     }
 
     protected processCreateCustomer(response: Response): Promise<ResponseDto> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -612,7 +636,8 @@ export class CustomersClient {
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -622,7 +647,7 @@ export class CustomersClient {
     }
 
     protected processUpdateCustomer(response: Response): Promise<ResponseDto> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -648,7 +673,8 @@ export class CustomersClient {
             method: "GET",
             headers: {
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -658,7 +684,7 @@ export class CustomersClient {
     }
 
     protected processGetListCustomer(response: Response): Promise<CustomerListVM> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -687,7 +713,8 @@ export class CustomersClient {
             method: "GET",
             headers: {
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -697,7 +724,7 @@ export class CustomersClient {
     }
 
     protected processGetCustomerDetail(response: Response): Promise<CustomerDetailVM> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -726,7 +753,8 @@ export class CustomersClient {
             method: "DELETE",
             headers: {
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -736,7 +764,7 @@ export class CustomersClient {
     }
 
     protected processDeleteCustomer(response: Response): Promise<boolean> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -760,12 +788,14 @@ export class IdentityUserClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
     private token: string;
+    private XSRF: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string) {
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string, XSRF?: string) {
          this.http = http || { fetch: fetch as any };
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
         this.token = token || "";
+        this.XSRF = XSRF || "";
     }
 
     signIn(query: SignInCommand): Promise<SignInVm> {
@@ -780,7 +810,8 @@ export class IdentityUserClient {
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -790,7 +821,7 @@ export class IdentityUserClient {
     }
 
     protected processSignIn(response: Response): Promise<SignInVm> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -820,7 +851,8 @@ export class IdentityUserClient {
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -830,7 +862,7 @@ export class IdentityUserClient {
     }
 
     protected processResetPassword(response: Response): Promise<ResetPasswordVm> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -853,12 +885,14 @@ export class OrdersClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
     private token: string;
+    private XSRF: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string) {
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string, XSRF?: string) {
          this.http = http || { fetch: fetch as any };
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
         this.token = token || "";
+        this.XSRF = XSRF || "";
     }
 
     importProduct(command: ImportStogareCommand): Promise<ResponseDto> {
@@ -873,7 +907,8 @@ export class OrdersClient {
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -883,7 +918,7 @@ export class OrdersClient {
     }
 
     protected processImportProduct(response: Response): Promise<ResponseDto> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -913,7 +948,8 @@ export class OrdersClient {
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -923,7 +959,7 @@ export class OrdersClient {
     }
 
     protected processGetList(response: Response): Promise<OrderListVM> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -952,7 +988,8 @@ export class OrdersClient {
             method: "DELETE",
             headers: {
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -962,7 +999,7 @@ export class OrdersClient {
     }
 
     protected processDeleteOrder(response: Response): Promise<boolean> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -992,7 +1029,8 @@ export class OrdersClient {
             method: "GET",
             headers: {
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -1002,7 +1040,7 @@ export class OrdersClient {
     }
 
     protected processGetOrderDetail(response: Response): Promise<OrderDetailVM> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -1025,12 +1063,14 @@ export class ProductsClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
     private token: string;
+    private XSRF: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string) {
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string, XSRF?: string) {
          this.http = http || { fetch: fetch as any };
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
         this.token = token || "";
+        this.XSRF = XSRF || "";
     }
 
     getProductList(): Promise<ProductListVM> {
@@ -1041,7 +1081,8 @@ export class ProductsClient {
             method: "GET",
             headers: {
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -1051,7 +1092,7 @@ export class ProductsClient {
     }
 
     protected processGetProductList(response: Response): Promise<ProductListVM> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -1074,12 +1115,14 @@ export class StorageClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
     private token: string;
+    private XSRF: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string) {
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string, XSRF?: string) {
          this.http = http || { fetch: fetch as any };
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
         this.token = token || "";
+        this.XSRF = XSRF || "";
     }
 
     createStorage(command: CreateStorageCommand): Promise<ResponseDto> {
@@ -1094,7 +1137,8 @@ export class StorageClient {
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -1104,7 +1148,7 @@ export class StorageClient {
     }
 
     protected processCreateStorage(response: Response): Promise<ResponseDto> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -1130,7 +1174,8 @@ export class StorageClient {
             method: "GET",
             headers: {
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -1140,7 +1185,7 @@ export class StorageClient {
     }
 
     protected processGetStorageList(response: Response): Promise<StorageListVM> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -1163,12 +1208,14 @@ export class SuperAdminClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
     private token: string;
+    private XSRF: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string) {
-        this.http = http || { fetch: fetch as any };
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string, XSRF?: string) {
+         this.http = http || { fetch: fetch as any };
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
         this.token = token || "";
+        this.XSRF = XSRF || "";
     }
 
     userRegister(command: CreateUserCommand): Promise<ResponseDto> {
@@ -1183,7 +1230,8 @@ export class SuperAdminClient {
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -1193,47 +1241,7 @@ export class SuperAdminClient {
     }
 
     protected processUserRegister(response: Response): Promise<ResponseDto> {
-        
-        const status = response.status;
-        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 200) {
-            return response.text().then((_responseText) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = ResponseDto.fromJS(resultData200);
-            return result200;
-            });
-        } else if (status !== 200 && status !== 204) {
-            return response.text().then((_responseText) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Promise.resolve<ResponseDto>(null as any);
-    }
-
-    updateUser(command: UpdateUserCommand): Promise<ResponseDto> {
-        let url_ = this.baseUrl + "/api/SuperAdmin/user";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(command);
-
-        let options_: RequestInit = {
-            body: content_,
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
-            }
-        };
-
-        return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processUpdateUser(_response);
-        });
-    }
-
-    protected processUpdateUser(response: Response): Promise<ResponseDto> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -1254,22 +1262,23 @@ export class SuperAdminClient {
     getAllUsers(): Promise<UserListVm> {
         let url_ = this.baseUrl + "/api/SuperAdmin/user/all";
         url_ = url_.replace(/[?&]$/, "");
-    
+
         let options_: RequestInit = {
             method: "GET",
             headers: {
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
-    
+
         return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processGetAllUsers(_response);
         });
     }
 
     protected processGetAllUsers(response: Response): Promise<UserListVm> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -1298,7 +1307,8 @@ export class SuperAdminClient {
             method: "GET",
             headers: {
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -1308,7 +1318,7 @@ export class SuperAdminClient {
     }
 
     protected processGetUserDetail(response: Response): Promise<UserVM> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -1337,7 +1347,8 @@ export class SuperAdminClient {
             method: "DELETE",
             headers: {
                 "Accept": "application/json",
-                "Authorization": `Bearer ${this.token}`
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
 
@@ -1347,7 +1358,7 @@ export class SuperAdminClient {
     }
 
     protected processDeleteUser(response: Response): Promise<boolean> {
-        
+        (response);
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -1364,6 +1375,50 @@ export class SuperAdminClient {
             });
         }
         return Promise.resolve<boolean>(null as any);
+    }
+
+    updateUser(command: UpdateUserCommand, id: string): Promise<ResponseDto> {
+        let url_ = this.baseUrl + "/api/SuperAdmin/user/{id}?";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (command === undefined || command === null)
+            throw new Error("The parameter 'command' must be defined and cannot be null.");
+        else
+            url_ += "command=" + encodeURIComponent("" + command) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "PUT",
+            headers: {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processUpdateUser(_response);
+        });
+    }
+
+    protected processUpdateUser(response: Response): Promise<ResponseDto> {
+        (response);
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResponseDto.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<ResponseDto>(null as any);
     }
 }
 
@@ -1927,6 +1982,7 @@ export class UserDto implements IUserDto {
     phoneNumber?: string | undefined;
     roleName?: string | undefined;
     isActived?: boolean;
+    avatarImage?: string | undefined;
     storages?: Storage[] | undefined;
 
     constructor(data?: IUserDto) {
@@ -1947,6 +2003,7 @@ export class UserDto implements IUserDto {
             this.phoneNumber = _data["phoneNumber"];
             this.roleName = _data["roleName"];
             this.isActived = _data["isActived"];
+            this.avatarImage = _data["avatarImage"];
             if (Array.isArray(_data["storages"])) {
                 this.storages = [] as any;
                 for (let item of _data["storages"])
@@ -1971,6 +2028,7 @@ export class UserDto implements IUserDto {
         data["phoneNumber"] = this.phoneNumber;
         data["roleName"] = this.roleName;
         data["isActived"] = this.isActived;
+        data["avatarImage"] = this.avatarImage;
         if (Array.isArray(this.storages)) {
             data["storages"] = [];
             for (let item of this.storages)
@@ -1988,6 +2046,7 @@ export interface IUserDto {
     phoneNumber?: string | undefined;
     roleName?: string | undefined;
     isActived?: boolean;
+    avatarImage?: string | undefined;
     storages?: Storage[] | undefined;
 }
 
@@ -3840,7 +3899,7 @@ export interface IUserListVm {
 }
 
 export class UserVM implements IUserVM {
-    userId?: string | undefined;
+    id?: string | undefined;
     name?: string | undefined;
     email?: string | undefined;
     phone?: string | undefined;
@@ -3850,7 +3909,7 @@ export class UserVM implements IUserVM {
     companyEmail?: string | undefined;
     companyAddress?: string | undefined;
     storages?: StorageDto[] | undefined;
-    imageFile?: string | undefined;
+    avatarImage?: string | undefined;
 
     constructor(data?: IUserVM) {
         if (data) {
@@ -3863,7 +3922,7 @@ export class UserVM implements IUserVM {
 
     init(_data?: any) {
         if (_data) {
-            this.userId = _data["userId"];
+            this.id = _data["id"];
             this.name = _data["name"];
             this.email = _data["email"];
             this.phone = _data["phone"];
@@ -3877,7 +3936,7 @@ export class UserVM implements IUserVM {
                 for (let item of _data["storages"])
                     this.storages!.push(StorageDto.fromJS(item));
             }
-            this.imageFile = _data["imageFile"];
+            this.avatarImage = _data["avatarImage"];
         }
     }
 
@@ -3890,7 +3949,7 @@ export class UserVM implements IUserVM {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["userId"] = this.userId;
+        data["id"] = this.id;
         data["name"] = this.name;
         data["email"] = this.email;
         data["phone"] = this.phone;
@@ -3904,13 +3963,13 @@ export class UserVM implements IUserVM {
             for (let item of this.storages)
                 data["storages"].push(item.toJSON());
         }
-        data["imageFile"] = this.imageFile;
+        data["avatarImage"] = this.avatarImage;
         return data;
     }
 }
 
 export interface IUserVM {
-    userId?: string | undefined;
+    id?: string | undefined;
     name?: string | undefined;
     email?: string | undefined;
     phone?: string | undefined;
@@ -3920,16 +3979,19 @@ export interface IUserVM {
     companyEmail?: string | undefined;
     companyAddress?: string | undefined;
     storages?: StorageDto[] | undefined;
-    imageFile?: string | undefined;
+    avatarImage?: string | undefined;
 }
 
 export class UpdateUserCommand implements IUpdateUserCommand {
-    userId?: string | undefined;
+    id?: string | undefined;
     userName?: string | undefined;
     password?: string | undefined;
     email?: string | undefined;
     phoneNumber?: string | undefined;
     roleName?: string | undefined;
+    companyId?: string | undefined;
+    isActived?: boolean;
+    avatarImage?: string | undefined;
 
     constructor(data?: IUpdateUserCommand) {
         if (data) {
@@ -3942,12 +4004,15 @@ export class UpdateUserCommand implements IUpdateUserCommand {
 
     init(_data?: any) {
         if (_data) {
-            this.userId = _data["userId"];
+            this.id = _data["id"];
             this.userName = _data["userName"];
             this.password = _data["password"];
             this.email = _data["email"];
             this.phoneNumber = _data["phoneNumber"];
             this.roleName = _data["roleName"];
+            this.companyId = _data["companyId"];
+            this.isActived = _data["isActived"];
+            this.avatarImage = _data["avatarImage"];
         }
     }
 
@@ -3960,23 +4025,29 @@ export class UpdateUserCommand implements IUpdateUserCommand {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["userId"] = this.userId;
+        data["id"] = this.id;
         data["userName"] = this.userName;
         data["password"] = this.password;
         data["email"] = this.email;
         data["phoneNumber"] = this.phoneNumber;
         data["roleName"] = this.roleName;
+        data["companyId"] = this.companyId;
+        data["isActived"] = this.isActived;
+        data["avatarImage"] = this.avatarImage;
         return data;
     }
 }
 
 export interface IUpdateUserCommand {
-    userId?: string | undefined;
+    id?: string | undefined;
     userName?: string | undefined;
     password?: string | undefined;
     email?: string | undefined;
     phoneNumber?: string | undefined;
     roleName?: string | undefined;
+    companyId?: string | undefined;
+    isActived?: boolean;
+    avatarImage?: string | undefined;
 }
 
 export class SwaggerException extends Error {

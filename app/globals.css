@@ -70,5 +70,11 @@
     syntax: "<angle>";
     initial-value: 0deg;
     inherits: false;
-  }  
+  }
+
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 }

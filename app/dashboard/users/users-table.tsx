@@ -1,8 +1,8 @@
 'use client'
 
-import { ArrowUpDown, CirclePlus } from 'lucide-react'
-import React, { Suspense } from 'react'
 import { useQueryErrorResetBoundary } from '@tanstack/react-query'
+import { ArrowUpDown, CirclePlus } from 'lucide-react'
+import React, { Suspense, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import DashboardDataSkeleton from '@/components/dashboard/dashboard-data-skeleton'
@@ -11,13 +11,11 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   Pagination,
   PaginationContent,
@@ -28,15 +26,6 @@ import {
   PaginationPrevious
 } from '@/components/ui/pagination'
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
-import {
   Table,
   TableBody,
   TableHead,
@@ -45,10 +34,14 @@ import {
   TableCell
 } from '@/components/ui/table'
 
+import AddUserForm from './add-user-form'
 import UsersData from './users-data'
 
 export default function UsersTable() {
   const { reset } = useQueryErrorResetBoundary()
+
+  const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState<boolean>(false)
+
   return (
     <div className="w-full mt-[1.5rem]">
       <div className="flex items-center justify-between w-full mb-[.85rem]">
@@ -59,82 +52,21 @@ export default function UsersTable() {
           />
         </div>
         <div>
-          <Dialog>
+          <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" className="bg-black text-white hover:bg-black hover:text-white dark:bg-primary/10 dark:text-primary">
                 <CirclePlus className="mr-2 h-4 w-4" />
                 <span>Add User</span>
               </Button>
             </DialogTrigger>
-            <DialogContent className="w-[26.5rem]">
+            <DialogContent className="max-w-[30rem]">
               <DialogHeader>
                 <DialogTitle>Add User</DialogTitle>
                 <DialogDescription>
                   Fill in the required details to create a new user profile.
                 </DialogDescription>
               </DialogHeader>
-              <div className="flex flex-col gap-4">
-                <div className="w-full flex items-center gap-4">
-                  <Label htmlFor="username" className="w-[35%]">
-                    Username
-                  </Label>
-                  <div className="w-full">
-                    <Input id="username" className="w-full" autoComplete="off" />
-                  </div>
-                </div>
-                <div className="w-full flex items-center gap-4">
-                  <Label htmlFor="email" className="w-[35%]">
-                    Email
-                  </Label>
-                  <div className="w-full">
-                    <Input id="email" className="w-full" autoComplete="off" />
-                  </div>
-                </div>
-                <div className="w-full flex items-center gap-4">
-                  <Label htmlFor="password" className="w-[35%]">
-                    Password
-                  </Label>
-                  <div className="w-full">
-                    <Input id="password" className="w-full" autoComplete="off" />
-                  </div>
-                </div>
-                <div className="w-full flex items-center gap-4">
-                  <Label htmlFor="status" className="w-[35%]">
-                    Status
-                  </Label>
-                  <Select>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Status</SelectLabel>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="inactive">Inactive</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="w-full flex items-center gap-4">
-                  <Label htmlFor="role" className="w-[35%]">
-                    Role
-                  </Label>
-                  <Select>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectItem value="admin">Admin</SelectItem>
-                        <SelectItem value="user">Customer</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button type="submit" className="bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary">Save changes</Button>
-              </DialogFooter>
+              <AddUserForm onClose={() => setIsAddUserDialogOpen(false)} />
             </DialogContent>
           </Dialog>
         </div>

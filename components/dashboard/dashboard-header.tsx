@@ -17,6 +17,7 @@ import { useAuth } from '@/hooks/useAuth'
 
 export default function DashboardHeader({ toggleSidebar, sidebarOpen }: { toggleSidebar: () => void, sidebarOpen: boolean }) {
   const { userInfo } = useAuth()
+  console.log(userInfo)
 
   return (
     <header className="flex items-center justify-between p-4 border-b dark:border-b-[#202020] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -39,7 +40,7 @@ export default function DashboardHeader({ toggleSidebar, sidebarOpen }: { toggle
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
               <Avatar className="h-8 w-8">
-                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                <AvatarImage src={userInfo?.avatar} alt={userInfo?.username} />
                 <AvatarFallback>{userInfo?.username?.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
             </Button>
@@ -49,7 +50,7 @@ export default function DashboardHeader({ toggleSidebar, sidebarOpen }: { toggle
               <div className="flex flex-col space-y-2">
                 <p className="text-sm font-medium leading-none">{userInfo?.username}</p>
                 <p className="text-xs leading-none text-gray-500 dark:text-[#8a8a8a]">
-                  {userInfo?.email}
+                  {userInfo?.username}
                 </p>
               </div>
             </DropdownMenuLabel>

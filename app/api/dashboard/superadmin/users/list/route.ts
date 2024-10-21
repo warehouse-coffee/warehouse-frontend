@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+
 import { getAuthCookie, isTokenValid } from '@/lib/auth'
 
 import { SuperAdminClient } from '../../../../web-api-client'
@@ -11,9 +12,9 @@ export async function GET(request: Request) {
   }
 
   try {
-    const client = new SuperAdminClient(process.env.NEXT_BACKEND_API_URL, undefined, token)
-    const res = await client.getAllUsers()
-    return NextResponse.json(res)
+    const client = new SuperAdminClient(process.env.NEXT_BACKEND_API_URL, undefined, token, undefined)
+    const response = await client.getAllUsers()
+    return NextResponse.json(response)
   } catch (error) {
     if (error instanceof Error) {
       return NextResponse.json({ error: error.message }, { status: 500 })

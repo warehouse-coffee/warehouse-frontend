@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 
-import { setAuthCookie } from '@/lib/auth'
+import { setAuthCookie, setXSRFCookie } from '@/lib/auth'
 
-import { IdentityUserClient, SignInCommand } from '../../web-api-client'
+import { Client, IdentityUserClient, SignInCommand } from '../../web-api-client'
 
 export async function POST(request: Request) {
   try {
@@ -17,6 +17,9 @@ export async function POST(request: Request) {
       const response = NextResponse.json({ success: true })
       setAuthCookie(response, res.token)
 
+      const xsrfClient = new Client(process.env.NEXT_BACKEND_API_URL, undefined, res.token)
+      const xsrfToken = await xsrfClient.getAntiforgeryToken()
+      setXSRFCookie(response, xsrfToken)
       return response
     } else {
       return NextResponse.json({ error: 'Login failed or invalid credentials' }, { status: res.statusCode || 401 })

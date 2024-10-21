@@ -15,10 +15,11 @@ export function useAuth() {
         credentials: 'include'
       })
       const data = await response.json()
-      // console.log('data', data)
+
       if (data.isAuthenticated) {
         setAuth(true, data.userInfo)
         localStorage.removeItem('hasShownExpiredMessage')
+
         return true
       } else {
         clearAuth()
@@ -30,7 +31,6 @@ export function useAuth() {
               duration: 3000
             })
             localStorage.setItem('hasShownExpiredMessage', 'true')
-            // window.location.reload()
           }
         }
       }
