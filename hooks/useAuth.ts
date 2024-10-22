@@ -35,7 +35,7 @@ export function useAuth() {
         }
       }
     } catch (error) {
-      console.error('Error checking auth:', error)
+      // console.error('Error checking auth:', error)
       clearAuth()
       return false
     }

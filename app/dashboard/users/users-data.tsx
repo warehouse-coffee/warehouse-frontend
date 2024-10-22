@@ -16,8 +16,8 @@ import {
   TableCell,
   TableRow
 } from '@/components/ui/table'
-import { UpdateUser, User, UserDetail } from '@/types'
 import { useUserList, useDeleteUser } from '@/hooks/user'
+import { UpdateUser, User, UserDetail } from '@/types'
 
 import UsersDetail from './users-detail'
 import UsersEditForm from './users-edit-form'
@@ -58,6 +58,7 @@ const UserActions = React.memo(({ user, onView, onEdit, onDelete }: {
     </Button>
   </TableCell>
 ))
+UserActions.displayName = 'UserActions'
 
 export default function UsersData() {
   const { data } = useUserList()
@@ -195,9 +196,9 @@ export default function UsersData() {
           </DialogHeader>
           <DialogFooter>
             <Button type="button" onClick={handleCloseDeleteDialog} variant="outline">Cancel</Button>
-            <Button 
-              type="submit" 
-              className={`bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary ${deleteUserMutation.isPending ? 'cursor-not-allowed pointer-events-none' : ''}`} 
+            <Button
+              type="submit"
+              className={`bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary ${deleteUserMutation.isPending ? 'cursor-not-allowed pointer-events-none' : ''}`}
               onClick={confirmDeleteUser}
             >
               {deleteUserMutation.isPending ? 'Deleting...' : 'Delete'}

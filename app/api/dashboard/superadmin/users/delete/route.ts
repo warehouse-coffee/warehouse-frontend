@@ -22,7 +22,7 @@ export async function DELETE(request: NextRequest) {
     const result = await client.deleteUser(id)
     return NextResponse.json(result)
   } catch (error) {
-    console.error('Error deleting user:', error)
+    // console.error('Error deleting user:', error)
     return NextResponse.json({ error: 'Failed to delete user' }, { status: 500 })
   }
 }

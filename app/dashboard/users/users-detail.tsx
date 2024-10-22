@@ -4,15 +4,15 @@ import React, { useState, useMemo, useCallback } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { DialogFooter } from '@/components/ui/dialog'
-import { TransitionPanel } from '@/components/ui/transition-panel'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { UserDetail } from '@/types'
+import { TransitionPanel } from '@/components/ui/transition-panel'
 import { useUserDetail } from '@/hooks/user'
+import { UserDetail } from '@/types'
 
 const InfoItem = React.memo(({ icon, label, value }: { icon: React.ReactNode, label: string, value: string }) => {
-  const labelsWithTooltip = ['Company Name'];
+  const labelsWithTooltip = ['Company Name']
 
-  const shouldShowTooltip = labelsWithTooltip.includes(label);
+  const shouldShowTooltip = labelsWithTooltip.includes(label)
 
   const content = (
     <div className={`flex items-center p-3 rounded-lg ${shouldShowTooltip ? 'cursor-pointer' : ''}`}>
@@ -24,7 +24,7 @@ const InfoItem = React.memo(({ icon, label, value }: { icon: React.ReactNode, la
         <p className="text-[.85rem] font-semibold truncate">{value}</p>
       </div>
     </div>
-  );
+  )
 
   if (shouldShowTooltip) {
     return (
@@ -38,11 +38,12 @@ const InfoItem = React.memo(({ icon, label, value }: { icon: React.ReactNode, la
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-    );
+    )
   }
 
-  return content;
+  return content
 })
+InfoItem.displayName = 'InfoItem'
 
 const UserHeader = React.memo(({ userDetail }: { userDetail: UserDetail }) => (
   <div className="flex items-center gap-4">
@@ -56,11 +57,11 @@ const UserHeader = React.memo(({ userDetail }: { userDetail: UserDetail }) => (
     </div>
   </div>
 ))
-
-const TabButtons = React.memo(({ items, activeIndex, setActiveIndex }: { 
-  items: { title: string }[], 
-  activeIndex: number, 
-  setActiveIndex: (index: number) => void 
+UserHeader.displayName = 'UserHeader'
+const TabButtons = React.memo(({ items, activeIndex, setActiveIndex }: {
+  items: { title: string }[],
+  activeIndex: number,
+  setActiveIndex: (index: number) => void
 }) => (
   <div className='mb-4 flex space-x-2'>
     {items.map((item, index) => (
@@ -78,6 +79,7 @@ const TabButtons = React.memo(({ items, activeIndex, setActiveIndex }: {
     ))}
   </div>
 ))
+TabButtons.displayName = 'TabButtons'
 
 export default function UsersDetail({ user, onClose }: { user: UserDetail, onClose: () => void }) {
   const { data: userDetail } = useUserDetail(user?.id || '')

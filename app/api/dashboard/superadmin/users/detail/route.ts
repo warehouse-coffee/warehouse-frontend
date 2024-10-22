@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     const result = await client.getUserDetail(id)
     return NextResponse.json(result)
   } catch (error) {
-    console.error('Error fetching user details:', error)
+    // console.error('Error fetching user details:', error)
     return NextResponse.json({ error: 'Failed to fetch user details' }, { status: 500 })
   }
 }
