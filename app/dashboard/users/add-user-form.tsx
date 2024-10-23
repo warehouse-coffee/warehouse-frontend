@@ -1,3 +1,4 @@
+import { Eye, EyeOff } from 'lucide-react'
 import React, { useState, useRef, useCallback } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -22,6 +23,7 @@ const initialFormState: CreateUserInput = {
 
 export default function AddUserForm({ onClose }: { onClose: () => void }) {
   const [createForm, setCreateForm] = useState<CreateUserInput>(initialFormState)
+  const [showPassword, setShowPassword] = useState(false)
   const initialFormRef = useRef<CreateUserInput>(initialFormState)
 
   const createUserMutation = useCreateUser(onClose)
@@ -40,6 +42,10 @@ export default function AddUserForm({ onClose }: { onClose: () => void }) {
     const { name, value } = e.target
     setCreateForm(prev => ({ ...prev, [name]: value }))
   }, [])
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword)
+  }
 
   return (
     <form onSubmit={handleCreateUser}>
@@ -67,12 +73,32 @@ export default function AddUserForm({ onClose }: { onClose: () => void }) {
                     </SelectGroup>
                   </SelectContent>
                 </Select>
+              ) : key === 'password' ? (
+                <div className="relative">
+                  <Input
+                    required
+                    id={key}
+                    name={key}
+                    type={showPassword ? 'text' : 'password'}
+                    className="w-full pr-10"
+                    autoComplete="new-password"
+                    value={value}
+                    onChange={handleInputChange}
+                  />
+                  <button
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    className="absolute inset-y-0 right-0 pr-5 flex items-center text-sm leading-5"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4 text-[#fff]" /> : <Eye className="h-4 w-4 text-[#fff]" />}
+                  </button>
+                </div>
               ) : (
                 <Input
                   required
                   id={key}
                   name={key}
-                  type={key === 'password' ? 'password' : key === 'phoneNumber' ? 'number' : 'text'}
+                  type={key === 'phoneNumber' ? 'number' : 'text'}
                   className="w-full"
                   autoComplete="off"
                   value={value}

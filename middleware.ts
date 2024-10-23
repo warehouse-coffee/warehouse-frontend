@@ -1,28 +1,25 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-import { getAuthCookie, isTokenValid, getXSRFCookie } from '@/lib/auth'
+import { getAuthCookie, isTokenValid } from '@/lib/auth'
 
 const protectedRoutes = ['/dashboard']
+const publicRoutes = ['/login']
 // const isDev = process.env.NODE_ENV === 'development'
 
 export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
-  const isProtectedRoute = protectedRoutes.some(route => path.startsWith(route))
-  const isLoginPage = path === '/login'
+  const isProtectedRoute = protectedRoutes.includes(path)
+  const isPublicRoute = publicRoutes.includes(path)
 
   const token = getAuthCookie(request)
-  // const xsrfToken = getXSRFCookie(request)
   const isValidToken = token && isTokenValid(token)
 
-  if (isValidToken) {
-    if (isLoginPage) {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
-    }
-    return NextResponse.next()
+  if (isPublicRoute && isValidToken) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  if (isProtectedRoute) {
+  if (isProtectedRoute && !isValidToken) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 

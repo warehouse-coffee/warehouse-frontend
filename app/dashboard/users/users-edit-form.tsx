@@ -1,3 +1,4 @@
+import { Eye, EyeOff } from 'lucide-react'
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -15,6 +16,7 @@ type EditFormType = UpdateUser & { password: string }
 
 export default function UsersEditForm({ user, onClose, isOpen }: { user: UpdateUser, onClose: () => void, isOpen: boolean }) {
   const [editForm, setEditForm] = useState<EditFormType>({ ...user, password: '' })
+  const [showPassword, setShowPassword] = useState(false)
   const initialFormRef = useRef<EditFormType>({ ...user, password: '' })
 
   const updateUserMutation = useUpdateUser(onClose)
@@ -49,6 +51,10 @@ export default function UsersEditForm({ user, onClose, isOpen }: { user: UpdateU
   const handleSelectChange = useCallback((name: string, value: any) => {
     setEditForm(prev => ({ ...prev, [name]: value }))
   }, [])
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword)
+  }
 
   if (!editForm) return null
 
@@ -86,16 +92,35 @@ export default function UsersEditForm({ user, onClose, isOpen }: { user: UpdateU
                     </SelectGroup>
                   </SelectContent>
                 </Select>
+              ) : key === 'password' ? (
+                <div className="relative">
+                  <Input
+                    id={`edit-${key}`}
+                    name={key}
+                    type={showPassword ? 'text' : 'password'}
+                    className="w-full pr-10"
+                    autoComplete="new-password"
+                    value={value as string}
+                    onChange={handleInputChange}
+                    placeholder="Leave blank to keep current password"
+                  />
+                  <button
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-sm leading-5"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4 text-[#fff]" /> : <Eye className="h-4 w-4 text-[#fff]" />}
+                  </button>
+                </div>
               ) : (
                 <Input
                   id={`edit-${key}`}
                   name={key}
-                  type={key === 'password' ? 'password' : key === 'phoneNumber' ? 'number' : 'text'}
+                  type={key === 'phoneNumber' ? 'number' : 'text'}
                   className="w-full"
                   autoComplete="off"
                   value={value as string}
                   onChange={handleInputChange}
-                  placeholder={key === 'password' ? 'Leave blank to keep current password' : ''}
                 />
               )}
             </div>

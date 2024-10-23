@@ -1,5 +1,5 @@
 import { Eye, Pencil, Trash } from 'lucide-react'
-import React, { useState, Suspense, useRef, useCallback, useMemo } from 'react'
+import React, { Suspense, useCallback, useMemo } from 'react'
 
 import DashboardFetchLoader from '@/components/dashboard/dashboard-fetch-loader'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -12,10 +12,12 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
+import { Loader } from '@/components/ui/loader'
 import {
   TableCell,
   TableRow
 } from '@/components/ui/table'
+import { useDialog } from '@/hooks/useDialog'
 import { useUserList, useDeleteUser } from '@/hooks/user'
 import { UpdateUser, User, UserDetail } from '@/types'
 
@@ -63,61 +65,41 @@ UserActions.displayName = 'UserActions'
 export default function UsersData() {
   const { data } = useUserList()
 
-  const deleteUserMutation = useDeleteUser(() => {
-    handleCloseDeleteDialog()
-  })
-
-  const [dialogsOpen, setDialogsOpen] = useState<{
-    detail: boolean,
-    edit: boolean,
-    delete: boolean
-  }>({
+  const {
+    dialogsOpen,
+    itemRef: userRef,
+    openDialog,
+    closeDialog,
+    setDialogsOpen
+  } = useDialog<User>({
     detail: false,
     edit: false,
     delete: false
   })
 
-  const editingUserRef = useRef<User | null>(null)
-  const viewingUserRef = useRef<User | null>(null)
-  const deletingUserRef = useRef<User | null>(null)
+  const deleteUserMutation = useDeleteUser(() => {
+    closeDialog('delete')
+  })
 
   const userList = useMemo(() => data?.users ?? [], [data])
 
   const handleEditUser = useCallback((user: User) => {
-    editingUserRef.current = user
-    setDialogsOpen(prev => ({ ...prev, edit: true }))
-  }, [])
-
-  const handleCloseEditDialog = useCallback(() => {
-    setDialogsOpen(prev => ({ ...prev, edit: false }))
-    setTimeout(() => editingUserRef.current = null, 250)
-  }, [])
+    openDialog('edit', user)
+  }, [openDialog])
 
   const handleViewUser = useCallback((user: User) => {
-    viewingUserRef.current = user
-    setDialogsOpen(prev => ({ ...prev, detail: true }))
-  }, [])
-
-  const handleCloseViewDialog = useCallback(() => {
-    setDialogsOpen(prev => ({ ...prev, detail: false }))
-    setTimeout(() => viewingUserRef.current = null, 250)
-  }, [])
+    openDialog('detail', user)
+  }, [openDialog])
 
   const handleDeleteUser = useCallback((user: User) => {
-    deletingUserRef.current = user
-    setDialogsOpen(prev => ({ ...prev, delete: true }))
-  }, [])
-
-  const handleCloseDeleteDialog = useCallback(() => {
-    setDialogsOpen(prev => ({ ...prev, delete: false }))
-    setTimeout(() => deletingUserRef.current = null, 250)
-  }, [])
+    openDialog('delete', user)
+  }, [openDialog])
 
   const confirmDeleteUser = useCallback(() => {
-    if (deletingUserRef.current) {
-      deleteUserMutation.mutate(deletingUserRef.current.id)
+    if (userRef.current) {
+      deleteUserMutation.mutate(userRef.current.id)
     }
-  }, [deleteUserMutation])
+  }, [deleteUserMutation, userRef])
 
   return (
     <>
@@ -159,8 +141,8 @@ export default function UsersData() {
             </DialogDescription>
           </DialogHeader>
           <Suspense fallback={<DashboardFetchLoader />}>
-            {viewingUserRef.current && (
-              <UsersDetail user={viewingUserRef.current as UserDetail} onClose={handleCloseViewDialog} />
+            {userRef.current && (
+              <UsersDetail user={userRef.current as UserDetail} onClose={() => closeDialog('detail')} />
             )}
           </Suspense>
         </DialogContent>
@@ -175,10 +157,10 @@ export default function UsersData() {
             </DialogDescription>
           </DialogHeader>
           <Suspense fallback={<DashboardFetchLoader />}>
-            {editingUserRef.current && (
+            {userRef.current && (
               <UsersEditForm
-                user={editingUserRef.current as UpdateUser}
-                onClose={handleCloseEditDialog}
+                user={userRef.current as UpdateUser}
+                onClose={() => closeDialog('edit')}
                 isOpen={dialogsOpen.edit}
               />
             )}
@@ -195,13 +177,20 @@ export default function UsersData() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button type="button" onClick={handleCloseDeleteDialog} variant="outline">Cancel</Button>
+            <Button type="button" onClick={() => closeDialog('delete')} variant="outline">Cancel</Button>
             <Button
               type="submit"
               className={`bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary ${deleteUserMutation.isPending ? 'cursor-not-allowed pointer-events-none' : ''}`}
               onClick={confirmDeleteUser}
             >
-              {deleteUserMutation.isPending ? 'Deleting...' : 'Delete'}
+              {deleteUserMutation.isPending ? (
+                <>
+                  Deleting...
+                  <Loader color="#62c5ff" size="1.25rem" />
+                </>
+              ) : (
+                'Delete'
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
