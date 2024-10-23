@@ -9,8 +9,8 @@ const publicRoutes = ['/login']
 
 export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
-  const isProtectedRoute = protectedRoutes.includes(path)
-  const isPublicRoute = publicRoutes.includes(path)
+  const isProtectedRoute = protectedRoutes.some(route => path.startsWith(route))
+  const isPublicRoute = publicRoutes.some(route => path.startsWith(route))
 
   const token = getAuthCookie(request)
   const isValidToken = token && isTokenValid(token)
