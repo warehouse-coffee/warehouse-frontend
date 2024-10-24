@@ -17,7 +17,7 @@ import { useAuth } from '@/hooks/useAuth'
 
 export default function DashboardHeader({ toggleSidebar, sidebarOpen }: { toggleSidebar: () => void, sidebarOpen: boolean }) {
   const { userInfo } = useAuth()
-  console.log(userInfo)
+  // console.log(userInfo)
 
   return (
     <header className="flex items-center justify-between p-4 border-b dark:border-b-[#202020] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">

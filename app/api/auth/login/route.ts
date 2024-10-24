@@ -15,11 +15,11 @@ export async function POST(request: Request) {
 
     if (res.statusCode === 200 && res.token && typeof res.token === 'string') {
       const response = NextResponse.json({ success: true })
-      setAuthCookie(response, res.token)
+      setAuthCookie(res.token)
 
       const xsrfClient = new Client(process.env.NEXT_BACKEND_API_URL, undefined, res.token)
       const xsrfToken = await xsrfClient.getAntiforgeryToken()
-      setXSRFCookie(response, xsrfToken)
+      setXSRFCookie(xsrfToken)
       return response
     } else {
       return NextResponse.json({ error: 'Login failed or invalid credentials' }, { status: res.statusCode || 401 })

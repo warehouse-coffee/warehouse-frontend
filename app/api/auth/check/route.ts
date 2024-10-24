@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
 
-import { getAuthCookie, isTokenValid, getUserInfoFromToken, getXSRFCookie } from '@/lib/auth'
+import { getTokenCookie, isTokenValid, getUserInfoFromToken } from '@/lib/auth'
 
 export async function GET(request: Request) {
-  const token = getAuthCookie(request)
-  const xsrfToken = getXSRFCookie(request)
+  const token = getTokenCookie('auth_token')
+  const xsrfToken = getTokenCookie('XSRF-TOKEN')
 
   if (token && isTokenValid(token) && xsrfToken) {
     const userInfo = getUserInfoFromToken(token)

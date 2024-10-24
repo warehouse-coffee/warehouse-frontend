@@ -28,3 +28,7 @@ export const formatLabel = (key: string): string => {
     .replace(/^./, str => str.toUpperCase())
     .replace(/([a-z])([A-Z])/g, '$1 $2')
 }
+
+export const formatRoleLabel = (role: string) => {
+  return role.replace(/-/g, ' ').replace(/\b\w/g, char => char.toUpperCase())
+}

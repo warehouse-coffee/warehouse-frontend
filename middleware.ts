@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-import { getAuthCookie, isTokenValid } from '@/lib/auth'
+import { getTokenCookie, isTokenValid } from '@/lib/auth'
 
 const protectedRoutes = ['/dashboard']
 const publicRoutes = ['/login']
@@ -12,7 +12,7 @@ export function middleware(request: NextRequest) {
   const isProtectedRoute = protectedRoutes.some(route => path.startsWith(route))
   const isPublicRoute = publicRoutes.some(route => path.startsWith(route))
 
-  const token = getAuthCookie(request)
+  const token = getTokenCookie('auth_token')
   const isValidToken = token && isTokenValid(token)
 
   if (isPublicRoute && isValidToken) {

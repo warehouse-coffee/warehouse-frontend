@@ -1,7 +1,7 @@
 'use client'
 
 import { useQueryErrorResetBoundary } from '@tanstack/react-query'
-import { ArrowUpDown, CirclePlus } from 'lucide-react'
+import { ArrowUpDown, CirclePlus, ArrowUpAZ, ArrowDownAZ } from 'lucide-react'
 import React, { Suspense, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
@@ -15,6 +15,15 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import {
   Pagination,
@@ -33,6 +42,8 @@ import {
   TableRow,
   TableCell
 } from '@/components/ui/table'
+import { useDialog } from '@/hooks/useDialog'
+import { cn } from '@/lib/utils'
 
 import AddUserForm from './add-user-form'
 import UsersData from './users-data'
@@ -40,7 +51,9 @@ import UsersData from './users-data'
 export default function UsersTable() {
   const { reset } = useQueryErrorResetBoundary()
 
-  const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState<boolean>(false)
+  const { closeDialog, dialogsOpen, setDialogsOpen } = useDialog({
+    add: false
+  })
 
   return (
     <div className="w-full mt-[1.5rem]">
@@ -52,7 +65,7 @@ export default function UsersTable() {
           />
         </div>
         <div>
-          <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>
+          <Dialog open={dialogsOpen.add ?? false} onOpenChange={(open) => setDialogsOpen(prev => ({ ...prev, add: open }))}>
             <DialogTrigger asChild>
               <Button variant="outline" className="bg-black text-white hover:bg-black hover:text-white dark:bg-primary/10 dark:text-primary">
                 <CirclePlus className="mr-2 h-4 w-4" />
@@ -66,7 +79,7 @@ export default function UsersTable() {
                   Fill in the required details to create a new user profile.
                 </DialogDescription>
               </DialogHeader>
-              <AddUserForm onClose={() => setIsAddUserDialogOpen(false)} />
+              <AddUserForm onClose={() => closeDialog('add')} />
             </DialogContent>
           </Dialog>
         </div>
@@ -78,13 +91,59 @@ export default function UsersTable() {
               <TableHead>
                 <div className="flex items-center gap-2">
                   Username
-                  <ArrowUpDown className="h-4 w-4" />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <ArrowUpDown className="h-4 w-4 cursor-pointer" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="min-w-[10rem]">
+                      <DropdownMenuLabel>
+                        Sort by
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727] mb-2" />
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem>
+                          <ArrowUpAZ className="mr-2 h-4 w-4" />
+                          <span>Ascending</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <ArrowDownAZ className="mr-2 h-4 w-4" />
+                          <span>Descending</span>
+                        </DropdownMenuItem>
+                        {/* <DropdownMenuItem>
+                          <Input placeholder="Search..." className="w-full" />
+                        </DropdownMenuItem> */}
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </TableHead>
               <TableHead>
                 <div className="flex items-center gap-2">
                   Email
-                  <ArrowUpDown className="h-4 w-4" />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <ArrowUpDown className="h-4 w-4 cursor-pointer" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="min-w-[10rem]">
+                      <DropdownMenuLabel>
+                        Sort by
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727] mb-2" />
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem>
+                          <ArrowUpAZ className="mr-2 h-4 w-4" />
+                          <span>Ascending</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <ArrowDownAZ className="mr-2 h-4 w-4" />
+                          <span>Descending</span>
+                        </DropdownMenuItem>
+                        {/* <DropdownMenuItem>
+                          <Input placeholder="Search..." className="w-full" />
+                        </DropdownMenuItem> */}
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </TableHead>
               <TableHead>
@@ -95,7 +154,7 @@ export default function UsersTable() {
               </TableHead>
               <TableHead>
                 <div className="flex items-center gap-2">
-                Role
+                  Role
                   <ArrowUpDown className="h-4 w-4" />
                 </div>
               </TableHead>
@@ -107,9 +166,16 @@ export default function UsersTable() {
               onReset={reset}
               fallbackRender={({ resetErrorBoundary }) => (
                 <TableRow>
-                  <TableCell>
-                    There was an error!
-                    <Button onClick={() => resetErrorBoundary()}>Try again</Button>
+                  <TableCell className="flex flex-col items-center justify-center">
+                    There was an error! Please try again.
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary"
+                      onClick={() => resetErrorBoundary()}
+                    >
+                      Try again
+                    </Button>
                   </TableCell>
                 </TableRow>
               )}

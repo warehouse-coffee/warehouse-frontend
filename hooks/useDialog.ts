@@ -3,12 +3,8 @@ import { useState, useCallback, useRef } from 'react'
 import { DialogType } from '@/constants'
 import { DialogState } from '@/types'
 
-export function useDialog<T>(initialState: DialogState = {
-  detail: false,
-  edit: false,
-  delete: false
-}) {
-  const [dialogsOpen, setDialogsOpen] = useState<DialogState>(initialState)
+export function useDialog<T>(initialState: Partial<DialogState> = {}) {
+  const [dialogsOpen, setDialogsOpen] = useState<Partial<DialogState>>(initialState)
   const itemRef = useRef<T | null>(null)
 
   const openDialog = useCallback((type: DialogType, item: T) => {

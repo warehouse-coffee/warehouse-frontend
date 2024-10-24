@@ -9,7 +9,7 @@ import { Loader } from '@/components/ui/loader'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ROLE_NAMES, RoleName } from '@/constants'
 import { useCreateUser } from '@/hooks/user'
-import { cn, formatLabel } from '@/lib/utils'
+import { cn, formatLabel, formatRoleLabel } from '@/lib/utils'
 import { CreateUserInput } from '@/types'
 
 const initialFormState: CreateUserInput = {
@@ -68,7 +68,7 @@ export default function AddUserForm({ onClose }: { onClose: () => void }) {
                   <SelectContent>
                     <SelectGroup>
                       {Object.values(ROLE_NAMES).map((role) => (
-                        <SelectItem key={role} value={role}>{role}</SelectItem>
+                        <SelectItem key={role} value={role}>{formatRoleLabel(role)}</SelectItem>
                       ))}
                     </SelectGroup>
                   </SelectContent>

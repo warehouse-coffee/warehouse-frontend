@@ -1,5 +1,5 @@
 import { jwtDecode, JwtPayload } from 'jwt-decode'
-import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 
 export interface UserInfo extends JwtPayload {
   role: string;
@@ -21,48 +21,32 @@ const defaultCookieOptions: CookieOptions = {
   path: '/'
 }
 
-function setCookie(response: NextResponse, name: string, value: string, options: CookieOptions = {}) {
-  response.cookies.set(name, value, {
+function setCookie(name: string, value: string, options: CookieOptions = {}) {
+  cookies().set(name, value, {
     ...defaultCookieOptions,
     ...options
   })
 }
 
 export function getCookie(name: string): string | undefined {
-  if (typeof document === 'undefined') return undefined
+  if (typeof window === 'undefined') {
+    return cookies().get(name)?.value
+  }
   const value = `; ${document.cookie}`
   const parts = value.split(`; ${name}=`)
   if (parts.length === 2) return parts.pop()?.split(';').shift()
 }
 
-function getCookieFromRequest(request: Request, name: string): string | undefined {
-  const cookieHeader = request.headers.get('cookie')
-  if (!cookieHeader) return undefined
-  return parseCookies(cookieHeader)[name]
+export function setAuthCookie(token: string) {
+  setCookie('auth_token', token, { httpOnly: true, maxAge: 60 * 60 * 24 })
 }
 
-function parseCookies(cookieString: string): { [key: string]: string } {
-  return cookieString.split(';').reduce((acc, cookie) => {
-    const [key, value] = cookie.trim().split('=')
-    acc[key] = value
-    return acc
-  }, {} as { [key: string]: string })
+export function setXSRFCookie(token: string) {
+  setCookie('XSRF-TOKEN', token, { httpOnly: false, secure: true })
 }
 
-export function setAuthCookie(response: NextResponse, token: string) {
-  setCookie(response, 'auth_token', token, { httpOnly: true, maxAge: 3600 })
-}
-
-export function getAuthCookie(request: Request): string | undefined {
-  return getCookieFromRequest(request, 'auth_token')
-}
-
-export function setXSRFCookie(response: NextResponse, token: string) {
-  setCookie(response, 'XSRF-TOKEN', token, { httpOnly: false, secure: true, path: '/' })
-}
-
-export function getXSRFCookie(request: Request): string | undefined {
-  return getCookieFromRequest(request, 'XSRF-TOKEN')
+export function getTokenCookie(name: string) {
+  return getCookie(name)
 }
 
 export function isTokenValid(token: string): boolean {

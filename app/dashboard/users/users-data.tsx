@@ -3,6 +3,7 @@ import React, { Suspense, useCallback, useMemo } from 'react'
 
 import DashboardFetchLoader from '@/components/dashboard/dashboard-fetch-loader'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -20,6 +21,7 @@ import {
 import { useDialog } from '@/hooks/useDialog'
 import { useUserList, useDeleteUser } from '@/hooks/user'
 import { UpdateUser, User, UserDetail } from '@/types'
+import { formatRoleLabel } from '@/lib/utils'
 
 import UsersDetail from './users-detail'
 import UsersEditForm from './users-edit-form'
@@ -120,8 +122,13 @@ export default function UsersData() {
               {user.userName}
             </TableCell>
             <TableCell>{user.email}</TableCell>
-            <TableCell>{user.isActived ? 'Active' : 'Inactive'}</TableCell>
-            <TableCell>{user.roleName}</TableCell>
+            <TableCell>
+              {user.isActived ?
+                <Badge variant="outline" className="dark:bg-primary/10 dark:text-primary">Active</Badge> :
+                <Badge variant="destructive" className="dark:bg-destructive/30 dark:text-red-500">Inactive</Badge>
+              }
+            </TableCell>
+            <TableCell>{formatRoleLabel(user.roleName)}</TableCell>
             <UserActions
               user={user}
               onView={handleViewUser}
@@ -161,7 +168,7 @@ export default function UsersData() {
               <UsersEditForm
                 user={userRef.current as UpdateUser}
                 onClose={() => closeDialog('edit')}
-                isOpen={dialogsOpen.edit}
+                isOpen={dialogsOpen.edit ?? false}
               />
             )}
           </Suspense>
