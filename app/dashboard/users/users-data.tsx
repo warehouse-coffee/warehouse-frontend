@@ -20,8 +20,8 @@ import {
 } from '@/components/ui/table'
 import { useDialog } from '@/hooks/useDialog'
 import { useUserList, useDeleteUser } from '@/hooks/user'
-import { UpdateUser, User, UserDetail } from '@/types'
 import { formatRoleLabel } from '@/lib/utils'
+import { UpdateUser, User, UserDetail } from '@/types'
 
 import UsersDetail from './users-detail'
 import UsersEditForm from './users-edit-form'

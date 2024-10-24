@@ -1,12 +1,12 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { toast } from 'sonner'
 
 import DashboardMain from '@/components/dashboard/dashboard-main'
 import DashboardPreloader from '@/components/dashboard/dashboard-preloader'
 import { ThemeProvider } from '@/components/theme-provider'
 import { useAuth } from '@/hooks/useAuth'
-import { toast } from 'sonner'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)

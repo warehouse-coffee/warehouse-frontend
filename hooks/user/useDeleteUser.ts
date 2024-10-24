@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+
 import { API_ENDPOINTS, METHODS } from '@/constants'
 import { handleApiError } from '@/lib/utils'
-import { toast } from 'sonner'
 
 const deleteUser = async (id: string) => {
   const response = await fetch(`${API_ENDPOINTS.DELETE_USER}?id=${id}`, {

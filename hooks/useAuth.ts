@@ -1,11 +1,12 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 import { useAuthStore } from '@/stores/auth-store'
 
 export function useAuth() {
+  const pathname = usePathname()
   const router = useRouter()
   const { isAuthenticated, userInfo, setAuth, clearAuth } = useAuthStore()
 
@@ -19,16 +20,15 @@ export function useAuth() {
       if (data.isAuthenticated) {
         setAuth(true, data.userInfo)
         localStorage.removeItem('hasShownExpiredMessage')
-
         return true
       } else {
         clearAuth()
-        const wasAuthenticated = localStorage.getItem('wasAuthenticated')
+        const wasAuthenticated = localStorage.getItem('authenticated')
         if (wasAuthenticated) {
           const hasShownExpiredMessage = localStorage.getItem('hasShownExpiredMessage')
           if (!hasShownExpiredMessage) {
             toast.error('Your session has expired. Please log in again.', {
-              duration: 3000
+              duration: 5000
             })
             localStorage.setItem('hasShownExpiredMessage', 'true')
           }
@@ -43,14 +43,14 @@ export function useAuth() {
 
   const initAuth = async () => {
     const isAuth = await checkAuth()
-    if (isAuth && window.location.pathname === '/login') {
+    if (isAuth && pathname === '/login') {
       router.replace('/dashboard')
     }
   }
 
   const clearExpiredMessage = () => {
     localStorage.removeItem('hasShownExpiredMessage')
-    localStorage.setItem('wasAuthenticated', 'true')
+    localStorage.setItem('authenticated', 'true')
   }
 
   return { isAuthenticated, userInfo, clearExpiredMessage, checkAuth, initAuth }

@@ -1,28 +1,21 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
+import { useEffect } from 'react'
 
 import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
 
 const DotPattern = dynamic(() => import('@/components/magicui/dot-pattern'), { ssr: false })
-
 import LoginForm from './login-form'
 
 export default function LoginMain() {
   const { checkAuth } = useAuth()
-  const router = useRouter()
 
   useEffect(() => {
-    const handleAuth = async () => {
-      const isAuthenticated = await checkAuth()
-      if (isAuthenticated) {
-        router.replace('/dashboard')
-      }
-    }
+    const handleAuth = async () => await checkAuth()
+
     handleAuth()
   }, [])
 

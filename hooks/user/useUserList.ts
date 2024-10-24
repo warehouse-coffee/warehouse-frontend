@@ -1,6 +1,7 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { User } from '@/types'
+
 import { API_ENDPOINTS } from '@/constants'
+import { User } from '@/types'
 
 const fetchUsers = async (): Promise<{ users: User[] }> => {
   const response = await fetch(`${API_ENDPOINTS.GET_ALL_USERS}`, {

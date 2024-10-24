@@ -1,9 +1,15 @@
-import dynamic from 'next/dynamic'
+import { redirect } from 'next/navigation'
 
-const LoginMain = dynamic(() => import('./login-main'))
+import { isTokenValid, getTokenCookie } from '@/lib/auth'
 
-export default function Login() {
-  return (
-    <LoginMain />
-  )
+import LoginMain from './login-main'
+
+export default function LoginPage() {
+  const token = getTokenCookie('auth_token')
+
+  if (token && isTokenValid(token)) {
+    redirect('/dashboard')
+  }
+
+  return <LoginMain />
 }

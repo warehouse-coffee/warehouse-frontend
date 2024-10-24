@@ -1,10 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff, TriangleAlert } from 'lucide-react'
-
+import dynamic from 'next/dynamic'
+import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import dynamic from 'next/dynamic'
 
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -17,9 +17,10 @@ import { LoginFormData } from '@/types'
 const BorderBeam = dynamic(() => import('@/components/magicui/border-beam'), { ssr: false })
 
 export default function LoginForm() {
+  const router = useRouter()
   const [error, setError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const { clearExpiredMessage, checkAuth } = useAuth()
+  const { checkAuth, clearExpiredMessage } = useAuth()
 
   const {
     register,
@@ -45,13 +46,18 @@ export default function LoginForm() {
 
       if (response.ok) {
         clearExpiredMessage()
-        await checkAuth()
+        const isAuth = await checkAuth()
 
-        toast.success('Login successful', {
-          description: 'Redirecting to dashboard...',
-          duration: 3000
-        })
-        window.location.href = '/dashboard'
+        if (isAuth) {
+          toast.success('Logged in successfully', {
+            description: 'Welcome back! Enjoy your time.',
+            duration: 3000
+          })
+
+          window.location.href = '/dashboard'
+        } else {
+          setError('Authentication failed after successful login')
+        }
       } else {
         setError(result.error || 'Login failed. Please check your credentials.')
       }

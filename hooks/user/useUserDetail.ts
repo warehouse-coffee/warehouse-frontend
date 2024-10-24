@@ -1,6 +1,7 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { UserDetail } from '@/types'
+
 import { API_ENDPOINTS } from '@/constants'
+import { UserDetail } from '@/types'
 
 const fetchUserDetail = async (id: string): Promise<UserDetail> => {
   const response = await fetch(`${API_ENDPOINTS.GET_USER_DETAIL}?id=${id}`)
