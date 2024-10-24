@@ -6,6 +6,7 @@ import DashboardMain from '@/components/dashboard/dashboard-main'
 import DashboardPreloader from '@/components/dashboard/dashboard-preloader'
 import { ThemeProvider } from '@/components/theme-provider'
 import { useAuth } from '@/hooks/useAuth'
+import { toast } from 'sonner'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
@@ -16,7 +17,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       try {
         await initAuth()
       } catch (error) {
-        // console.error('Lỗi khi khởi tạo ứng dụng:', error)
+        toast.error('Failed to initialize app')
       } finally {
         setIsLoading(false)
       }

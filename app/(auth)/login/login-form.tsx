@@ -1,26 +1,25 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff, TriangleAlert } from 'lucide-react'
-// import { useRouter } from 'next/navigation'
+
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import dynamic from 'next/dynamic'
 
-import { BorderBeam } from '@/components/magicui/border-beam'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader } from '@/components/ui/loader'
 import { loginSchema } from '@/configs/zod-schema'
-// import { useToast } from '@/hooks/useToast'
 import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
 import { LoginFormData } from '@/types'
 
-export function LoginForm() {
+const BorderBeam = dynamic(() => import('@/components/magicui/border-beam'), { ssr: false })
+
+export default function LoginForm() {
   const [error, setError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  // const router = useRouter()
   const { clearExpiredMessage, checkAuth } = useAuth()
-  // const { toast } = useToast()
 
   const {
     register,
@@ -52,7 +51,6 @@ export function LoginForm() {
           description: 'Redirecting to dashboard...',
           duration: 3000
         })
-        // router.push('/dashboard')
         window.location.href = '/dashboard'
       } else {
         setError(result.error || 'Login failed. Please check your credentials.')
@@ -153,8 +151,8 @@ const LabelInputContainer = ({
   children,
   className
 }: {
-  children: React.ReactNode;
-  className?: string;
+  children: React.ReactNode
+  className?: string
 }) => {
   return (
     <div className={cn('flex flex-col space-y-2 w-full', className)}>

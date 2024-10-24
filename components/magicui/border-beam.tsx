@@ -13,7 +13,7 @@ interface BorderBeamProps {
   delay?: number;
 }
 
-export const BorderBeam = ({
+export default function BorderBeam({
   className,
   size = 200,
   duration = 15,
@@ -22,7 +22,7 @@ export const BorderBeam = ({
   colorFrom = '#62c5ff',
   colorTo = '#62c5ff',
   delay = 0
-}: BorderBeamProps) => {
+}: BorderBeamProps) {
   return (
     <div
       style={
