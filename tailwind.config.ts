@@ -81,14 +81,6 @@ const config = {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-1.25rem)' }
         },
-        'aurora': {
-          from: {
-            backgroundPosition: '50% 50%, 50% 50%'
-          },
-          to: {
-            backgroundPosition: '350% 50%, 350% 50%'
-          }
-        },
         'border-beam': {
           '100%': {
             'offset-distance': '100%'
@@ -99,7 +91,6 @@ const config = {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'float': 'float 3s ease infinite',
-        'aurora': 'aurora 60s linear infinite',
         'border-beam': 'border-beam calc(var(--duration)*1s) infinite linear'
       },
       transitionDuration: {
