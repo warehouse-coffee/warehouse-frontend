@@ -5,6 +5,7 @@ export interface UserInfo extends JwtPayload {
   role: string;
   username: string;
   avatar: string;
+  userId: string;
 }
 
 interface CookieOptions {
@@ -47,6 +48,12 @@ export function setXSRFCookie(token: string) {
 
 export function getTokenCookie(name: string) {
   return getCookie(name)
+}
+
+export function clearAllTokens(names: string[]) {
+  names.forEach(name => {
+    cookies().delete(name)
+  })
 }
 
 export function isTokenValid(token: string): boolean {

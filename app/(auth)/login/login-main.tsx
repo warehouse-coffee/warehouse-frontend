@@ -2,23 +2,13 @@
 
 import { motion } from 'framer-motion'
 import dynamic from 'next/dynamic'
-import { useEffect } from 'react'
 
-import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
 
 const DotPattern = dynamic(() => import('@/components/magicui/dot-pattern'), { ssr: false })
 import LoginForm from './login-form'
 
 export default function LoginMain() {
-  const { checkAuth } = useAuth()
-
-  useEffect(() => {
-    const handleAuth = async () => await checkAuth()
-
-    handleAuth()
-  }, [])
-
   return (
     <div className="w-full min-h-screen overflow-hidden rounded-md bg-neutral-950 relative flex flex-col items-center justify-center">
       <DotPattern

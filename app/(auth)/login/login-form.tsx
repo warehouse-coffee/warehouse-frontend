@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff, TriangleAlert } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -17,10 +16,10 @@ import { LoginFormData } from '@/types'
 const BorderBeam = dynamic(() => import('@/components/magicui/border-beam'), { ssr: false })
 
 export default function LoginForm() {
-  const router = useRouter()
+  const { login, clearExpiredMessage } = useAuth()
+
   const [error, setError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const { checkAuth, clearExpiredMessage } = useAuth()
 
   const {
     register,
@@ -34,32 +33,14 @@ export default function LoginForm() {
   const onSubmit = async (data: LoginFormData) => {
     setError('')
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      })
-
-      const result = await response.json()
-
-      if (response.ok) {
+      const success = await login(data.email, data.password)
+      if (success) {
         clearExpiredMessage()
-        const isAuth = await checkAuth()
-
-        if (isAuth) {
-          toast.success('Logged in successfully', {
-            description: 'Welcome back! Enjoy your time.',
-            duration: 3000
-          })
-
-          window.location.href = '/dashboard'
-        } else {
-          setError('Authentication failed after successful login')
-        }
-      } else {
-        setError(result.error || 'Login failed. Please check your credentials.')
+        toast.success('Logged in successfully', {
+          description: 'Welcome back! Enjoy your time.',
+          duration: 3000
+        })
+        window.location.href = '/dashboard'
       }
     } catch (error) {
       setError('An unexpected error occurred')
@@ -132,7 +113,10 @@ export default function LoginForm() {
           disabled={isSubmitting}
         >
           {isSubmitting ? (
-            <Loader size='1.35rem' />
+            <>
+              Logging in...
+              <Loader size='1.35rem' />
+            </>
           ) : (
             'Login'
           )}

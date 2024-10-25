@@ -187,7 +187,7 @@ export default function UsersData() {
             <Button type="button" onClick={() => closeDialog('delete')} variant="outline">Cancel</Button>
             <Button
               type="submit"
-              className={`bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary ${deleteUserMutation.isPending ? 'cursor-not-allowed pointer-events-none' : ''}`}
+              className={`bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary ${deleteUserMutation.isPending ? 'flex items-center gap-3 cursor-not-allowed pointer-events-none' : ''}`}
               onClick={confirmDeleteUser}
             >
               {deleteUserMutation.isPending ? (

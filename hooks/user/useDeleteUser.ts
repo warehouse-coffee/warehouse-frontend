@@ -9,12 +9,13 @@ const deleteUser = async (id: string) => {
     method: METHODS.DELETE
   })
   if (!response.ok) {
-    throw new Error('Failed to delete user')
+    const errorData = await response.json()
+    throw new Error(errorData.error || 'Failed to delete user')
   }
   return response.json()
 }
 
-export const useDeleteUser = (onComplete: () => void) => {
+export const useDeleteUser = (onComplete?: () => void) => {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -23,11 +24,12 @@ export const useDeleteUser = (onComplete: () => void) => {
       queryClient.invalidateQueries({ queryKey: ['users'] })
       toast.success('User deleted successfully')
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       handleApiError(error)
+      toast.error(error.message)
     },
     onSettled: () => {
-      onComplete()
+      onComplete?.()
     }
   })
 }
