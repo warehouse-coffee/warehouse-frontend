@@ -1,6 +1,12 @@
 'use client'
 
 import { useQueryErrorResetBoundary } from '@tanstack/react-query'
+import {
+  getCoreRowModel,
+  getPaginationRowModel,
+  useReactTable,
+  PaginationState
+} from '@tanstack/react-table'
 import { ArrowUpDown, CirclePlus, ArrowUpAZ, ArrowDownAZ } from 'lucide-react'
 import React, { Suspense, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
@@ -28,7 +34,6 @@ import { Input } from '@/components/ui/input'
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -43,7 +48,6 @@ import {
   TableCell
 } from '@/components/ui/table'
 import { useDialog } from '@/hooks/useDialog'
-import { cn } from '@/lib/utils'
 
 import AddUserForm from './add-user-form'
 import UsersData from './users-data'
@@ -53,6 +57,30 @@ export default function UsersTable() {
 
   const { closeDialog, dialogsOpen, setDialogsOpen } = useDialog({
     add: false
+  })
+
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 5
+  })
+
+  const [totalElements, setTotalElements] = useState<number>(0)
+
+  const handleUpdateTotalElements = (total: number) => {
+    setTotalElements(total)
+  }
+
+  const table = useReactTable({
+    data: [],
+    columns: [],
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    state: {
+      pagination
+    },
+    onPaginationChange: setPagination,
+    manualPagination: true,
+    pageCount: Math.ceil(totalElements / pagination.pageSize)
   })
 
   return (
@@ -166,7 +194,7 @@ export default function UsersTable() {
               onReset={reset}
               fallbackRender={({ resetErrorBoundary }) => (
                 <TableRow>
-                  <TableCell className="flex flex-col items-center justify-center">
+                  <TableCell className="w-full flex flex-col items-center justify-center">
                     There was an error! Please try again.
                     <Button
                       type="button"
@@ -181,33 +209,53 @@ export default function UsersTable() {
               )}
             >
               <Suspense fallback={<DashboardDataSkeleton />}>
-                <UsersData />
+                <UsersData
+                  pageIndex={pagination.pageIndex}
+                  pageSize={pagination.pageSize}
+                  onUpdateTotalElements={handleUpdateTotalElements}
+                />
               </Suspense>
             </ErrorBoundary>
           </TableBody>
         </Table>
       </div>
       <div className="w-full flex items-center justify-between mt-[1.25rem]">
-        <p className="text-[.85rem] text-muted-foreground">Showing 1 to 5 of 5 users</p>
+        <p className="text-[.85rem] text-muted-foreground">
+          Showing {' '}
+          {totalElements === 0 ? 0 : table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} {' '}
+          to {' '}
+          {Math.min(
+            (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
+            totalElements
+          )}{' '}
+          of {totalElements} users
+        </p>
         <Pagination>
           <PaginationContent>
             <PaginationItem>
-              <PaginationPrevious href="#" />
+              <PaginationPrevious
+                href="#"
+                onClick={() => table.previousPage()}
+                aria-disabled={!table.getCanPreviousPage()}
+              />
             </PaginationItem>
+            {table.getPageOptions().map((pageIdx) => (
+              <PaginationItem key={pageIdx}>
+                <PaginationLink
+                  href="#"
+                  isActive={pageIdx === table.getState().pagination.pageIndex}
+                  onClick={() => table.setPageIndex(pageIdx)}
+                >
+                  {pageIdx + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
             <PaginationItem>
-              <PaginationLink href="#" isActive>1</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#">2</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#">3</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationEllipsis />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationNext href="#" />
+              <PaginationNext
+                href="#"
+                onClick={() => table.nextPage()}
+                aria-disabled={!table.getCanNextPage()}
+              />
             </PaginationItem>
           </PaginationContent>
         </Pagination>

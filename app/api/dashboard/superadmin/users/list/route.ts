@@ -2,18 +2,35 @@ import { NextResponse } from 'next/server'
 
 import { getTokenCookie, isTokenValid } from '@/lib/auth'
 
-import { SuperAdminClient } from '../../../../web-api-client'
+import { GetUserListQuery, SuperAdminClient, Page } from '../../../../web-api-client'
 
 export async function GET(request: Request) {
   const token = getTokenCookie('auth_token')
+  const xsrfToken = getTokenCookie('XSRF-TOKEN')
 
   if (!token || !isTokenValid(token)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   try {
-    const client = new SuperAdminClient(process.env.NEXT_BACKEND_API_URL, undefined, token, undefined)
-    const response = await client.getAllUsers()
+    const { searchParams } = new URL(request.url)
+    const pageNumber = parseInt(searchParams.get('pageNumber') || '1')
+    const size = parseInt(searchParams.get('size') || '5')
+
+    const client = new SuperAdminClient(process.env.NEXT_BACKEND_API_URL, undefined, token, xsrfToken)
+
+    const page = new Page({
+      pageNumber: pageNumber,
+      size: size
+    })
+
+    const query = new GetUserListQuery({
+      page: page
+    })
+
+    // console.log(query)
+
+    const response = await client.getAllUsers(query)
     return NextResponse.json(response)
   } catch (error) {
     if (error instanceof Error) {

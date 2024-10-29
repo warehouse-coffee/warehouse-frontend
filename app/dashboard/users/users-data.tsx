@@ -1,5 +1,5 @@
 import { Eye, Pencil, Trash } from 'lucide-react'
-import React, { Suspense, useCallback, useMemo } from 'react'
+import React, { Suspense, useCallback, useMemo, useEffect } from 'react'
 
 import DashboardFetchLoader from '@/components/dashboard/dashboard-fetch-loader'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -25,6 +25,12 @@ import { UpdateUser, User, UserDetail } from '@/types'
 
 import UsersDetail from './users-detail'
 import UsersEditForm from './users-edit-form'
+
+interface UsersDataProps {
+  pageIndex: number
+  pageSize: number
+  onUpdateTotalElements: (total: number) => void
+}
 
 const UserActions = React.memo(({ user, onView, onEdit, onDelete }: {
   user: User,
@@ -64,8 +70,14 @@ const UserActions = React.memo(({ user, onView, onEdit, onDelete }: {
 ))
 UserActions.displayName = 'UserActions'
 
-export default function UsersData() {
-  const { data } = useUserList()
+export default function UsersData({ pageIndex, pageSize, onUpdateTotalElements }: UsersDataProps) {
+  const { data } = useUserList(pageIndex, pageSize)
+
+  useEffect(() => {
+    if (data?.page?.totalElements !== undefined) {
+      onUpdateTotalElements(data.page.totalElements)
+    }
+  }, [data?.page?.totalElements, onUpdateTotalElements])
 
   const {
     dialogsOpen,
@@ -99,7 +111,7 @@ export default function UsersData() {
 
   const confirmDeleteUser = useCallback(() => {
     if (userRef.current) {
-      deleteUserMutation.mutate(userRef.current.id)
+      deleteUserMutation.mutate(userRef.current.id ?? '')
     }
   }, [deleteUserMutation, userRef])
 
@@ -117,7 +129,7 @@ export default function UsersData() {
             <TableCell className="flex items-center gap-3">
               <Avatar className="w-8 h-8">
                 <AvatarImage src={user.avatarImage} alt={user.userName} />
-                <AvatarFallback>{user.userName.slice(0, 2).toUpperCase()}</AvatarFallback>
+                <AvatarFallback>{user.userName?.slice(0, 2).toUpperCase()}</AvatarFallback>
               </Avatar>
               {user.userName}
             </TableCell>
@@ -128,7 +140,7 @@ export default function UsersData() {
                 <Badge variant="destructive" className="dark:bg-destructive/30 dark:text-red-500">Inactive</Badge>
               }
             </TableCell>
-            <TableCell>{formatRoleLabel(user.roleName)}</TableCell>
+            <TableCell>{formatRoleLabel(user.roleName ?? '')}</TableCell>
             <UserActions
               user={user}
               onView={handleViewUser}

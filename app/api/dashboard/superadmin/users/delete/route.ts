@@ -1,15 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { getTokenCookie, isTokenValid, getUserInfoFromToken } from '@/lib/auth'
+
 import { SuperAdminClient } from '../../../../web-api-client'
 
 function canDeleteUser(userInfo: any, targetUserId: string) {
-  if (userInfo?.userId !== targetUserId && userInfo?.role === 'Super-Admin') {
-    return { canDelete: false, error: `You can't delete other Super-Admin users` }
+  if (userInfo?.role === 'Super-Admin') {
+    if (targetUserId === userInfo?.userId) {
+      return { canDelete: false, error: 'You can\'t delete your own user' }
+    }
+    return { canDelete: true, error: null }
   }
-  if (targetUserId === userInfo?.userId) {
-    return { canDelete: false, error: `You can't delete your own user` }
-  }
-  return { canDelete: true, error: null }
+
+  return { canDelete: false, error: 'You don\'t have permission to delete users' }
 }
 
 export async function DELETE(request: NextRequest) {

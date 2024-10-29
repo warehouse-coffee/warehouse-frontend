@@ -1,12 +1,13 @@
 export type User = {
-  id: string
-  companyId: string
-  avatarImage: string
-  userName: string
-  email: string
-  phoneNumber: string
-  roleName: 'Super-Admin' | 'Admin' | 'Customer'
-  isActived: boolean
+  id?: string | undefined;
+  companyId?: string | undefined;
+  userName?: string | undefined;
+  email?: string | undefined;
+  phoneNumber?: string | undefined;
+  roleName?: string | undefined;
+  isActived?: boolean;
+  avatarImage?: string | undefined;
+  storages?: Storage[] | undefined;
 }
 
 export type UserDetail = (User & {

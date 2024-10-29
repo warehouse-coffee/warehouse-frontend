@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { getTokenCookie, clearAllTokens } from '@/lib/auth'
+
+import { getTokenCookie } from '@/lib/auth'
 
 import { IdentityUserClient } from '../../web-api-client'
 
@@ -15,7 +16,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
     }
     const result = await client.logout(id)
-    clearAllTokens(['auth_token', 'XSRF-TOKEN'])
     return NextResponse.json(result)
   } catch (error) {
     console.error('Logout error:', error)

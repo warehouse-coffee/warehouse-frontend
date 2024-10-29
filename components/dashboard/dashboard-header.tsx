@@ -1,6 +1,6 @@
 import { PanelRight, PanelLeftClose, Bell, LogOut, User, Settings } from 'lucide-react'
-import React from 'react'
 import { useRouter } from 'next/navigation'
+import React from 'react'
 import { toast } from 'sonner'
 
 import { ThemeToggle } from '@/components/theme-toggle'
@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { useAuth } from '@/hooks/useAuth'
+// import { clearAllTokens } from '@/lib/auth'
 
 export default function DashboardHeader({ toggleSidebar, sidebarOpen }: { toggleSidebar: () => void, sidebarOpen: boolean }) {
   const router = useRouter()
@@ -26,12 +27,13 @@ export default function DashboardHeader({ toggleSidebar, sidebarOpen }: { toggle
       const success = await logout(userInfo?.userId || '')
       if (success) {
         toast.success('Logged out successfully')
+        // clearAllTokens(['auth_token', 'XSRF-TOKEN'])
         router.push('/login')
       } else {
         toast.error('Logout failed. Please try again.')
       }
     } catch (error) {
-      console.error('Logout error:', error)
+      // console.error('Logout error:', error)
       toast.error('An unexpected error occurred during logout')
     }
   }
