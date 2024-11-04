@@ -12,7 +12,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         staleTime: 0,
         refetchOnWindowFocus: true,
         refetchOnReconnect: true,
-        refetchInterval: 1000 * 30,
+        // refetchInterval: 1000 * 30,
         retry: 2,
         retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000)
       },

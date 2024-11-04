@@ -1,14 +1,19 @@
 'use client'
 
+import { rankItem } from '@tanstack/match-sorter-utils'
 import { useQueryErrorResetBoundary } from '@tanstack/react-query'
 import {
   getCoreRowModel,
   getPaginationRowModel,
   useReactTable,
-  PaginationState
+  PaginationState,
+  ColumnDef,
+  FilterFn,
+  getFilteredRowModel,
+  getSortedRowModel
 } from '@tanstack/react-table'
 import { ArrowUpDown, CirclePlus, ArrowUpAZ, ArrowDownAZ } from 'lucide-react'
-import React, { Suspense, useState } from 'react'
+import React, { Suspense, useState, useEffect, useMemo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import DashboardDataSkeleton from '@/components/dashboard/dashboard-data-skeleton'
@@ -31,6 +36,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
+import { Loader } from '@/components/ui/loader'
 import {
   Pagination,
   PaginationContent,
@@ -47,10 +53,19 @@ import {
   TableRow,
   TableCell
 } from '@/components/ui/table'
+import { useDebounce } from '@/hooks/useDebounce'
 import { useDialog } from '@/hooks/useDialog'
+import { useUserList } from '@/hooks/user'
+import { User } from '@/types'
 
 import AddUserForm from './add-user-form'
 import UsersData from './users-data'
+
+const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+  const itemRank = rankItem(row.getValue(columnId), value)
+  addMeta({ itemRank })
+  return itemRank.passed
+}
 
 export default function UsersTable() {
   const { reset } = useQueryErrorResetBoundary()
@@ -65,20 +80,93 @@ export default function UsersTable() {
   })
 
   const [totalElements, setTotalElements] = useState<number>(0)
+  const [globalSearch, setGlobalSearch] = useState('')
+  const debouncedGlobalSearch = useDebounce(globalSearch, 500)
+  const [isSearching, setIsSearching] = useState<boolean>(false)
 
-  const handleUpdateTotalElements = (total: number) => {
-    setTotalElements(total)
+  const { data: userData, isFetching } = useUserList(
+    pagination.pageIndex,
+    pagination.pageSize,
+    debouncedGlobalSearch
+  )
+
+  const handleSearchEmail = (value: string) => {
+    setGlobalSearch(value)
+
+    if (!value.trim()) {
+      if (userData?.users) {
+        setData(userData.users)
+      }
+      return
+    }
+
+    const filteredEmail = data.filter(user => user.email?.toLowerCase().includes(value.toLowerCase()))
+
+    if (filteredEmail.length > 0) {
+      setData(filteredEmail)
+      setTotalElements(filteredEmail.length)
+      return
+    }
+
+    table.setGlobalFilter(value)
   }
 
+  const columns = useMemo<ColumnDef<User>[]>(() => [
+    // {
+    //   accessorKey: 'userName',
+    //   header: 'Username',
+    //   filterFn: fuzzyFilter
+    // },
+    {
+      accessorKey: 'email',
+      header: 'Email',
+      filterFn: fuzzyFilter
+    },
+    // {
+    //   accessorKey: 'isActived',
+    //   header: 'Status',
+    //   filterFn: fuzzyFilter
+    // },
+    // {
+    //   accessorKey: 'roleName',
+    //   header: 'Role',
+    //   filterFn: fuzzyFilter
+    // }
+  ], [])
+
+  const [data, setData] = useState<User[]>([])
+
+  useEffect(() => {
+    if (userData?.users) {
+      setData(userData.users)
+      setTotalElements(userData.page?.totalElements ?? 0)
+      setIsSearching(false)
+    }
+  }, [userData])
+
+  useEffect(() => {
+    if (debouncedGlobalSearch && data.length === 0) {
+      setIsSearching(true)
+    }
+  }, [debouncedGlobalSearch, data.length])
+
   const table = useReactTable({
-    data: [],
-    columns: [],
+    data,
+    columns,
     getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     state: {
-      pagination
+      pagination,
+      globalFilter: globalSearch
     },
     onPaginationChange: setPagination,
+    onGlobalFilterChange: setGlobalSearch,
+    globalFilterFn: fuzzyFilter,
+    filterFns: {
+      fuzzy: fuzzyFilter
+    },
     manualPagination: true,
     pageCount: Math.ceil(totalElements / pagination.pageSize)
   })
@@ -87,10 +175,19 @@ export default function UsersTable() {
     <div className="w-full mt-[1.5rem]">
       <div className="flex items-center justify-between w-full mb-[.85rem]">
         <div className="flex items-center gap-4">
-          <Input
-            placeholder="Filter emails..."
-            className="min-w-[20rem]"
-          />
+          <div className="relative">
+            <Input
+              placeholder="Search emails..."
+              className="min-w-[20rem]"
+              value={globalSearch}
+              onChange={(e) => handleSearchEmail(String(e.target.value))}
+            />
+            {isSearching && (
+              <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                <Loader color="#fff" size="1.15rem" />
+              </div>
+            )}
+          </div>
         </div>
         <div>
           <Dialog open={dialogsOpen.add ?? false} onOpenChange={(open) => setDialogsOpen(prev => ({ ...prev, add: open }))}>
@@ -166,9 +263,6 @@ export default function UsersTable() {
                           <ArrowDownAZ className="mr-2 h-4 w-4" />
                           <span>Descending</span>
                         </DropdownMenuItem>
-                        {/* <DropdownMenuItem>
-                          <Input placeholder="Search..." className="w-full" />
-                        </DropdownMenuItem> */}
                       </DropdownMenuGroup>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -210,9 +304,9 @@ export default function UsersTable() {
             >
               <Suspense fallback={<DashboardDataSkeleton />}>
                 <UsersData
-                  pageIndex={pagination.pageIndex}
-                  pageSize={pagination.pageSize}
-                  onUpdateTotalElements={handleUpdateTotalElements}
+                  data={data}
+                  isLoading={isFetching}
+                  table={table}
                 />
               </Suspense>
             </ErrorBoundary>
@@ -237,6 +331,7 @@ export default function UsersTable() {
                 href="#"
                 onClick={() => table.previousPage()}
                 aria-disabled={!table.getCanPreviousPage()}
+                className={!table.getCanPreviousPage() ? 'cursor-not-allowed pointer-events-none opacity-75' : ''}
               />
             </PaginationItem>
             {table.getPageOptions().map((pageIdx) => (
@@ -255,6 +350,7 @@ export default function UsersTable() {
                 href="#"
                 onClick={() => table.nextPage()}
                 aria-disabled={!table.getCanNextPage()}
+                className={!table.getCanNextPage() ? 'cursor-not-allowed pointer-events-none opacity-75' : ''}
               />
             </PaginationItem>
           </PaginationContent>

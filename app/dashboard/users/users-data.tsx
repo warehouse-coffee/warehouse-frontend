@@ -1,6 +1,8 @@
+import { flexRender, Cell, Row } from '@tanstack/react-table'
 import { Eye, Pencil, Trash } from 'lucide-react'
 import React, { Suspense, useCallback, useMemo, useEffect } from 'react'
 
+import DashboardDataSkeleton from '@/components/dashboard/dashboard-data-skeleton'
 import DashboardFetchLoader from '@/components/dashboard/dashboard-fetch-loader'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -19,7 +21,7 @@ import {
   TableRow
 } from '@/components/ui/table'
 import { useDialog } from '@/hooks/useDialog'
-import { useUserList, useDeleteUser } from '@/hooks/user'
+import { useDeleteUser } from '@/hooks/user'
 import { formatRoleLabel } from '@/lib/utils'
 import { UpdateUser, User, UserDetail } from '@/types'
 
@@ -27,9 +29,9 @@ import UsersDetail from './users-detail'
 import UsersEditForm from './users-edit-form'
 
 interface UsersDataProps {
-  pageIndex: number
-  pageSize: number
-  onUpdateTotalElements: (total: number) => void
+  data: User[]
+  isLoading: boolean
+  table: any
 }
 
 const UserActions = React.memo(({ user, onView, onEdit, onDelete }: {
@@ -70,15 +72,11 @@ const UserActions = React.memo(({ user, onView, onEdit, onDelete }: {
 ))
 UserActions.displayName = 'UserActions'
 
-export default function UsersData({ pageIndex, pageSize, onUpdateTotalElements }: UsersDataProps) {
-  const { data } = useUserList(pageIndex, pageSize)
-
-  useEffect(() => {
-    if (data?.page?.totalElements !== undefined) {
-      onUpdateTotalElements(data.page.totalElements)
-    }
-  }, [data?.page?.totalElements, onUpdateTotalElements])
-
+export default function UsersData({
+  data,
+  isLoading,
+  table
+}: UsersDataProps) {
   const {
     dialogsOpen,
     itemRef: userRef,
@@ -94,8 +92,6 @@ export default function UsersData({ pageIndex, pageSize, onUpdateTotalElements }
   const deleteUserMutation = useDeleteUser(() => {
     closeDialog('delete')
   })
-
-  const userList = useMemo(() => data?.users ?? [], [data])
 
   const handleEditUser = useCallback((user: User) => {
     openDialog('edit', user)
@@ -115,41 +111,65 @@ export default function UsersData({ pageIndex, pageSize, onUpdateTotalElements }
     }
   }, [deleteUserMutation, userRef])
 
+  if (isLoading) {
+    return <DashboardDataSkeleton />
+  }
+
+  if (table.getRowModel().rows.length === 0) {
+    return (
+      <TableRow>
+        <TableCell colSpan={5} className="h-24 text-muted-foreground text-center">
+          {table.getState().globalFilter ? (
+            <div className="flex flex-col items-center gap-1">
+              <span>
+                No users found matching &quot;<span className="font-medium">{table.getState().globalFilter}</span>&quot;
+              </span>
+              <span className="text-sm">
+                Try adjusting your search to find what you&apos;re looking for.
+              </span>
+            </div>
+          ) : (
+            'No users available.'
+          )}
+        </TableCell>
+      </TableRow>
+    )
+  }
+
   return (
     <>
-      {userList.length === 0 ? (
-        <TableRow>
-          <TableCell colSpan={5} className="h-24 text-center text-muted-foreground hover:bg-transparent">
-            No users found.
+      {table.getRowModel().rows.map((row: Row<User>) => (
+        <TableRow key={row.original.id}>
+          <TableCell className="flex items-center gap-3">
+            <Avatar className="w-8 h-8">
+              <AvatarImage src={row.original.avatarImage} alt={row.original.userName} />
+              <AvatarFallback>
+                {row.original.userName?.slice(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            {row.original.userName}
           </TableCell>
+          <TableCell>{row.original.email}</TableCell>
+          <TableCell>
+            {row.original.isActived ? (
+              <Badge variant="outline" className="dark:bg-primary/10 dark:text-primary">
+                Active
+              </Badge>
+            ) : (
+              <Badge variant="destructive" className="dark:bg-destructive/30 dark:text-red-500">
+                Inactive
+              </Badge>
+            )}
+          </TableCell>
+          <TableCell>{formatRoleLabel(row.original.roleName ?? '')}</TableCell>
+          <UserActions
+            user={row.original}
+            onView={handleViewUser}
+            onEdit={handleEditUser}
+            onDelete={handleDeleteUser}
+          />
         </TableRow>
-      ) : (
-        userList.map((user: User) => (
-          <TableRow key={user.id}>
-            <TableCell className="flex items-center gap-3">
-              <Avatar className="w-8 h-8">
-                <AvatarImage src={user.avatarImage} alt={user.userName} />
-                <AvatarFallback>{user.userName?.slice(0, 2).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              {user.userName}
-            </TableCell>
-            <TableCell>{user.email}</TableCell>
-            <TableCell>
-              {user.isActived ?
-                <Badge variant="outline" className="dark:bg-primary/10 dark:text-primary">Active</Badge> :
-                <Badge variant="destructive" className="dark:bg-destructive/30 dark:text-red-500">Inactive</Badge>
-              }
-            </TableCell>
-            <TableCell>{formatRoleLabel(user.roleName ?? '')}</TableCell>
-            <UserActions
-              user={user}
-              onView={handleViewUser}
-              onEdit={handleEditUser}
-              onDelete={handleDeleteUser}
-            />
-          </TableRow>
-        ))
-      )}
+      ))}
 
       <Dialog open={dialogsOpen.detail} onOpenChange={(open) => setDialogsOpen(prev => ({ ...prev, detail: open }))}>
         <DialogContent className="max-w-[35rem]">

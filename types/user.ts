@@ -8,6 +8,7 @@ export type User = {
   isActived?: boolean;
   avatarImage?: string | undefined;
   storages?: Storage[] | undefined;
+  totalElements?: number;
 }
 
 export type UserDetail = (User & {

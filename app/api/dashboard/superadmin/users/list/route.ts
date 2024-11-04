@@ -14,8 +14,9 @@ export async function GET(request: Request) {
 
   try {
     const { searchParams } = new URL(request.url)
-    const pageNumber = parseInt(searchParams.get('pageNumber') || '1')
-    const size = parseInt(searchParams.get('size') || '5')
+    const pageNumber = parseInt(searchParams.get('pageNumber') || '')
+    const size = parseInt(searchParams.get('size') || '')
+    // const searchText = searchParams.get('searchText')
 
     const client = new SuperAdminClient(process.env.NEXT_BACKEND_API_URL, undefined, token, xsrfToken)
 
@@ -26,9 +27,8 @@ export async function GET(request: Request) {
 
     const query = new GetUserListQuery({
       page: page
+      // searchText: searchText || ''
     })
-
-    // console.log(query)
 
     const response = await client.getAllUsers(query)
     return NextResponse.json(response)
