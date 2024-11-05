@@ -1,7 +1,7 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import { TableCell, TableRow } from '@/components/ui/table'
 
-export default function DashboardDataSkeleton() {
+export default function UsersDataLoading() {
   return (
     [...Array(5)].map((_, index) => (
       <TableRow key={index}>

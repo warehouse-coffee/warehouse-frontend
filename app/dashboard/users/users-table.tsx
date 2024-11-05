@@ -16,7 +16,7 @@ import { ArrowUpDown, CirclePlus, ArrowUpAZ, ArrowDownAZ } from 'lucide-react'
 import React, { Suspense, useState, useEffect, useMemo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
-import DashboardDataSkeleton from '@/components/dashboard/dashboard-data-skeleton'
+import UsersDataLoading from '@/app/dashboard/users/users-data-loading'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -84,7 +84,7 @@ export default function UsersTable() {
   const debouncedGlobalSearch = useDebounce(globalSearch, 500)
   const [isSearching, setIsSearching] = useState<boolean>(false)
 
-  const { data: userData, isFetching } = useUserList(
+  const { data: userData } = useUserList(
     pagination.pageIndex,
     pagination.pageSize,
     debouncedGlobalSearch
@@ -302,10 +302,9 @@ export default function UsersTable() {
                 </TableRow>
               )}
             >
-              <Suspense fallback={<DashboardDataSkeleton />}>
+              <Suspense fallback={<UsersDataLoading />}>
                 <UsersData
                   data={data}
-                  isLoading={isFetching}
                   table={table}
                 />
               </Suspense>
@@ -322,7 +321,7 @@ export default function UsersTable() {
             (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
             totalElements
           )}{' '}
-          of {totalElements} users
+          of {totalElements} user{totalElements > 1 ? 's' : ''}
         </p>
         <Pagination>
           <PaginationContent>

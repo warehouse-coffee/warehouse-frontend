@@ -7,6 +7,8 @@ import {
   BreadcrumbSeparator
 } from '@/components/ui/breadcrumb'
 
+import LogsTable from './logs-table'
+
 export default function LogsPage() {
   return (
     <>
@@ -29,6 +31,7 @@ export default function LogsPage() {
           </p>
         </div>
       </div>
+      <LogsTable />
     </>
   )
 }

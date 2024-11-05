@@ -1,8 +1,7 @@
-import { flexRender, Cell, Row } from '@tanstack/react-table'
+import { Row } from '@tanstack/react-table'
 import { Eye, Pencil, Trash } from 'lucide-react'
-import React, { Suspense, useCallback, useMemo, useEffect } from 'react'
+import React, { Suspense, useCallback } from 'react'
 
-import DashboardDataSkeleton from '@/components/dashboard/dashboard-data-skeleton'
 import DashboardFetchLoader from '@/components/dashboard/dashboard-fetch-loader'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -30,7 +29,6 @@ import UsersEditForm from './users-edit-form'
 
 interface UsersDataProps {
   data: User[]
-  isLoading: boolean
   table: any
 }
 
@@ -74,7 +72,6 @@ UserActions.displayName = 'UserActions'
 
 export default function UsersData({
   data,
-  isLoading,
   table
 }: UsersDataProps) {
   const {
@@ -110,10 +107,6 @@ export default function UsersData({
       deleteUserMutation.mutate(userRef.current.id ?? '')
     }
   }, [deleteUserMutation, userRef])
-
-  if (isLoading) {
-    return <DashboardDataSkeleton />
-  }
 
   if (table.getRowModel().rows.length === 0) {
     return (

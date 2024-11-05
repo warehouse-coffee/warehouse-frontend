@@ -32,3 +32,7 @@ export const formatLabel = (key: string): string => {
 export const formatRoleLabel = (role: string) => {
   return role.replace(/-/g, ' ').replace(/\b\w/g, char => char.toUpperCase())
 }
+
+export const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleString()
+}
