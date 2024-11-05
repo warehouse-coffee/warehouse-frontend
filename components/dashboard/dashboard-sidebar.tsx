@@ -10,12 +10,12 @@ import { cn } from '@/lib/utils'
 import { DashboardSidebarItems } from '@/types'
 
 const sidebarItems: DashboardSidebarItems[] = [
-  { name: 'Dashboard', href: '/dashboard', icon: Home, requiredRoles: ['Super-Admin', 'Admin', 'Customer'] },
-  { name: 'Storages', href: '/dashboard/storages', icon: Warehouse, requiredRoles: ['Admin', 'Customer'] },
-  { name: 'Products', href: '/dashboard/products', icon: Boxes, requiredRoles: ['Admin', 'Customer'] },
-  { name: 'Orders', href: '/dashboard/orders', icon: Truck, requiredRoles: ['Admin', 'Customer'] },
+  { name: 'Dashboard', href: '/dashboard', icon: Home, requiredRoles: ['Super-Admin', 'Admin', 'Employee'] },
+  { name: 'Storages', href: '/dashboard/storages', icon: Warehouse, requiredRoles: ['Admin', 'Employee'] },
+  { name: 'Products', href: '/dashboard/products', icon: Boxes, requiredRoles: ['Admin', 'Employee'] },
+  { name: 'Orders', href: '/dashboard/orders', icon: Truck, requiredRoles: ['Admin', 'Employee'] },
   { name: 'Employees', href: '/dashboard/employees', icon: Users, requiredRoles: ['Admin'] },
-  { name: 'Reports', href: '/dashboard/reports', icon: File, requiredRoles: ['Admin', 'Customer'] },
+  { name: 'Reports', href: '/dashboard/reports', icon: File, requiredRoles: ['Admin', 'Employee'] },
   { name: 'Company Settings', href: '/dashboard/company-settings', icon: Settings, requiredRoles: ['Admin'] },
   { name: 'Users', href: '/dashboard/users', icon: Users, requiredRoles: ['Super-Admin'] },
   { name: 'Logs', href: '/dashboard/logs', icon: Logs, requiredRoles: ['Super-Admin'] },

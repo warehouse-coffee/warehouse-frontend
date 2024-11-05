@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { getTokenCookie, isTokenValid, getUserInfoFromToken } from '@/lib/auth'
+import { cookieStore, tokenUtils } from '@/lib/auth'
 
 import { SuperAdminClient } from '../../../../web-api-client'
 
@@ -16,14 +16,14 @@ function canDeleteUser(userInfo: any, targetUserId: string) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const token = getTokenCookie('auth_token')
-  const xsrfToken = getTokenCookie('XSRF-TOKEN')
+  const token = cookieStore.get('auth_token')
+  const xsrfToken = cookieStore.get('XSRF-TOKEN')
 
-  if (!token || !isTokenValid(token)) {
+  if (!token || !tokenUtils.isValid(token)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const userInfo = getUserInfoFromToken(token)
+  const userInfo = tokenUtils.getUserInfo(token)
 
   try {
     const { searchParams } = new URL(request.url)

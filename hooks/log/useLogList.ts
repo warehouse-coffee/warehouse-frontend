@@ -23,8 +23,6 @@ const fetchLogs = async ({ pageIndex, pageSize }: FetchLogsParams) => {
 
   const data = await response.json()
 
-  console.log(data)
-
   if (!data || data.error) {
     throw new Error(data?.error || 'No data received')
   }

@@ -74,6 +74,7 @@ export default function UsersData({
   data,
   table
 }: UsersDataProps) {
+
   const {
     dialogsOpen,
     itemRef: userRef,

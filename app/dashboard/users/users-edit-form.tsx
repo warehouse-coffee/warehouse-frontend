@@ -7,14 +7,19 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader } from '@/components/ui/loader'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ROLE_NAMES, RoleName } from '@/constants'
+import { ROLE_NAMES } from '@/constants'
+import { useCompanyList } from '@/hooks/company'
 import { useUpdateUser } from '@/hooks/user'
 import { cn, formatLabel, formatRoleLabel } from '@/lib/utils'
-import { UpdateUser } from '@/types'
+import { UpdateUser, RoleName, CompanyInfo } from '@/types'
 
 type EditFormType = UpdateUser & { password: string }
 
 export default function UsersEditForm({ user, onClose, isOpen }: { user: UpdateUser, onClose: () => void, isOpen: boolean }) {
+  const { data: companyData } = useCompanyList()
+
+  const companyList = companyData?.companyList || []
+
   const [editForm, setEditForm] = useState<EditFormType>({ ...user, password: '' })
   const [showPassword, setShowPassword] = useState(false)
   const initialFormRef = useRef<EditFormType>({ ...user, password: '' })
@@ -112,6 +117,24 @@ export default function UsersEditForm({ user, onClose, isOpen }: { user: UpdateU
                     {showPassword ? <EyeOff className="h-4 w-4 text-[#fff]" /> : <Eye className="h-4 w-4 text-[#fff]" />}
                   </button>
                 </div>
+              ) : key === 'companyId' ? (
+                <Select
+                  value={value as string}
+                  onValueChange={(newValue) => handleSelectChange(key, newValue)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select company" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {companyList.map((company: CompanyInfo) => (
+                        <SelectItem key={company.companyId} value={company.companyId}>
+                          {company.companyId}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               ) : (
                 <Input
                   id={`edit-${key}`}

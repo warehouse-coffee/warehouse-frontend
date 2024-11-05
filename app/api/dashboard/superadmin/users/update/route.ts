@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { getTokenCookie, isTokenValid } from '@/lib/auth'
+import { cookieStore, tokenUtils } from '@/lib/auth'
 
 import { SuperAdminClient, SwaggerException, UpdateUserCommand } from '../../../../web-api-client'
 
 export async function PUT(request: NextRequest) {
-  const token = getTokenCookie('auth_token')
-  const xsrfToken = getTokenCookie('XSRF-TOKEN')
+  const token = cookieStore.get('auth_token')
+  const xsrfToken = cookieStore.get('XSRF-TOKEN')
 
-  if (!token || !isTokenValid(token)) {
+  if (!token || !tokenUtils.isValid(token)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

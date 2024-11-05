@@ -4,7 +4,7 @@ export type CreateUserInput = {
   email: string;
   phoneNumber: string;
   companyId: string
-  roleName: 'Super-Admin' | 'Admin' | 'Customer'
+  roleName: string
 }
 
 export type CreateUser = CreateUserInput

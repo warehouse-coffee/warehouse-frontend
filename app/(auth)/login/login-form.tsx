@@ -16,7 +16,7 @@ import { LoginFormData } from '@/types'
 const BorderBeam = dynamic(() => import('@/components/magicui/border-beam'), { ssr: false })
 
 export default function LoginForm() {
-  const { login, clearExpiredMessage } = useAuth()
+  const { login } = useAuth()
 
   const [error, setError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -35,7 +35,6 @@ export default function LoginForm() {
     try {
       const success = await login(data.email, data.password)
       if (success) {
-        clearExpiredMessage()
         toast.success('Logged in successfully', {
           description: 'Welcome back! Enjoy your time.',
           duration: 3000

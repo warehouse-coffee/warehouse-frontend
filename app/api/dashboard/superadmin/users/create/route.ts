@@ -1,19 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { getTokenCookie, isTokenValid } from '@/lib/auth'
+import { cookieStore, tokenUtils } from '@/lib/auth'
 
 import { SuperAdminClient, CreateUserCommand, SwaggerException } from '../../../../web-api-client'
 
 export async function POST(request: NextRequest) {
-  const token = getTokenCookie('auth_token')
-  const xsrfToken = getTokenCookie('XSRF-TOKEN')
+  const token = cookieStore.get('auth_token')
+  const xsrfToken = cookieStore.get('XSRF-TOKEN')
 
-  if (!token || !isTokenValid(token)) {
+  if (!token || !tokenUtils.isValid(token)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   try {
     const createUserData = await request.json()
+    console.log(createUserData)
     const createUserCommand = new CreateUserCommand({ ...createUserData })
     const client = new SuperAdminClient(process.env.NEXT_BACKEND_API_URL, undefined, token, xsrfToken)
     const result = await client.userRegister(createUserCommand)

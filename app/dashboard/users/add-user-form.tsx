@@ -7,10 +7,11 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader } from '@/components/ui/loader'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ROLE_NAMES, RoleName } from '@/constants'
+import { ROLE_NAMES } from '@/constants'
+import { useCompanyList } from '@/hooks/company'
 import { useCreateUser } from '@/hooks/user'
 import { cn, formatLabel, formatRoleLabel } from '@/lib/utils'
-import { CreateUserInput } from '@/types'
+import { CompanyInfo, CreateUserInput, RoleName } from '@/types'
 
 const initialFormState: CreateUserInput = {
   userName: '',
@@ -18,7 +19,7 @@ const initialFormState: CreateUserInput = {
   email: '',
   phoneNumber: '',
   companyId: '',
-  roleName: 'Customer'
+  roleName: ''
 }
 
 export default function AddUserForm({ onClose }: { onClose: () => void }) {
@@ -27,6 +28,10 @@ export default function AddUserForm({ onClose }: { onClose: () => void }) {
   const initialFormRef = useRef<CreateUserInput>(initialFormState)
 
   const createUserMutation = useCreateUser(onClose)
+
+  const { data: companyData } = useCompanyList()
+
+  const companyList = companyData?.companyList || []
 
   const handleCreateUser = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -93,6 +98,25 @@ export default function AddUserForm({ onClose }: { onClose: () => void }) {
                     {showPassword ? <EyeOff className="h-4 w-4 text-[#fff]" /> : <Eye className="h-4 w-4 text-[#fff]" />}
                   </button>
                 </div>
+              ) : key === 'companyId' ? (
+                <Select
+                  required
+                  value={value}
+                  onValueChange={(newValue) => setCreateForm(prev => ({ ...prev, [key]: newValue }))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select company" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {companyList.map((company: CompanyInfo) => (
+                        <SelectItem key={company.companyId} value={company.companyId}>
+                          {company.companyId}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               ) : (
                 <Input
                   required
