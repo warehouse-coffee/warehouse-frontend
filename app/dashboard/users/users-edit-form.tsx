@@ -37,6 +37,8 @@ export default function UsersEditForm({ user, onClose, isOpen }: { user: UpdateU
     e.preventDefault()
     const updateData: Partial<UpdateUser> = { ...editForm }
 
+    // console.log(updateData)
+
     if (editForm.password) {
       updateData.password = editForm.password
     }

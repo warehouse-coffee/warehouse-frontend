@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+
 import { tokenUtils } from './lib/auth'
 
 const protectedRoutes = ['/dashboard']

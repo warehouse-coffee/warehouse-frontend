@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { CompaniesClient } from '@/app/api/web-api-client'
-import { getServerCookie } from '@/lib/server-auth'
+import { CompaniesClient } from '../../../../web-api-client'
+import { cookieStore } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
-  const token = getServerCookie('auth_token')
-  const xsrfToken = getServerCookie('XSRF-TOKEN')
+  const token = cookieStore.get('auth_token')
+  const xsrfToken = cookieStore.get('XSRF-TOKEN')
 
   try {
     const client = new CompaniesClient(process.env.NEXT_BACKEND_API_URL, undefined, token, xsrfToken)

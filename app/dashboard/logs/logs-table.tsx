@@ -39,6 +39,8 @@ export default function LogsTable() {
     pageIndex: 0,
     pageSize: 5
   })
+  const [searchTerm, setSearchTerm] = useState('')
+  const [totalPages, setTotalPages] = useState<number>(0)
   const [totalElements, setTotalElements] = useState<number>(0)
   const [data, setData] = useState<any[]>([])
 
@@ -47,16 +49,40 @@ export default function LogsTable() {
     pagination.pageSize
   )
 
+  // console.log(logData)
+
   useEffect(() => {
     if (logData?.logVMs) {
       setData(logData.logVMs)
       setTotalElements(logData.page?.totalElements ?? 0)
+      setTotalPages(logData.page?.totalPages ?? 0)
     }
-  }, [logData])
+  }, [logData, pagination.pageSize])
 
   const table = useReactTable({
     data,
-    columns: [],
+    columns: [
+      {
+        accessorKey: 'date',
+        header: 'Date'
+      },
+      {
+        accessorKey: 'logLevel',
+        header: 'Level'
+      },
+      {
+        accessorKey: 'message',
+        header: 'Message'
+      },
+      {
+        accessorKey: 'hour',
+        header: 'Hour'
+      },
+      {
+        accessorKey: 'type',
+        header: 'Type'
+      }
+    ],
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     state: {
@@ -64,8 +90,12 @@ export default function LogsTable() {
     },
     onPaginationChange: setPagination,
     manualPagination: true,
-    pageCount: Math.ceil(totalElements / pagination.pageSize)
+    pageCount: totalPages
   })
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value)
+  }
 
   return (
     <div className="w-full mt-[1.5rem]">
@@ -75,8 +105,8 @@ export default function LogsTable() {
             <Input
               placeholder="Search logs..."
               className="min-w-[20rem]"
-              value=""
-              // onChange={(e) => {}}
+              value={searchTerm}
+              onChange={handleSearch}
             />
             {/* {isSearching && (
               <div className="absolute right-4 top-1/2 -translate-y-1/2">
@@ -131,10 +161,10 @@ export default function LogsTable() {
       <div className="w-full flex items-center justify-between mt-[1.25rem]">
         <p className="text-[.85rem] text-muted-foreground">
           Showing {' '}
-          {totalElements === 0 ? 0 : table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} {' '}
+          {totalElements === 0 ? 0 : pagination.pageIndex * pagination.pageSize + 1} {' '}
           to {' '}
           {Math.min(
-            (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
+            (pagination.pageIndex + 1) * pagination.pageSize,
             totalElements
           )}{' '}
           of {totalElements} log{totalElements > 1 ? 's' : ''}
@@ -144,28 +174,37 @@ export default function LogsTable() {
             <PaginationItem>
               <PaginationPrevious
                 href="#"
-                onClick={() => table.previousPage()}
+                onClick={(e) => {
+                  e.preventDefault()
+                  table.previousPage()
+                }}
                 aria-disabled={!table.getCanPreviousPage()}
-                className={!table.getCanPreviousPage() ? 'cursor-not-allowed pointer-events-none opacity-75' : ''}
+                className={!table.getCanPreviousPage() ? 'pointer-events-none opacity-50' : ''}
               />
             </PaginationItem>
-            {table.getPageOptions().map((pageIdx) => (
-              <PaginationItem key={pageIdx}>
+            {Array.from({ length: Math.max(1, totalPages) }, (_, i) => (
+              <PaginationItem key={i}>
                 <PaginationLink
                   href="#"
-                  isActive={pageIdx === table.getState().pagination.pageIndex}
-                  onClick={() => table.setPageIndex(pageIdx)}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    table.setPageIndex(i)
+                  }}
+                  isActive={i === pagination.pageIndex}
                 >
-                  {pageIdx + 1}
+                  {i + 1}
                 </PaginationLink>
               </PaginationItem>
             ))}
             <PaginationItem>
               <PaginationNext
                 href="#"
-                onClick={() => table.nextPage()}
+                onClick={(e) => {
+                  e.preventDefault()
+                  table.nextPage()
+                }}
                 aria-disabled={!table.getCanNextPage()}
-                className={!table.getCanNextPage() ? 'cursor-not-allowed pointer-events-none opacity-75' : ''}
+                className={!table.getCanNextPage() ? 'pointer-events-none opacity-50' : ''}
               />
             </PaginationItem>
           </PaginationContent>
