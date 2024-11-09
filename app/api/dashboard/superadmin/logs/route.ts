@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     })
 
     const result = await client.getLogs(query)
-    
+
     console.log('API Response:', {
       totalElements: result.page?.totalElements,
       pageSize: size,

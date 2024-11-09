@@ -1,6 +1,5 @@
 import { PanelRight, PanelLeftClose, Bell, LogOut, User, Settings } from 'lucide-react'
 import React from 'react'
-import { toast } from 'sonner'
 
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -16,15 +15,14 @@ import {
 import { Input } from '@/components/ui/input'
 import { useAuth } from '@/hooks/useAuth'
 
-export default function DashboardHeader({ toggleSidebar, sidebarOpen }: { toggleSidebar: () => void, sidebarOpen: boolean }) {
-  const { userInfo, logout } = useAuth()
+interface DashboardHeaderProps {
+  toggleSidebar: () => void
+  sidebarOpen: boolean
+  onLogout: () => Promise<void>
+}
 
-  const handleLogout = async () => {
-    const success = await logout(userInfo?.userId || '')
-    if (success) {
-      toast.success('Logged out successfully')
-    }
-  }
+export default function DashboardHeader({ toggleSidebar, sidebarOpen, onLogout }: DashboardHeaderProps) {
+  const { userInfo } = useAuth()
 
   return (
     <header className="flex items-center justify-between p-4 border-b dark:border-b-[#202020] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -71,7 +69,7 @@ export default function DashboardHeader({ toggleSidebar, sidebarOpen }: { toggle
               <span className='text-[.85rem]'>Settings</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727] mb-2" />
-            <DropdownMenuItem className="px-2 h-9 text-[#ff0000] hover:text-[#ff0000] dark:text-[#ff1717] hover:font-bold hover:bg-red-500/10 dark:hover:bg-red-900/30 cursor-pointer transition-all duration-250 [&>*]:text-[#ff0000] [&>*]:dark:text-[#ff1717] [&>*]:hover:text-[#ff0000] [&>*]:dark:hover:text-[#ff1717]" onClick={handleLogout}>
+            <DropdownMenuItem className="px-2 h-9 text-[#ff0000] hover:text-[#ff0000] dark:text-[#ff1717] hover:font-bold hover:bg-red-500/10 dark:hover:bg-red-900/30 cursor-pointer transition-all duration-250 [&>*]:text-[#ff0000] [&>*]:dark:text-[#ff1717] [&>*]:hover:text-[#ff0000] [&>*]:dark:hover:text-[#ff1717]" onClick={onLogout}>
               <LogOut className="mr-2 h-4 w-4" />
               <span className='text-[.85rem]'>Log out</span>
             </DropdownMenuItem>

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { CompaniesClient } from '../../../../web-api-client'
 import { cookieStore } from '@/lib/auth'
+
+import { CompaniesClient } from '../../../../web-api-client'
 
 export async function GET(request: NextRequest) {
   const token = cookieStore.get('auth_token')
