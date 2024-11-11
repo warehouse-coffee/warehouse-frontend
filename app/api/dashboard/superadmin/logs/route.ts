@@ -30,13 +30,13 @@ export async function GET(request: NextRequest) {
 
     const result = await client.getLogs(query)
 
-    console.log('API Response:', {
-      totalElements: result.page?.totalElements,
-      pageSize: size,
-      currentPage: pageNumber,
-      totalPages: result.page?.totalPages,
-      data: result.logVMs?.length
-    })
+    // console.log('API Response:', {
+    //   totalElements: result.page?.totalElements,
+    //   pageSize: size,
+    //   currentPage: pageNumber,
+    //   totalPages: result.page?.totalPages,
+    //   data: result.logVMs?.length
+    // })
 
     return NextResponse.json(result)
   } catch (error) {

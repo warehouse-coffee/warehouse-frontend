@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { Badge } from '@/components/ui/badge'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { formatDate } from '@/lib/utils'
@@ -12,13 +13,13 @@ interface LogsDataProps {
 
 const LOG_LEVEL_STYLES: Record<LogLevel, { className: string }> = {
   INFO: {
-    className: "dark:bg-primary/10 dark:text-primary"
+    className: 'dark:bg-primary/10 dark:text-primary'
   },
   WARNING: {
-    className: "dark:bg-yellow-500/30 dark:text-yellow-500"
+    className: 'dark:bg-yellow-500/30 dark:text-yellow-500'
   },
   ERROR: {
-    className: "dark:bg-destructive/30 dark:text-red-500"
+    className: 'dark:bg-destructive/30 dark:text-red-500'
   }
 } as const
 
@@ -38,8 +39,8 @@ export default function LogsData({ data, isLoading, table }: LogsDataProps) {
   if (rows.length === 0) {
     return (
       <TableRow>
-        <TableCell 
-          colSpan={5} 
+        <TableCell
+          colSpan={5}
           className="h-24 text-center text-muted-foreground"
         >
           No logs available.

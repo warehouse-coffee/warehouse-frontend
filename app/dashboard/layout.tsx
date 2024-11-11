@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 
 import { AuthWrapper } from '@/components/auth-wrapper'
 import DashboardMain from '@/components/dashboard/dashboard-main'
 import { ThemeProvider } from '@/components/theme-provider'
+
+import DashboardLoading from './loading'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -13,7 +15,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       enableSystem
     >
       <AuthWrapper>
-        <DashboardMain>{children}</DashboardMain>
+        <DashboardMain>
+          <Suspense fallback={<DashboardLoading />}>{children}</Suspense>
+        </DashboardMain>
       </AuthWrapper>
     </ThemeProvider>
   )

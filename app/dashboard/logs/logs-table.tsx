@@ -56,8 +56,16 @@ export default function LogsTable() {
       setData(logData.logVMs)
       setTotalElements(logData.page?.totalElements ?? 0)
       setTotalPages(logData.page?.totalPages ?? 0)
+
+      console.log('Log Data:', {
+        totalElements: logData.page?.totalElements,
+        totalPages: logData.page?.totalPages,
+        currentPage: pagination.pageIndex + 1,
+        pageSize: pagination.pageSize,
+        dataLength: logData.logVMs.length
+      })
     }
-  }, [logData, pagination.pageSize])
+  }, [logData])
 
   const table = useReactTable({
     data,

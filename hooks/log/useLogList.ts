@@ -13,11 +13,11 @@ const fetchLogs = async ({ pageIndex, pageSize }: FetchLogsParams) => {
     size: pageSize.toString()
   })
 
-  console.log('Fetching logs with params:', {
-    pageIndex,
-    pageSize,
-    url: `${API_ENDPOINTS.GET_ALL_LOGS}?${params}`
-  })
+  // console.log('Fetching logs with params:', {
+  //   pageIndex,
+  //   pageSize,
+  //   url: `${API_ENDPOINTS.GET_ALL_LOGS}?${params}`
+  // })
 
   const response = await fetch(`${API_ENDPOINTS.GET_ALL_LOGS}?${params}`, {
     credentials: 'include'

@@ -739,16 +739,31 @@ export class CustomersClient {
         }
         return Promise.resolve<ResponseDto>(null as any);
     }
+}
 
-    updateCustomer(command: UpdateCustomerCommand): Promise<ResponseDto> {
-        let url_ = this.baseUrl + "/api/Customers";
+export class EmployeesClient {
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
+    private token: string;
+    private XSRF: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string, XSRF?: string) {
+         this.http = http || { fetch: fetch as any };
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+        this.token = token || "";
+        this.XSRF = XSRF || "";
+    }
+
+    createEmployee(command: CreateEmployeeCommand): Promise<ResponseDto> {
+        let url_ = this.baseUrl + "/api/Employees";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(command);
 
         let options_: RequestInit = {
             body: content_,
-            method: "PUT",
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
@@ -758,11 +773,11 @@ export class CustomersClient {
         };
 
         return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processUpdateCustomer(_response);
+            return this.processCreateEmployee(_response);
         });
     }
 
-    protected processUpdateCustomer(response: Response): Promise<ResponseDto> {
+    protected processCreateEmployee(response: Response): Promise<ResponseDto> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -780,8 +795,48 @@ export class CustomersClient {
         return Promise.resolve<ResponseDto>(null as any);
     }
 
-    getListCustomer(query: GetListCustomerQuery): Promise<EmployeeListVM> {
-        let url_ = this.baseUrl + "/api/Customers/all";
+    updateEmployee(command: UpdateEmployeeCommand): Promise<ResponseDto> {
+        let url_ = this.baseUrl + "/api/Employees";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(command);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processUpdateEmployee(_response);
+        });
+    }
+
+    protected processUpdateEmployee(response: Response): Promise<ResponseDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResponseDto.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<ResponseDto>(null as any);
+    }
+
+    getListEmployee(query: GetListEmployeeQuery): Promise<EmployeeListVM> {
+        let url_ = this.baseUrl + "/api/Employees/all";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(query);
@@ -798,11 +853,11 @@ export class CustomersClient {
         };
 
         return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processGetListCustomer(_response);
+            return this.processGetListEmployee(_response);
         });
     }
 
-    protected processGetListCustomer(response: Response): Promise<EmployeeListVM> {
+    protected processGetListEmployee(response: Response): Promise<EmployeeListVM> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -820,8 +875,8 @@ export class CustomersClient {
         return Promise.resolve<EmployeeListVM>(null as any);
     }
 
-    getCustomerDetail(id: string): Promise<CustomerDetailVM> {
-        let url_ = this.baseUrl + "/api/Customers/{id}";
+    getEmployeeDetail(id: string): Promise<EmployeeDetailVM> {
+        let url_ = this.baseUrl + "/api/Employees/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -837,18 +892,18 @@ export class CustomersClient {
         };
 
         return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processGetCustomerDetail(_response);
+            return this.processGetEmployeeDetail(_response);
         });
     }
 
-    protected processGetCustomerDetail(response: Response): Promise<CustomerDetailVM> {
+    protected processGetEmployeeDetail(response: Response): Promise<EmployeeDetailVM> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
             return response.text().then((_responseText) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = CustomerDetailVM.fromJS(resultData200);
+            result200 = EmployeeDetailVM.fromJS(resultData200);
             return result200;
             });
         } else if (status !== 200 && status !== 204) {
@@ -856,11 +911,11 @@ export class CustomersClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
-        return Promise.resolve<CustomerDetailVM>(null as any);
+        return Promise.resolve<EmployeeDetailVM>(null as any);
     }
 
-    deleteCustomer(id: string): Promise<boolean> {
-        let url_ = this.baseUrl + "/api/Customers/{id}";
+    deleteEmployee(id: string): Promise<boolean> {
+        let url_ = this.baseUrl + "/api/Employees/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -876,11 +931,11 @@ export class CustomersClient {
         };
 
         return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processDeleteCustomer(_response);
+            return this.processDeleteEmployee(_response);
         });
     }
 
-    protected processDeleteCustomer(response: Response): Promise<boolean> {
+    protected processDeleteEmployee(response: Response): Promise<boolean> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -1033,6 +1088,61 @@ export class IdentityUserClient {
             });
         }
         return Promise.resolve<boolean>(null as any);
+    }
+}
+
+export class InventoriesOutboundClient {
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
+    private token: string;
+    private XSRF: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string, XSRF?: string) {
+         this.http = http || { fetch: fetch as any };
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+        this.token = token || "";
+        this.XSRF = XSRF || "";
+    }
+
+    createInventoryOutbound(command: CreateInventoryOutboundCommand): Promise<ResponseDto> {
+        let url_ = this.baseUrl + "/api/InventoriesOutbound";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(command);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processCreateInventoryOutbound(_response);
+        });
+    }
+
+    protected processCreateInventoryOutbound(response: Response): Promise<ResponseDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResponseDto.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<ResponseDto>(null as any);
     }
 }
 
@@ -1262,6 +1372,46 @@ export class OrdersClient {
             });
         }
         return Promise.resolve<OrderDetailVM>(null as any);
+    }
+
+    saleOrder(command: SaleOrderCommand): Promise<ResponseDto> {
+        let url_ = this.baseUrl + "/api/Orders/sale";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(command);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processSaleOrder(_response);
+        });
+    }
+
+    protected processSaleOrder(response: Response): Promise<ResponseDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResponseDto.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<ResponseDto>(null as any);
     }
 }
 
@@ -1690,16 +1840,15 @@ export class SuperAdminClient {
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
             return response.text().then((_responseText) => {
-                let result200: any = null;
-                let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-                result200 = ResponseDto.fromJS(resultData200);
-                return result200;
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResponseDto.fromJS(resultData200);
+            return result200;
             });
         } else if (status !== 200 && status !== 204) {
             return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            
-        });
+            });
         }
         return Promise.resolve<ResponseDto>(null as any);
     }
@@ -1872,7 +2021,7 @@ export interface ICategoryDto {
 export class ProductDto implements IProductDto {
     name?: string | undefined;
     units?: string | undefined;
-    amount?: number;
+    quantity?: number;
     image?: string | undefined;
     status?: string | undefined;
     expiration?: Date | undefined;
@@ -1894,7 +2043,7 @@ export class ProductDto implements IProductDto {
         if (_data) {
             this.name = _data["name"];
             this.units = _data["units"];
-            this.amount = _data["amount"];
+            this.quantity = _data["quantity"];
             this.image = _data["image"];
             this.status = _data["status"];
             this.expiration = _data["expiration"] ? new Date(_data["expiration"].toString()) : <any>undefined;
@@ -1916,7 +2065,7 @@ export class ProductDto implements IProductDto {
         data = typeof data === 'object' ? data : {};
         data["name"] = this.name;
         data["units"] = this.units;
-        data["amount"] = this.amount;
+        data["quantity"] = this.quantity;
         data["image"] = this.image;
         data["status"] = this.status;
         data["expiration"] = this.expiration ? this.expiration.toISOString() : <any>undefined;
@@ -1931,7 +2080,7 @@ export class ProductDto implements IProductDto {
 export interface IProductDto {
     name?: string | undefined;
     units?: string | undefined;
-    amount?: number;
+    quantity?: number;
     image?: string | undefined;
     status?: string | undefined;
     expiration?: Date | undefined;
@@ -2436,6 +2585,7 @@ export class Storage extends BaseAuditableEntity implements IStorage {
     status?: StorageStatus;
     companyId?: string | undefined;
     areas?: Area[] | undefined;
+    inventories?: Inventory[];
 
     constructor(data?: IStorage) {
         super(data);
@@ -2452,6 +2602,11 @@ export class Storage extends BaseAuditableEntity implements IStorage {
                 this.areas = [] as any;
                 for (let item of _data["areas"])
                     this.areas!.push(Area.fromJS(item));
+            }
+            if (Array.isArray(_data["inventories"])) {
+                this.inventories = [] as any;
+                for (let item of _data["inventories"])
+                    this.inventories!.push(Inventory.fromJS(item));
             }
         }
     }
@@ -2474,6 +2629,11 @@ export class Storage extends BaseAuditableEntity implements IStorage {
             for (let item of this.areas)
                 data["areas"].push(item.toJSON());
         }
+        if (Array.isArray(this.inventories)) {
+            data["inventories"] = [];
+            for (let item of this.inventories)
+                data["inventories"].push(item.toJSON());
+        }
         super.toJSON(data);
         return data;
     }
@@ -2485,6 +2645,7 @@ export interface IStorage extends IBaseAuditableEntity {
     status?: StorageStatus;
     companyId?: string | undefined;
     areas?: Area[] | undefined;
+    inventories?: Inventory[];
 }
 
 export enum StorageStatus {
@@ -2542,7 +2703,9 @@ export interface IArea extends IBaseAuditableEntity {
 export class Product extends BaseAuditableEntity implements IProduct {
     name?: string;
     units?: string;
-    amount?: number;
+    quantity?: number;
+    soldQuantity?: number;
+    orderedQuantity?: number;
     image?: string | undefined;
     status?: ProductStatus;
     expiration?: Date;
@@ -2564,7 +2727,9 @@ export class Product extends BaseAuditableEntity implements IProduct {
         if (_data) {
             this.name = _data["name"];
             this.units = _data["units"];
-            this.amount = _data["amount"];
+            this.quantity = _data["quantity"];
+            this.soldQuantity = _data["soldQuantity"];
+            this.orderedQuantity = _data["orderedQuantity"];
             this.image = _data["image"];
             this.status = _data["status"];
             this.expiration = _data["expiration"] ? new Date(_data["expiration"].toString()) : <any>undefined;
@@ -2590,7 +2755,9 @@ export class Product extends BaseAuditableEntity implements IProduct {
         data = typeof data === 'object' ? data : {};
         data["name"] = this.name;
         data["units"] = this.units;
-        data["amount"] = this.amount;
+        data["quantity"] = this.quantity;
+        data["soldQuantity"] = this.soldQuantity;
+        data["orderedQuantity"] = this.orderedQuantity;
         data["image"] = this.image;
         data["status"] = this.status;
         data["expiration"] = this.expiration ? this.expiration.toISOString() : <any>undefined;
@@ -2610,7 +2777,9 @@ export class Product extends BaseAuditableEntity implements IProduct {
 export interface IProduct extends IBaseAuditableEntity {
     name?: string;
     units?: string;
-    amount?: number;
+    quantity?: number;
+    soldQuantity?: number;
+    orderedQuantity?: number;
     image?: string | undefined;
     status?: ProductStatus;
     expiration?: Date;
@@ -2707,6 +2876,91 @@ export abstract class BaseEvent implements IBaseEvent {
 }
 
 export interface IBaseEvent {
+}
+
+export class Inventory extends BaseAuditableEntity implements IInventory {
+    productName?: string;
+    totalQuantity?: number;
+    reservedQuantity?: number;
+    availableQuantity?: number;
+    expiration?: Date | undefined;
+    totalPrice?: number;
+    totalSalePrice?: number;
+    safeStock?: number;
+    categoryId?: number;
+    storageId?: number;
+    storage?: Storage | undefined;
+    products?: Product[];
+
+    constructor(data?: IInventory) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.productName = _data["productName"];
+            this.totalQuantity = _data["totalQuantity"];
+            this.reservedQuantity = _data["reservedQuantity"];
+            this.availableQuantity = _data["availableQuantity"];
+            this.expiration = _data["expiration"] ? new Date(_data["expiration"].toString()) : <any>undefined;
+            this.totalPrice = _data["totalPrice"];
+            this.totalSalePrice = _data["totalSalePrice"];
+            this.safeStock = _data["safeStock"];
+            this.categoryId = _data["categoryId"];
+            this.storageId = _data["storageId"];
+            this.storage = _data["storage"] ? Storage.fromJS(_data["storage"]) : <any>undefined;
+            if (Array.isArray(_data["products"])) {
+                this.products = [] as any;
+                for (let item of _data["products"])
+                    this.products!.push(Product.fromJS(item));
+            }
+        }
+    }
+
+    static override fromJS(data: any): Inventory {
+        data = typeof data === 'object' ? data : {};
+        let result = new Inventory();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["productName"] = this.productName;
+        data["totalQuantity"] = this.totalQuantity;
+        data["reservedQuantity"] = this.reservedQuantity;
+        data["availableQuantity"] = this.availableQuantity;
+        data["expiration"] = this.expiration ? this.expiration.toISOString() : <any>undefined;
+        data["totalPrice"] = this.totalPrice;
+        data["totalSalePrice"] = this.totalSalePrice;
+        data["safeStock"] = this.safeStock;
+        data["categoryId"] = this.categoryId;
+        data["storageId"] = this.storageId;
+        data["storage"] = this.storage ? this.storage.toJSON() : <any>undefined;
+        if (Array.isArray(this.products)) {
+            data["products"] = [];
+            for (let item of this.products)
+                data["products"].push(item.toJSON());
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+export interface IInventory extends IBaseAuditableEntity {
+    productName?: string;
+    totalQuantity?: number;
+    reservedQuantity?: number;
+    availableQuantity?: number;
+    expiration?: Date | undefined;
+    totalPrice?: number;
+    totalSalePrice?: number;
+    safeStock?: number;
+    categoryId?: number;
+    storageId?: number;
+    storage?: Storage | undefined;
+    products?: Product[];
 }
 
 export class Page implements IPage {
@@ -3810,13 +4064,65 @@ export interface ICrawlData {
 }
 
 export class CreateCustomerCommand implements ICreateCustomerCommand {
+    name?: string;
+    email?: string | undefined;
+    phone?: string | undefined;
+    address?: string | undefined;
+    companyName?: string | undefined;
+
+    constructor(data?: ICreateCustomerCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.email = _data["email"];
+            this.phone = _data["phone"];
+            this.address = _data["address"];
+            this.companyName = _data["companyName"];
+        }
+    }
+
+    static fromJS(data: any): CreateCustomerCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateCustomerCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["email"] = this.email;
+        data["phone"] = this.phone;
+        data["address"] = this.address;
+        data["companyName"] = this.companyName;
+        return data;
+    }
+}
+
+export interface ICreateCustomerCommand {
+    name?: string;
+    email?: string | undefined;
+    phone?: string | undefined;
+    address?: string | undefined;
+    companyName?: string | undefined;
+}
+
+export class CreateEmployeeCommand implements ICreateEmployeeCommand {
     userName?: string | undefined;
     password?: string | undefined;
     email?: string | undefined;
     phoneNumber?: string | undefined;
     warehouses?: number[] | undefined;
 
-    constructor(data?: ICreateCustomerCommand) {
+    constructor(data?: ICreateEmployeeCommand) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -3839,9 +4145,9 @@ export class CreateCustomerCommand implements ICreateCustomerCommand {
         }
     }
 
-    static fromJS(data: any): CreateCustomerCommand {
+    static fromJS(data: any): CreateEmployeeCommand {
         data = typeof data === 'object' ? data : {};
-        let result = new CreateCustomerCommand();
+        let result = new CreateEmployeeCommand();
         result.init(data);
         return result;
     }
@@ -3861,7 +4167,7 @@ export class CreateCustomerCommand implements ICreateCustomerCommand {
     }
 }
 
-export interface ICreateCustomerCommand {
+export interface ICreateEmployeeCommand {
     userName?: string | undefined;
     password?: string | undefined;
     email?: string | undefined;
@@ -3869,7 +4175,7 @@ export interface ICreateCustomerCommand {
     warehouses?: number[] | undefined;
 }
 
-export class UpdateCustomerCommand implements IUpdateCustomerCommand {
+export class UpdateEmployeeCommand implements IUpdateEmployeeCommand {
     id?: string;
     userName?: string | undefined;
     password?: string | undefined;
@@ -3877,7 +4183,7 @@ export class UpdateCustomerCommand implements IUpdateCustomerCommand {
     phoneNumber?: string | undefined;
     warehouses?: number[] | undefined;
 
-    constructor(data?: IUpdateCustomerCommand) {
+    constructor(data?: IUpdateEmployeeCommand) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -3901,9 +4207,9 @@ export class UpdateCustomerCommand implements IUpdateCustomerCommand {
         }
     }
 
-    static fromJS(data: any): UpdateCustomerCommand {
+    static fromJS(data: any): UpdateEmployeeCommand {
         data = typeof data === 'object' ? data : {};
-        let result = new UpdateCustomerCommand();
+        let result = new UpdateEmployeeCommand();
         result.init(data);
         return result;
     }
@@ -3924,7 +4230,7 @@ export class UpdateCustomerCommand implements IUpdateCustomerCommand {
     }
 }
 
-export interface IUpdateCustomerCommand {
+export interface IUpdateEmployeeCommand {
     id?: string;
     userName?: string | undefined;
     password?: string | undefined;
@@ -4041,10 +4347,10 @@ export interface IEmployeeDto {
     avatarImage?: string | undefined;
 }
 
-export class GetListCustomerQuery implements IGetListCustomerQuery {
+export class GetListEmployeeQuery implements IGetListEmployeeQuery {
     page?: Page | undefined;
 
-    constructor(data?: IGetListCustomerQuery) {
+    constructor(data?: IGetListEmployeeQuery) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -4059,9 +4365,9 @@ export class GetListCustomerQuery implements IGetListCustomerQuery {
         }
     }
 
-    static fromJS(data: any): GetListCustomerQuery {
+    static fromJS(data: any): GetListEmployeeQuery {
         data = typeof data === 'object' ? data : {};
-        let result = new GetListCustomerQuery();
+        let result = new GetListEmployeeQuery();
         result.init(data);
         return result;
     }
@@ -4073,11 +4379,11 @@ export class GetListCustomerQuery implements IGetListCustomerQuery {
     }
 }
 
-export interface IGetListCustomerQuery {
+export interface IGetListEmployeeQuery {
     page?: Page | undefined;
 }
 
-export class CustomerDetailVM implements ICustomerDetailVM {
+export class EmployeeDetailVM implements IEmployeeDetailVM {
     id?: string | undefined;
     userName?: string | undefined;
     email?: string | undefined;
@@ -4089,7 +4395,7 @@ export class CustomerDetailVM implements ICustomerDetailVM {
     companyAddress?: string | undefined;
     storages?: StorageDto2[] | undefined;
 
-    constructor(data?: ICustomerDetailVM) {
+    constructor(data?: IEmployeeDetailVM) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -4117,9 +4423,9 @@ export class CustomerDetailVM implements ICustomerDetailVM {
         }
     }
 
-    static fromJS(data: any): CustomerDetailVM {
+    static fromJS(data: any): EmployeeDetailVM {
         data = typeof data === 'object' ? data : {};
-        let result = new CustomerDetailVM();
+        let result = new EmployeeDetailVM();
         result.init(data);
         return result;
     }
@@ -4144,7 +4450,7 @@ export class CustomerDetailVM implements ICustomerDetailVM {
     }
 }
 
-export interface ICustomerDetailVM {
+export interface IEmployeeDetailVM {
     id?: string | undefined;
     userName?: string | undefined;
     email?: string | undefined;
@@ -4369,6 +4675,42 @@ export interface IResetPasswordCommand {
     newPassword?: string;
 }
 
+export class CreateInventoryOutboundCommand implements ICreateInventoryOutboundCommand {
+    orderId?: number;
+
+    constructor(data?: ICreateInventoryOutboundCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.orderId = _data["orderId"];
+        }
+    }
+
+    static fromJS(data: any): CreateInventoryOutboundCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateInventoryOutboundCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["orderId"] = this.orderId;
+        return data;
+    }
+}
+
+export interface ICreateInventoryOutboundCommand {
+    orderId?: number;
+}
+
 export class LogList implements ILogList {
     logVMs?: LogVM[];
     status?: number;
@@ -4522,8 +4864,9 @@ export interface IGetLogListQuery {
 }
 
 export class ImportStogareCommand implements IImportStogareCommand {
-    type?: string;
     totalPrice?: number;
+    customerName?: string | undefined;
+    customerPhoneNumber?: string | undefined;
     products?: ImportProductDto[] | undefined;
 
     constructor(data?: IImportStogareCommand) {
@@ -4537,8 +4880,9 @@ export class ImportStogareCommand implements IImportStogareCommand {
 
     init(_data?: any) {
         if (_data) {
-            this.type = _data["type"];
             this.totalPrice = _data["totalPrice"];
+            this.customerName = _data["customerName"];
+            this.customerPhoneNumber = _data["customerPhoneNumber"];
             if (Array.isArray(_data["products"])) {
                 this.products = [] as any;
                 for (let item of _data["products"])
@@ -4556,8 +4900,9 @@ export class ImportStogareCommand implements IImportStogareCommand {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["type"] = this.type;
         data["totalPrice"] = this.totalPrice;
+        data["customerName"] = this.customerName;
+        data["customerPhoneNumber"] = this.customerPhoneNumber;
         if (Array.isArray(this.products)) {
             data["products"] = [];
             for (let item of this.products)
@@ -4568,13 +4913,14 @@ export class ImportStogareCommand implements IImportStogareCommand {
 }
 
 export interface IImportStogareCommand {
-    type?: string;
     totalPrice?: number;
+    customerName?: string | undefined;
+    customerPhoneNumber?: string | undefined;
     products?: ImportProductDto[] | undefined;
 }
 
 export class ImportProductDto implements IImportProductDto {
-    name?: string | undefined;
+    name?: string;
     unit?: string;
     quantity?: number;
     price?: number;
@@ -4630,7 +4976,7 @@ export class ImportProductDto implements IImportProductDto {
 }
 
 export interface IImportProductDto {
-    name?: string | undefined;
+    name?: string;
     unit?: string;
     quantity?: number;
     price?: number;
@@ -4887,6 +5233,106 @@ export interface IOrderProductDto {
     totalPrice?: number;
     units?: string | undefined;
     note?: string | undefined;
+}
+
+export class SaleOrderCommand implements ISaleOrderCommand {
+    totalPrice?: number;
+    customerId?: number;
+    products?: SaleOrderProduct[];
+
+    constructor(data?: ISaleOrderCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalPrice = _data["totalPrice"];
+            this.customerId = _data["customerId"];
+            if (Array.isArray(_data["products"])) {
+                this.products = [] as any;
+                for (let item of _data["products"])
+                    this.products!.push(SaleOrderProduct.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): SaleOrderCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new SaleOrderCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalPrice"] = this.totalPrice;
+        data["customerId"] = this.customerId;
+        if (Array.isArray(this.products)) {
+            data["products"] = [];
+            for (let item of this.products)
+                data["products"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface ISaleOrderCommand {
+    totalPrice?: number;
+    customerId?: number;
+    products?: SaleOrderProduct[];
+}
+
+export class SaleOrderProduct implements ISaleOrderProduct {
+    productName?: string;
+    quantity?: number;
+    price?: number;
+    expectedPickupDate?: Date | undefined;
+
+    constructor(data?: ISaleOrderProduct) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.productName = _data["productName"];
+            this.quantity = _data["quantity"];
+            this.price = _data["price"];
+            this.expectedPickupDate = _data["expectedPickupDate"] ? new Date(_data["expectedPickupDate"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): SaleOrderProduct {
+        data = typeof data === 'object' ? data : {};
+        let result = new SaleOrderProduct();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["productName"] = this.productName;
+        data["quantity"] = this.quantity;
+        data["price"] = this.price;
+        data["expectedPickupDate"] = this.expectedPickupDate ? this.expectedPickupDate.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface ISaleOrderProduct {
+    productName?: string;
+    quantity?: number;
+    price?: number;
+    expectedPickupDate?: Date | undefined;
 }
 
 export class ProductListVM implements IProductListVM {
