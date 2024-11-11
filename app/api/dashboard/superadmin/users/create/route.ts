@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const createUserData = await request.json()
     console.log(createUserData)
     const createUserCommand = new CreateUserCommand({ ...createUserData })
-    const client = new SuperAdminClient(process.env.NEXT_BACKEND_API_URL, undefined, token, xsrfToken)
+    const client = new SuperAdminClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token, xsrfToken)
     const result = await client.userRegister(createUserCommand)
     return NextResponse.json(result)
   } catch (error) {

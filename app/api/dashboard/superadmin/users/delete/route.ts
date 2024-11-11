@@ -38,7 +38,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error }, { status: 403 })
     }
 
-    const client = new SuperAdminClient(process.env.NEXT_BACKEND_API_URL, undefined, token, xsrfToken)
+    const client = new SuperAdminClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token, xsrfToken)
 
     const result = await client.deleteUser(id)
     return NextResponse.json(result)

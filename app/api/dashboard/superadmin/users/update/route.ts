@@ -24,7 +24,7 @@ export async function PUT(request: NextRequest) {
 
     const updateUserCommand = new UpdateUserCommand({ ...updateUserData })
 
-    const client = new SuperAdminClient(process.env.NEXT_BACKEND_API_URL, undefined, token, xsrfToken)
+    const client = new SuperAdminClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token, xsrfToken)
     const result = await client.updateUser(updateUserCommand, id)
     return NextResponse.json(result)
   } catch (error) {

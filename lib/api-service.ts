@@ -11,7 +11,7 @@ export class ApiClientService {
     config: { token?: string; xsrfToken?: string }
   ): T {
     return new ClientClass(
-      process.env.NEXT_BACKEND_API_URL!,
+      process.env.NEXT_PUBLIC_BACKEND_API_URL!,
       undefined,
       config.token,
       config.xsrfToken
