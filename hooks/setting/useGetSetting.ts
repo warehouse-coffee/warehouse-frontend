@@ -10,14 +10,14 @@ const getSetting = async () => {
     }
   })
   if (!response.ok) {
-    throw new Error('Failed to get config')
+    throw new Error('Failed to get settings')
   }
   return response.json()
 }
 
 export function useGetSetting() {
   return useQuery({
-    queryKey: ['config'],
+    queryKey: ['settings'],
     queryFn: getSetting
   })
 }

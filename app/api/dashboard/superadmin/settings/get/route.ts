@@ -19,8 +19,10 @@ export async function GET(request: NextRequest) {
       token,
       xsrfToken
     )
-    // const result = await client.getConfig()
-    // return NextResponse.json(result)
+    console.log(client)
+    const result = await client.getAllConfig()
+    // console.log(result)
+    return NextResponse.json(result)
   } catch (error) {
     return NextResponse.json({ error: 'Failed to get config' }, { status: 500 })
   }
