@@ -14,12 +14,11 @@ export async function GET(request: NextRequest) {
 
   try {
     const client = new ConfigurationsClient(
-      process.env.NEXT_PUBLIC_WEB_API_URL!,
+      process.env.NEXT_PUBLIC_BACKEND_API_URL!,
       undefined,
       token,
       xsrfToken
     )
-    console.log(client)
     const result = await client.getAllConfig()
     // console.log(result)
     return NextResponse.json(result)

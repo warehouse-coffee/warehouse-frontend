@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff, Save } from 'lucide-react'
-import React, { useState, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
@@ -12,8 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader } from '@/components/ui/loader'
 import { settingsFormSchema } from '@/configs/zod-schema'
-import { useCreateSetting } from '@/hooks/setting/useCreateSetting'
-import { useGetSetting } from '@/hooks/setting/useGetSetting'
+import { useGetSetting, useCreateSetting } from '@/hooks/setting'
 import { cn } from '@/lib/utils'
 import { Settings } from '@/types'
 
@@ -21,6 +20,8 @@ export default function SettingsForm() {
   const [showAiKey, setShowAiKey] = useState(false)
   const { data: currentConfig } = useGetSetting()
   const createConfigMutation = useCreateSetting()
+
+  // console.log(currentConfig)
 
   const {
     register,
@@ -46,6 +47,16 @@ export default function SettingsForm() {
       toast.success('Form reset to saved settings')
     }
   }, [currentConfig, reset])
+
+  useEffect(() => {
+    if (currentConfig) {
+      reset({
+        aiServiceKey: currentConfig.aiServiceKey || '',
+        emailServiceKey: currentConfig.emailServiceKey || '',
+        aiDriverServer: currentConfig.aiDriverServer || ''
+      })
+    }
+  }, [currentConfig]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -140,13 +151,13 @@ export default function SettingsForm() {
           >
             {createConfigMutation.isPending ? (
               <>
-                Creating...
+                Saving...
                 <Loader color="#62c5ff" size="1.25rem" />
               </>
             ) : (
               <>
                 <Save className="mr-2 h-4 w-4" />
-                Create Config
+                Save Changes
               </>
             )}
           </Button>

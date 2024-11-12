@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const settingsData = await request.json()
     const createSettingCommand = CreateConfigCommand.fromJS({ ...settingsData })
     const client = new ConfigurationsClient(
-      process.env.NEXT_PUBLIC_WEB_API_URL!,
+      process.env.NEXT_PUBLIC_BACKEND_API_URL!,
       undefined,
       token,
       xsrfToken

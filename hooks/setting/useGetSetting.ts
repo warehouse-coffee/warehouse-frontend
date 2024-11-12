@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 
 import { API_ENDPOINTS, METHODS } from '@/constants'
 
@@ -16,7 +16,7 @@ const getSetting = async () => {
 }
 
 export function useGetSetting() {
-  return useQuery({
+  return useSuspenseQuery({
     queryKey: ['settings'],
     queryFn: getSetting
   })
