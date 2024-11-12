@@ -7,7 +7,6 @@ import { Log, LogLevel } from '@/types'
 
 interface LogsDataProps {
   data: Log[]
-  isLoading: boolean
   table: any
 }
 
@@ -33,7 +32,7 @@ const LogLevelBadge = ({ level }: { level: LogLevel }) => {
   )
 }
 
-export default function LogsData({ data, isLoading, table }: LogsDataProps) {
+export default function LogsData({ data, table }: LogsDataProps) {
   const rows = table.getRowModel().rows
 
   if (rows.length === 0) {

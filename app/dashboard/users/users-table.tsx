@@ -13,10 +13,9 @@ import {
   getSortedRowModel
 } from '@tanstack/react-table'
 import { ArrowUpDown, CirclePlus, ArrowUpAZ, ArrowDownAZ } from 'lucide-react'
-import React, { Suspense, useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
-import UsersDataLoading from '@/app/dashboard/users/users-data-loading'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -84,6 +83,8 @@ export default function UsersTable() {
   const debouncedGlobalSearch = useDebounce(globalSearch, 500)
   const [isSearching, setIsSearching] = useState<boolean>(false)
 
+  const [totalPages, setTotalPages] = useState<number>(0)
+
   const { data: userData } = useUserList(
     pagination.pageIndex,
     pagination.pageSize,
@@ -121,7 +122,7 @@ export default function UsersTable() {
       accessorKey: 'email',
       header: 'Email',
       filterFn: fuzzyFilter
-    },
+    }
     // {
     //   accessorKey: 'isActived',
     //   header: 'Status',
@@ -140,6 +141,7 @@ export default function UsersTable() {
     if (userData?.users) {
       setData(userData.users)
       setTotalElements(userData.page?.totalElements ?? 0)
+      setTotalPages(userData.page?.totalPages ?? 0)
       setIsSearching(false)
     }
   }, [userData])
@@ -168,7 +170,7 @@ export default function UsersTable() {
       fuzzy: fuzzyFilter
     },
     manualPagination: true,
-    pageCount: Math.ceil(totalElements / pagination.pageSize)
+    pageCount: totalPages
   })
 
   return (
@@ -302,25 +304,23 @@ export default function UsersTable() {
                 </TableRow>
               )}
             >
-              <Suspense fallback={<UsersDataLoading />}>
-                <UsersData
-                  data={data}
-                  table={table}
-                />
-              </Suspense>
+              <UsersData
+                data={data}
+                table={table}
+              />
             </ErrorBoundary>
           </TableBody>
         </Table>
       </div>
       <div className="w-full flex items-center justify-between mt-[1.25rem]">
         <p className="text-[.85rem] text-muted-foreground">
-          Showing {' '}
-          {totalElements === 0 ? 0 : table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} {' '}
+           Showing {' '}
+          {table.getRowModel().rows.length === 0 ? 0 : totalElements === 0 ? 0 : pagination.pageIndex * pagination.pageSize + 1} {' '}
           to {' '}
-          {Math.min(
-            (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
+          {table.getRowModel().rows.length === 0 ? 0 : Math.min(
+            (pagination.pageIndex + 1) * pagination.pageSize,
             totalElements
-          )}{' '}
+          )} {' '}
           of {totalElements} user{totalElements > 1 ? 's' : ''}
         </p>
         <Pagination>
@@ -328,28 +328,37 @@ export default function UsersTable() {
             <PaginationItem>
               <PaginationPrevious
                 href="#"
-                onClick={() => table.previousPage()}
+                onClick={(e) => {
+                  e.preventDefault()
+                  table.previousPage()
+                }}
                 aria-disabled={!table.getCanPreviousPage()}
-                className={!table.getCanPreviousPage() ? 'cursor-not-allowed pointer-events-none opacity-75' : ''}
+                className={!table.getCanPreviousPage() ? 'pointer-events-none opacity-50' : ''}
               />
             </PaginationItem>
-            {table.getPageOptions().map((pageIdx) => (
-              <PaginationItem key={pageIdx}>
+            {Array.from({ length: Math.max(1, totalPages) }, (_, i) => (
+              <PaginationItem key={i}>
                 <PaginationLink
                   href="#"
-                  isActive={pageIdx === table.getState().pagination.pageIndex}
-                  onClick={() => table.setPageIndex(pageIdx)}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    table.setPageIndex(i)
+                  }}
+                  isActive={i === pagination.pageIndex}
                 >
-                  {pageIdx + 1}
+                  {i + 1}
                 </PaginationLink>
               </PaginationItem>
             ))}
             <PaginationItem>
               <PaginationNext
                 href="#"
-                onClick={() => table.nextPage()}
+                onClick={(e) => {
+                  e.preventDefault()
+                  table.nextPage()
+                }}
                 aria-disabled={!table.getCanNextPage()}
-                className={!table.getCanNextPage() ? 'cursor-not-allowed pointer-events-none opacity-75' : ''}
+                className={!table.getCanNextPage() ? 'pointer-events-none opacity-50' : ''}
               />
             </PaginationItem>
           </PaginationContent>

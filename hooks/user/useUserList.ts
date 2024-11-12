@@ -7,7 +7,6 @@ import { User } from '@/types'
 interface FetchUsersParams {
   pageIndex: number
   pageSize: number
-  // searchText?: string
 }
 
 const fetchUsers = async ({ pageIndex, pageSize }: FetchUsersParams): Promise<{ users: User[], page: Page }> => {
@@ -15,10 +14,6 @@ const fetchUsers = async ({ pageIndex, pageSize }: FetchUsersParams): Promise<{ 
     pageNumber: (pageIndex + 1).toString(),
     size: pageSize.toString()
   })
-
-  // if (searchText) {
-  //   params.append('searchText', searchText.trim())
-  // }
 
   const response = await fetch(`${API_ENDPOINTS.GET_ALL_USERS}?${params}`, {
     credentials: 'include'
@@ -33,16 +28,6 @@ const fetchUsers = async ({ pageIndex, pageSize }: FetchUsersParams): Promise<{ 
   if (!data || data.error) {
     throw new Error(data?.error || 'No data received')
   }
-
-  // if (searchText && (!data.users || data.users.length === 0)) {
-  //   return {
-  //     users: [],
-  //     page: {
-  //       ...data.page,
-  //       totalElements: 0
-  //     }
-  //   }
-  // }
 
   if (!data.users) {
     throw new Error('Invalid response format')
