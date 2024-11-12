@@ -1,0 +1,279 @@
+"use client";
+import { useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, Plus, Save, XCircle, MapPin, Tag, Info, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { toast } from "sonner";
+
+export default function StoragesCreatePage() {
+  const [name, setName] = useState('')
+  const [location, setLocation] = useState('')
+  const [status, setStatus] = useState('1')
+  const [areas, setAreas] = useState(['Area A', 'Area B', 'Area C'])
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const dragItem = useRef<number | null>(null)
+  const dragOverItem = useRef<number | null>(null)
+
+  const handleAddArea = () => {
+    setAreas([...areas, ''])
+  }
+
+  const handleRemoveArea = (index: number) => {
+    const newAreas = areas.filter((_, i) => i !== index)
+    setAreas(newAreas)
+  }
+
+  const handleAreaChange = (index: number, value: string) => {
+    const newAreas = [...areas]
+    newAreas[index] = value
+    setAreas(newAreas)
+  }
+
+  const handleDragStart = (index: number) => {
+    dragItem.current = index
+  }
+
+  const handleDragEnter = (index: number) => {
+    dragOverItem.current = index
+  }
+
+  const handleDragEnd = () => {
+    if (dragItem.current !== null && dragOverItem.current !== null) {
+      const newAreas = [...areas]
+      const draggedItem = newAreas[dragItem.current]
+      newAreas.splice(dragItem.current, 1)
+      newAreas.splice(dragOverItem.current, 0, draggedItem)
+      setAreas(newAreas)
+    }
+    dragItem.current = null
+    dragOverItem.current = null
+  }
+
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {}
+    if (!name.trim()) newErrors.name = 'Name is required'
+    if (name.length > 50) newErrors.name = 'Name must be 50 characters or less'
+    if (!location.trim()) newErrors.location = 'Location is required'
+    if (areas.some(area => !area.trim())) newErrors.areas = 'All areas must have a name'
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (validateForm()) {
+      setIsSubmitting(true)
+      const formData = {
+        name,
+        location,
+        status: parseInt(status),
+        areas: areas.map(area => ({ name: area }))
+      }
+      console.log('Submitting:', formData)
+      // Simulating API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      setIsSubmitting(false)
+      setShowSuccessModal(true)
+      setTimeout(() => setShowSuccessModal(false), 3000)
+      toast.success( "Storage created successfully.")
+    }
+  }
+
+  return (
+    <div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card className="flex flex-col h-full">
+            <CardHeader>
+              <CardTitle>Basic Information</CardTitle>
+            </CardHeader>
+            <CardContent className="flex-grow space-y-4">
+              <div>
+                <Label htmlFor="name" className="flex items-center">
+                  <Tag className="w-4 h-4 mr-2" />
+                  Name
+                </Label>
+                <Input
+                  id="name"
+                  placeholder="e.g., Coffee Trung Nguyen K3"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className={`mt-1 ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500`}
+                />
+                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+                <p className="text-sm text-gray-500 mt-1">{name.length}/50 characters</p>
+              </div>
+
+              <div>
+                <Label htmlFor="location" className="flex items-center">
+                  <MapPin className="w-4 h-4 mr-2" />
+                  Location
+                </Label>
+                <Input
+                  id="location"
+                  placeholder="e.g., 123 Main St, Anytown, USA"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className={`mt-1 ${errors.location ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500`}
+                />
+                {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location}</p>}
+              </div>
+
+              <div>
+                <Label htmlFor="status" className="flex items-center">
+                  Status
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="w-4 h-4 ml-2 text-gray-400" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Set the current operational status of the storage</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </Label>
+                <Select value={status} onValueChange={setStatus}>
+                  <SelectTrigger className="w-full mt-1">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">Active</SelectItem>
+                    <SelectItem value="0">Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="flex flex-col h-full">
+            <CardHeader>
+              <CardTitle>Areas</CardTitle>
+            </CardHeader>
+            <CardContent className="flex-grow overflow-hidden flex flex-col h-[400px]">
+              <Accordion type="single" collapsible className="w-full flex-grow">
+                <AccordionItem value="areas" className="flex flex-col flex-grow">
+                  <AccordionTrigger>Manage Areas</AccordionTrigger>
+                  <AccordionContent className="flex flex-col flex-grow">
+                    <div className="flex-grow overflow-y-auto pr-2 space-y-2">
+                      {areas.map((area, index) => (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.2 }}
+                          className="flex items-center"
+                          draggable
+                          onDragStart={() => handleDragStart(index)}
+                          onDragEnter={() => handleDragEnter(index)}
+                          onDragEnd={handleDragEnd}
+                          onDragOver={(e) => e.preventDefault()}
+                        >
+                          <Input
+                            placeholder={`Area ${index + 1}`}
+                            value={area}
+                            onChange={(e) => handleAreaChange(index, e.target.value)}
+                            className={`${errors.areas ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500`}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleRemoveArea(index)}
+                            className="ml-2 flex-shrink-0"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </motion.div>
+                      ))}
+                    </div>
+                    {errors.areas && <p className="text-red-500 text-sm mt-1">{errors.areas}</p>}
+                    <Button type="button" variant="outline" onClick={handleAddArea} className="mt-2 w-full">
+                      <Plus className="h-4 w-4 mr-2" /> Add Area
+                    </Button>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="flex justify-end space-x-4">
+          <Button type="button" variant="outline" onClick={() => {
+            setName('')
+            setLocation('')
+            setStatus('1')
+            setAreas(['Area A', 'Area B', 'Area C'])
+            setErrors({})
+          }}>
+            <XCircle className="h-4 w-4 mr-2" /> Cancel
+          </Button>
+          <Button
+            type="submit"
+            className="bg-gradient-to-r from-teal-500 to-teal-600 text-white"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <motion.div
+                className="h-5 w-5 border-t-2 border-white rounded-full animate-spin"
+              />
+            ) : (
+              <>
+                <Save className="h-4 w-4 mr-2" /> Save
+              </>
+            )}
+          </Button>
+        </div>
+      </form>
+
+      <AnimatePresence>
+        {showSuccessModal && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+          >
+            <div className="bg-white p-6 rounded-lg shadow-xl">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                className="w-16 h-16 mx-auto mb-4 bg-green-500 text-white rounded-full flex items-center justify-center"
+              >
+                <Check className="w-8 h-8" />
+              </motion.div>
+              <h2 className="text-2xl font-bold text-center mb-2">Success!</h2>
+              <p className="text-gray-600 text-center">Your storage has been created.</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
