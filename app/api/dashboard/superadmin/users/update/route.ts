@@ -22,7 +22,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
     }
 
-    const updateUserCommand = new UpdateUserCommand({ ...updateUserData })
+    const updateUserCommand = UpdateUserCommand.fromJS({ ...updateUserData })
 
     const client = new SuperAdminClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token, xsrfToken)
     const result = await client.updateUser(updateUserCommand, id)

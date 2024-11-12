@@ -7,6 +7,7 @@ import {
   useReactTable,
   PaginationState
 } from '@tanstack/react-table'
+import dynamic from 'next/dynamic'
 import React, { useState, useEffect } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
@@ -30,7 +31,12 @@ import {
 } from '@/components/ui/table'
 import { useLogList } from '@/hooks/log/useLogList'
 
-import LogsData from './logs-data'
+import LogsDataLoading from './logs-data-loading'
+
+const LogsData = dynamic(() => import('./logs-data'), {
+  ssr: false,
+  loading: () => <LogsDataLoading />
+})
 
 export default function LogsTable() {
   const { reset } = useQueryErrorResetBoundary()
@@ -105,7 +111,7 @@ export default function LogsTable() {
   }
 
   return (
-    <div className="w-full mt-[1.5rem]">
+    <section className="w-full mt-[1.5rem]">
       <div className="flex items-center justify-between w-full mb-[.85rem]">
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -214,6 +220,6 @@ export default function LogsTable() {
           </PaginationContent>
         </Pagination>
       </div>
-    </div>
+    </section>
   )
 }

@@ -1,6 +1,7 @@
 import { Row } from '@tanstack/react-table'
 import { Eye, Pencil, Trash } from 'lucide-react'
-import React, { Suspense, useCallback } from 'react'
+import dynamic from 'next/dynamic'
+import React, { useCallback } from 'react'
 
 import DashboardFetchLoader from '@/components/dashboard/dashboard-fetch-loader'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -24,8 +25,15 @@ import { useDeleteUser } from '@/hooks/user'
 import { formatRoleLabel } from '@/lib/utils'
 import { UpdateUser, User, UserDetail } from '@/types'
 
-import UsersDetail from './users-detail'
-import UsersEditForm from './users-edit-form'
+const UsersDetailDialog = dynamic(() => import('./users-detail'), {
+  ssr: false,
+  loading: () => <DashboardFetchLoader />
+})
+
+const UsersEditForm = dynamic(() => import('./users-edit-form'), {
+  ssr: false,
+  loading: () => <DashboardFetchLoader />
+})
 
 interface UsersDataProps {
   data: User[]
@@ -173,11 +181,9 @@ export default function UsersData({
               View user details here.
             </DialogDescription>
           </DialogHeader>
-          <Suspense fallback={<DashboardFetchLoader />}>
-            {userRef.current && (
-              <UsersDetail user={userRef.current as UserDetail} onClose={() => closeDialog('detail')} />
-            )}
-          </Suspense>
+          {userRef.current && (
+            <UsersDetailDialog user={userRef.current as UserDetail} onClose={() => closeDialog('detail')} />
+          )}
         </DialogContent>
       </Dialog>
 
@@ -189,15 +195,13 @@ export default function UsersData({
               Make changes to user details here. Click save when you&apos;re done.
             </DialogDescription>
           </DialogHeader>
-          <Suspense fallback={<DashboardFetchLoader />}>
-            {userRef.current && (
-              <UsersEditForm
-                user={userRef.current as UpdateUser}
-                onClose={() => closeDialog('edit')}
-                isOpen={dialogsOpen.edit ?? false}
-              />
-            )}
-          </Suspense>
+          {userRef.current && (
+            <UsersEditForm
+              user={userRef.current as UpdateUser}
+              onClose={() => closeDialog('edit')}
+              isOpen={dialogsOpen.edit ?? false}
+            />
+          )}
         </DialogContent>
       </Dialog>
 

@@ -13,6 +13,7 @@ import {
   getSortedRowModel
 } from '@tanstack/react-table'
 import { ArrowUpDown, CirclePlus, ArrowUpAZ, ArrowDownAZ } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import React, { useState, useEffect, useMemo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
@@ -58,7 +59,14 @@ import { useUserList } from '@/hooks/user'
 import { User } from '@/types'
 
 import AddUserForm from './add-user-form'
-import UsersData from './users-data'
+// import DashboardFetchLoader from '@/components/dashboard/dashboard-fetch-loader'
+import UsersDataLoading from './users-data-loading'
+// import UsersData from './users-data'
+
+const UserDataMain = dynamic(() => import('./users-data'), {
+  ssr: false,
+  loading: () => <UsersDataLoading />
+})
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value)
@@ -174,7 +182,7 @@ export default function UsersTable() {
   })
 
   return (
-    <div className="w-full mt-[1.5rem]">
+    <section className="w-full mt-[1.5rem]">
       <div className="flex items-center justify-between w-full mb-[.85rem]">
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -304,7 +312,7 @@ export default function UsersTable() {
                 </TableRow>
               )}
             >
-              <UsersData
+              <UserDataMain
                 data={data}
                 table={table}
               />
@@ -364,6 +372,6 @@ export default function UsersTable() {
           </PaginationContent>
         </Pagination>
       </div>
-    </div>
+    </section>
   )
 }

@@ -24,6 +24,8 @@ export const useCompanyList = () => {
   return useSuspenseQuery({
     queryKey: ['companies'],
     queryFn: () => fetchCompanies(),
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 60 * 24,
     refetchOnWindowFocus: false
   })
 }
