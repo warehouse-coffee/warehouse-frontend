@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { ConfigurationsClient, CreateConfigCommand } from '../../../../web-api-client'
 import { cookieStore, tokenUtils } from '@/lib/auth'
+
+import { ConfigurationsClient, CreateConfigCommand } from '../../../../web-api-client'
 
 export async function POST(request: NextRequest) {
   const token = cookieStore.get('auth_token')
