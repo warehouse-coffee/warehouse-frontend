@@ -16,6 +16,8 @@ export async function PUT(request: NextRequest) {
     const formData = await request.formData()
     const updateUserData = Object.fromEntries(formData)
 
+    // updateUserData: { abc: '123', ... }
+
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
 
@@ -23,7 +25,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
     }
 
-    const updateUserCommand = UpdateUserCommand.fromJS({ ...updateUserData })
+    const updateUserCommand = UpdateUserCommand.fromJS(updateUserData)
 
     const client = new SuperAdminClient(
       process.env.NEXT_PUBLIC_BACKEND_API_URL!,
@@ -34,7 +36,7 @@ export async function PUT(request: NextRequest) {
     const result = await client.updateUser(updateUserCommand, id)
     return NextResponse.json(result)
   } catch (error) {
-    // console.error('Update user error:', error)
+    console.error('Update user error:', error)
     if (error instanceof SwaggerException) {
       return NextResponse.json(
         { error: error.message, details: error.result },
