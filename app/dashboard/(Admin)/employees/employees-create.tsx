@@ -4,32 +4,29 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-
-interface Storage {
-  id: number;
-  name: string;
-  status: "Active" | "Inactive" | "UnderMaintenance";
-}
+import { CreateEmployeeInput } from "@/types";
+import { useUserStorageList } from "@/hooks/storage/useStorageOfUser";
+const initialFormState: CreateEmployeeInput = {
+  userName: "",
+  password: "",
+  email: "",
+  phoneNumber: "",
+  warehouses: [],
+};
+import {Storage} from "@/types/storage";
 
 export default function EmployeesCreatePage() {
   const [searchTerm, setSearchTerm] = React.useState("");
-  const [currentPage, setCurrentPage] = React.useState(1);
+  const [currentPage, setCurrentPage] = React.useState(0);
   const [selectedStorages, setSelectedStorages] = React.useState<number[]>([]);
-
-  const storages: Storage[] = [
-    { id: 1, name: "Coffee Trung Nguyen 1", status: "Active" },
-    { id: 2, name: "Tea House 1", status: "Active" },
-    { id: 3, name: "Bakery Shop 1", status: "Inactive" },
-    { id: 4, name: "Coffee Trung Nguyen 2", status: "UnderMaintenance" },
-    { id: 5, name: "Tea House 2", status: "Active" },
-    { id: 6, name: "Bakery Shop 2", status: "Inactive" },
-    { id: 7, name: "Coffee Trung Nguyen 3", status: "Active" },
-    { id: 8, name: "Tea House 3", status: "UnderMaintenance" },
-    { id: 9, name: "Bakery Shop 3", status: "Active" },
-  ];
-
+  
+  // set data to storages
+  const { data: storageData } = useUserStorageList(currentPage, 5); 
+  // set page and storage 
+  const storages: Storage[] = [];
+  
   const filteredStorages = storages.filter((storage) =>
-    storage.name.toLowerCase().includes(searchTerm.toLowerCase())
+    storage.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const itemsPerPage = 5;
@@ -151,12 +148,12 @@ export default function EmployeesCreatePage() {
                       <div className="flex items-center space-x-2">
                         <Checkbox
                           id={`storage-${storage.id}`}
-                          checked={selectedStorages.includes(storage.id)}
+                          checked={storage.id !== undefined && selectedStorages.includes(storage.id)}
                           onCheckedChange={(checked: any) => {
                             if (checked) {
                               setSelectedStorages([
-                                ...selectedStorages,
-                                storage.id,
+                                ...selectedStorages.filter(id => id !== undefined),
+                                storage.id!,
                               ]);
                             } else {
                               setSelectedStorages(

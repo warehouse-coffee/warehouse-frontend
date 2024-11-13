@@ -1,7 +1,7 @@
-"use client";
+"use client"; 
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Plus, Save, XCircle, MapPin, Tag, Info, Check } from "lucide-react";
+import { X, Plus, Save, XCircle, MapPin, Tag, Info, Check, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,19 +19,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { toast } from "sonner";
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 export default function StoragesCreatePage() {
   const [name, setName] = useState('')
   const [location, setLocation] = useState('')
-  const [status, setStatus] = useState('1')
-  const [areas, setAreas] = useState(['Area A', 'Area B', 'Area C'])
+  const [status, setStatus] = useState('0')
+  const [areas, setAreas] = useState<string[]>([])
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
@@ -99,19 +94,19 @@ export default function StoragesCreatePage() {
       setIsSubmitting(false)
       setShowSuccessModal(true)
       setTimeout(() => setShowSuccessModal(false), 3000)
-      toast.success( "Storage created successfully.")
+      toast.success('Storage created successfully')
     }
   }
 
   return (
     <div>
-        <form onSubmit={handleSubmit} className="space-y-6">
+       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="flex flex-col h-full">
+          <Card className="h-full">
             <CardHeader>
               <CardTitle>Basic Information</CardTitle>
             </CardHeader>
-            <CardContent className="flex-grow space-y-4">
+            <CardContent className="space-y-4">
               <div>
                 <Label htmlFor="name" className="flex items-center">
                   <Tag className="w-4 h-4 mr-2" />
@@ -162,63 +157,60 @@ export default function StoragesCreatePage() {
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1">Active</SelectItem>
-                    <SelectItem value="0">Inactive</SelectItem>
+                    <SelectItem value="0">Active</SelectItem>
+                    <SelectItem value="1">UnderMaintenance</SelectItem>
+                    <SelectItem value="2">Inactive</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="flex flex-col h-full">
+          <Card className="h-full">
             <CardHeader>
               <CardTitle>Areas</CardTitle>
             </CardHeader>
-            <CardContent className="flex-grow overflow-hidden flex flex-col h-[400px]">
-              <Accordion type="single" collapsible className="w-full flex-grow">
-                <AccordionItem value="areas" className="flex flex-col flex-grow">
-                  <AccordionTrigger>Manage Areas</AccordionTrigger>
-                  <AccordionContent className="flex flex-col flex-grow">
-                    <div className="flex-grow overflow-y-auto pr-2 space-y-2">
-                      {areas.map((area, index) => (
-                        <motion.div
-                          key={index}
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          transition={{ duration: 0.2 }}
-                          className="flex items-center"
-                          draggable
-                          onDragStart={() => handleDragStart(index)}
-                          onDragEnter={() => handleDragEnter(index)}
-                          onDragEnd={handleDragEnd}
-                          onDragOver={(e) => e.preventDefault()}
-                        >
-                          <Input
-                            placeholder={`Area ${index + 1}`}
-                            value={area}
-                            onChange={(e) => handleAreaChange(index, e.target.value)}
-                            className={`${errors.areas ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500`}
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleRemoveArea(index)}
-                            className="ml-2 flex-shrink-0"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </motion.div>
-                      ))}
+            <CardContent>
+              <ScrollArea className="h-[300px] pr-4">
+                {areas.map((area, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex items-center mt-2"
+                    draggable
+                    onDragStart={() => handleDragStart(index)}
+                    onDragEnter={() => handleDragEnter(index)}
+                    onDragEnd={handleDragEnd}
+                    onDragOver={(e) => e.preventDefault()}
+                  >
+                    <GripVertical className="h-5 w-5 mr-2 text-gray-400 cursor-move" />
+                    <div className="w-full">
+                      <Input
+                        placeholder={`Area ${index + 1}`}
+                        value={area}
+                        onChange={(e) => handleAreaChange(index, e.target.value)}
+                        className={`${errors.areas ? 'border-red-500' : 'border-gray-300'} flex-grow rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500`}
+                      />
                     </div>
-                    {errors.areas && <p className="text-red-500 text-sm mt-1">{errors.areas}</p>}
-                    <Button type="button" variant="outline" onClick={handleAddArea} className="mt-2 w-full">
-                      <Plus className="h-4 w-4 mr-2" /> Add Area
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemoveArea(index)}
+                      className="ml-2"
+                    >
+                      <X className="h-4 w-4" />
                     </Button>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
+                  </motion.div>
+                ))}
+              </ScrollArea>
+              {errors.areas && <p className="text-red-500 text-sm mt-1">{errors.areas}</p>}
+              <Button type="button" variant="outline" onClick={handleAddArea} className="mt-4 w-full">
+                <Plus className="h-4 w-4 mr-2" /> Add Area
+              </Button>
             </CardContent>
           </Card>
         </div>

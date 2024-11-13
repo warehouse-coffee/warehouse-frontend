@@ -52,7 +52,7 @@ export default function StoragesPage(){
         <DialogTrigger asChild>
           <button className="hidden"></button>
         </DialogTrigger>
-        <DialogContent  className="max-w-2xl mx-auto p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg shadow-lg"> 
+        <DialogContent  className="max-w-7xl mx-auto p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg shadow-lg"> 
         <DialogHeader>
             <DialogTitle> <h1 className="text-3xl font-bold mb-2 text-gray-800">Create New Storage</h1>
           </DialogTitle>
