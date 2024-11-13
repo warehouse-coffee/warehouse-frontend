@@ -13,7 +13,8 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
-    const updateUserData = await request.json()
+    const formData = await request.formData()
+    const updateUserData = Object.fromEntries(formData)
 
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
@@ -24,13 +25,25 @@ export async function PUT(request: NextRequest) {
 
     const updateUserCommand = UpdateUserCommand.fromJS({ ...updateUserData })
 
-    const client = new SuperAdminClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token, xsrfToken)
+    const client = new SuperAdminClient(
+      process.env.NEXT_PUBLIC_BACKEND_API_URL!,
+      undefined,
+      token,
+      xsrfToken
+    )
     const result = await client.updateUser(updateUserCommand, id)
     return NextResponse.json(result)
   } catch (error) {
+    // console.error('Update user error:', error)
     if (error instanceof SwaggerException) {
-      return NextResponse.json({ error: error.message, details: error.result }, { status: error.status })
+      return NextResponse.json(
+        { error: error.message, details: error.result },
+        { status: error.status }
+      )
     }
-    return NextResponse.json({ error: 'Failed to update user' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Failed to update user' },
+      { status: 500 }
+    )
   }
 }
