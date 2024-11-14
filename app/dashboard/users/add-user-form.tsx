@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { ROLE_NAMES } from '@/constants'
 import { useCompanyList } from '@/hooks/company'
 import { useCreateUser } from '@/hooks/user'
-import { cn, formatLabel, formatRoleLabel } from '@/lib/utils'
+import { cn, formatLabel, formatRoleLabel, getAvailableRoles } from '@/lib/utils'
 import { CompanyInfo, CreateUserInput, RoleName } from '@/types'
 
 const initialFormState: CreateUserInput = {
@@ -52,6 +52,8 @@ export default function AddUserForm({ onClose }: { onClose: () => void }) {
     setShowPassword(!showPassword)
   }
 
+  const availableRoles = getAvailableRoles()
+
   return (
     <form onSubmit={handleCreateUser}>
       <div className="flex flex-col gap-4">
@@ -72,7 +74,7 @@ export default function AddUserForm({ onClose }: { onClose: () => void }) {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      {Object.values(ROLE_NAMES).map((role) => (
+                      {availableRoles.map((role) => (
                         <SelectItem key={role} value={role}>{formatRoleLabel(role)}</SelectItem>
                       ))}
                     </SelectGroup>

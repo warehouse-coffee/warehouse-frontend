@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     if (!id) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
     }
-    const client = new SuperAdminClient(process.env.NEXT_BACKEND_API_URL, undefined, token, undefined)
+    const client = new SuperAdminClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token, undefined)
     const result = await client.getUserDetail(id)
     return NextResponse.json(result)
   } catch (error) {

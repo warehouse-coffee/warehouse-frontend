@@ -1,13 +1,15 @@
-'use client';
+'use client'
 
 import {
   AnimatePresence,
   Transition,
   Variant,
   motion,
-  MotionProps,
-} from 'framer-motion';
-import { cn } from '@/lib/utils';
+  MotionProps
+} from 'framer-motion'
+import React from 'react'
+
+import { cn } from '@/lib/utils'
 
 type TransitionPanelProps = {
   children: React.ReactNode[];
@@ -45,5 +47,5 @@ export function TransitionPanel({
         </motion.div>
       </AnimatePresence>
     </div>
-  );
+  )
 }

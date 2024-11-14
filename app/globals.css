@@ -77,21 +77,16 @@
     -webkit-appearance: none;
     margin: 0;
   }
-}
 
-.max-h-200px::-webkit-scrollbar {
-  width: 6px;
-}
+  ::-webkit-scrollbar {
+    @apply w-[.45rem];
+  }
 
-.max-h-200px::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary/75 rounded-[.5rem];
+  }
 
-.max-h-200px::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 3px;
-}
-
-.max-h-200px::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-400/20;
+  }
 }

@@ -7,6 +7,8 @@ import {
   BreadcrumbSeparator
 } from '@/components/ui/breadcrumb'
 
+import SettingsForm from './settings-form'
+
 export default function SettingsPage() {
   return (
     <>
@@ -29,6 +31,9 @@ export default function SettingsPage() {
           </p>
         </div>
       </div>
+      <section className="mt-[1.5rem]">
+        <SettingsForm />
+      </section>
     </>
   )
 }

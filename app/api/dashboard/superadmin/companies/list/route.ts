@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   const xsrfToken = cookieStore.get('XSRF-TOKEN')
 
   try {
-    const client = new CompaniesClient(process.env.NEXT_BACKEND_API_URL, undefined, token, xsrfToken)
+    const client = new CompaniesClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token, xsrfToken)
     const result = await client.getCompanyList()
     return NextResponse.json(result)
   } catch (error) {

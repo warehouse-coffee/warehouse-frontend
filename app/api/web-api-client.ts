@@ -567,6 +567,42 @@ export class ConfigurationsClient {
         }
         return Promise.resolve<ResponseDto>(null as any);
     }
+
+    getAllConfig(): Promise<ConfigVm> {
+        let url_ = this.baseUrl + "/api/Configurations";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetAllConfig(_response);
+        });
+    }
+
+    protected processGetAllConfig(response: Response): Promise<ConfigVm> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ConfigVm.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<ConfigVm>(null as any);
+    }
 }
 
 export class CrawClient {
@@ -1911,30 +1947,39 @@ export class SuperAdminClient {
     }
 
     updateUser(command: UpdateUserCommand, id: string): Promise<ResponseDto> {
-        let url_ = this.baseUrl + "/api/SuperAdmin/user/{id}?";
+        let url_ = this.baseUrl + "/api/SuperAdmin/user/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        if (command === undefined || command === null)
-            throw new Error("The parameter 'command' must be defined and cannot be null.");
-        else
-            url_ += "command=" + encodeURIComponent("" + command) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
+    
+        const formData = new FormData();
+        const commandData = command.toJSON();
+        
+        Object.entries(commandData).forEach(([key, value]) => {
+            if (value !== null && value !== undefined) {
+                if (typeof value === 'boolean') {
+                    formData.append(key, value.toString());
+                } else {
+                    formData.append(key, value as string);
+                }
+            }
+        });
+    
         let options_: RequestInit = {
             method: "PUT",
+            body: formData,
             headers: {
                 "Accept": "application/json",
                 "Authorization": `Bearer ${this.token}`,
-                "X-XSRF-TOKEN": `${this.XSRF}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`
             }
         };
-
+    
         return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processUpdateUser(_response);
         });
     }
-
+    
     protected processUpdateUser(response: Response): Promise<ResponseDto> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
@@ -3438,6 +3483,50 @@ export class CreateConfigCommand implements ICreateConfigCommand {
 }
 
 export interface ICreateConfigCommand {
+    aiServiceKey?: string | undefined;
+    emailServiceKey?: string | undefined;
+    aiDriverServer?: string | undefined;
+}
+
+export class ConfigVm implements IConfigVm {
+    aiServiceKey?: string | undefined;
+    emailServiceKey?: string | undefined;
+    aiDriverServer?: string | undefined;
+
+    constructor(data?: IConfigVm) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.aiServiceKey = _data["aiServiceKey"];
+            this.emailServiceKey = _data["emailServiceKey"];
+            this.aiDriverServer = _data["aiDriverServer"];
+        }
+    }
+
+    static fromJS(data: any): ConfigVm {
+        data = typeof data === 'object' ? data : {};
+        let result = new ConfigVm();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["aiServiceKey"] = this.aiServiceKey;
+        data["emailServiceKey"] = this.emailServiceKey;
+        data["aiDriverServer"] = this.aiDriverServer;
+        return data;
+    }
+}
+
+export interface IConfigVm {
     aiServiceKey?: string | undefined;
     emailServiceKey?: string | undefined;
     aiDriverServer?: string | undefined;

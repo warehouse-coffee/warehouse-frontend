@@ -31,7 +31,7 @@ export default function DashboardMain({ children }: { children: React.ReactNode 
   return (
     <div className="flex h-screen overflow-hidden relative">
       <DashboardSidebar open={sidebarOpen} />
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto relative">
         <DashboardHeader
           toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
           sidebarOpen={sidebarOpen}

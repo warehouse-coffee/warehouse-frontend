@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { ROLE_NAMES } from '@/constants'
 import { useCompanyList } from '@/hooks/company'
 import { useUpdateUser } from '@/hooks/user'
-import { cn, formatLabel, formatRoleLabel } from '@/lib/utils'
+import { cn, formatLabel, formatRoleLabel, getAvailableRoles } from '@/lib/utils'
 import { UpdateUser, RoleName, CompanyInfo } from '@/types'
 
 type EditFormType = UpdateUser & { password: string }
@@ -63,6 +63,8 @@ export default function UsersEditForm({ user, onClose, isOpen }: { user: UpdateU
     setShowPassword(!showPassword)
   }
 
+  const availableRoles = getAvailableRoles()
+
   if (!editForm) return null
 
   return (
@@ -81,7 +83,7 @@ export default function UsersEditForm({ user, onClose, isOpen }: { user: UpdateU
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      {Object.values(ROLE_NAMES).map((role) => (
+                      {availableRoles.map((role) => (
                         <SelectItem key={role} value={role}>{formatRoleLabel(role)}</SelectItem>
                       ))}
                     </SelectGroup>

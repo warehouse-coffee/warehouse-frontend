@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const pageNumber = parseInt(searchParams.get('pageNumber') || '1')
     const size = parseInt(searchParams.get('size') || '5')
 
-    const client = new LogsClient(process.env.NEXT_BACKEND_API_URL, undefined, token, xsrfToken)
+    const client = new LogsClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token, xsrfToken)
 
     const page = new Page({
       pageNumber: pageNumber,
@@ -30,13 +30,13 @@ export async function GET(request: NextRequest) {
 
     const result = await client.getLogs(query)
 
-    console.log('API Response:', {
-      totalElements: result.page?.totalElements,
-      pageSize: size,
-      currentPage: pageNumber,
-      totalPages: result.page?.totalPages,
-      data: result.logVMs?.length
-    })
+    // console.log('API Response:', {
+    //   totalElements: result.page?.totalElements,
+    //   pageSize: size,
+    //   currentPage: pageNumber,
+    //   totalPages: result.page?.totalPages,
+    //   data: result.logVMs?.length
+    // })
 
     return NextResponse.json(result)
   } catch (error) {

@@ -6,13 +6,19 @@ import { handleApiError } from '@/lib/utils'
 import { UpdateUser } from '@/types'
 
 const updateUser = async (data: UpdateUser) => {
+  const formData = new FormData()
+
+  Object.entries(data).forEach(([key, value]) => {
+    if (value !== null && value !== undefined) {
+      formData.append(key, value.toString())
+    }
+  })
+
   const response = await fetch(`${API_ENDPOINTS.UPDATE_USER}?id=${data.id}`, {
     method: METHODS.PUT,
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
+    body: formData
   })
+
   if (!response.ok) {
     throw new Error('Failed to update user')
   }

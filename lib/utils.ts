@@ -2,6 +2,9 @@ import { ClassValue, clsx } from 'clsx'
 import { toast } from 'sonner'
 import { twMerge } from 'tailwind-merge'
 
+import { ROLE_NAMES } from '@/constants'
+import { RoleName } from '@/types'
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -35,4 +38,9 @@ export const formatRoleLabel = (role: string) => {
 
 export const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleString()
+}
+
+export const getAvailableRoles = () => {
+  const { SUPER_ADMIN, ...otherRoles } = ROLE_NAMES
+  return Object.values(otherRoles)
 }

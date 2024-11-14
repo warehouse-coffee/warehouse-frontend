@@ -6,3 +6,4 @@ export type UpdateUser = User & {
 }
 
 export type UpdateEmployee = EmployeeDetail;
+

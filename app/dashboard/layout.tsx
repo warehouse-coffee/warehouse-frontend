@@ -4,6 +4,8 @@ import { AuthWrapper } from '@/components/auth-wrapper'
 import DashboardMain from '@/components/dashboard/dashboard-main'
 import { ThemeProvider } from '@/components/theme-provider'
 
+// import DashboardLoading from './loading'
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider
@@ -13,7 +15,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       enableSystem
     >
       <AuthWrapper>
-        <DashboardMain>{children}</DashboardMain>
+        <DashboardMain>
+          {children}
+        </DashboardMain>
       </AuthWrapper>
     </ThemeProvider>
   )

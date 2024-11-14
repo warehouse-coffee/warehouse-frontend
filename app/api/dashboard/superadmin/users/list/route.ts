@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const size = parseInt(searchParams.get('size') || '')
     // const searchText = searchParams.get('searchText')
 
-    const client = new SuperAdminClient(process.env.NEXT_BACKEND_API_URL, undefined, token, xsrfToken)
+    const client = new SuperAdminClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token, xsrfToken)
 
     const page = new Page({
       pageNumber: pageNumber,

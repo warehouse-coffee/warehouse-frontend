@@ -10,7 +10,7 @@ export interface UserInfo extends JwtPayload {
 
 export const cookieStore = {
   get: (name: string) => cookies().get(name)?.value,
-  
+
   set: (name: string, value: string, options = {}) => {
     cookies().set(name, value, {
       secure: process.env.NODE_ENV !== 'development',
@@ -19,7 +19,7 @@ export const cookieStore = {
       ...options
     })
   },
-  
+
   delete: (name: string) => cookies().delete(name)
 }
 
@@ -32,7 +32,7 @@ export const tokenUtils = {
       return false
     }
   },
-  
+
   getUserInfo: (token: string): UserInfo | null => {
     try {
       return jwtDecode<UserInfo>(token)

@@ -7,7 +7,8 @@ import {
   useReactTable,
   PaginationState
 } from '@tanstack/react-table'
-import React, { useState, useEffect, Suspense } from 'react'
+import dynamic from 'next/dynamic'
+import React, { useState, useEffect } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import { Button } from '@/components/ui/button'
@@ -30,8 +31,12 @@ import {
 } from '@/components/ui/table'
 import { useLogList } from '@/hooks/log/useLogList'
 
-import LogsData from './logs-data'
 import LogsDataLoading from './logs-data-loading'
+
+const LogsData = dynamic(() => import('./logs-data'), {
+  ssr: false,
+  loading: () => <LogsDataLoading />
+})
 
 export default function LogsTable() {
   const { reset } = useQueryErrorResetBoundary()
@@ -44,7 +49,7 @@ export default function LogsTable() {
   const [totalElements, setTotalElements] = useState<number>(0)
   const [data, setData] = useState<any[]>([])
 
-  const { data: logData, isFetching } = useLogList(
+  const { data: logData } = useLogList(
     pagination.pageIndex,
     pagination.pageSize
   )
@@ -56,8 +61,16 @@ export default function LogsTable() {
       setData(logData.logVMs)
       setTotalElements(logData.page?.totalElements ?? 0)
       setTotalPages(logData.page?.totalPages ?? 0)
+
+      // console.log('Log Data:', {
+      //   totalElements: logData.page?.totalElements,
+      //   totalPages: logData.page?.totalPages,
+      //   currentPage: pagination.pageIndex + 1,
+      //   pageSize: pagination.pageSize,
+      //   dataLength: logData.logVMs.length
+      // })
     }
-  }, [logData, pagination.pageSize])
+  }, [logData])
 
   const table = useReactTable({
     data,
@@ -98,7 +111,7 @@ export default function LogsTable() {
   }
 
   return (
-    <div className="w-full mt-[1.5rem]">
+    <section className="w-full mt-[1.5rem]">
       <div className="flex items-center justify-between w-full mb-[.85rem]">
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -147,13 +160,10 @@ export default function LogsTable() {
                 </TableRow>
               )}
             >
-              <Suspense fallback={<LogsDataLoading />}>
-                <LogsData
-                  data={data}
-                  isLoading={isFetching}
-                  table={table}
-                />
-              </Suspense>
+              <LogsData
+                data={data}
+                table={table}
+              />
             </ErrorBoundary>
           </TableBody>
         </Table>
@@ -161,9 +171,9 @@ export default function LogsTable() {
       <div className="w-full flex items-center justify-between mt-[1.25rem]">
         <p className="text-[.85rem] text-muted-foreground">
           Showing {' '}
-          {totalElements === 0 ? 0 : pagination.pageIndex * pagination.pageSize + 1} {' '}
+          {table.getRowModel().rows.length === 0 ? 0 : totalElements === 0 ? 0 : pagination.pageIndex * pagination.pageSize + 1} {' '}
           to {' '}
-          {Math.min(
+          {table.getRowModel().rows.length === 0 ? 0 : Math.min(
             (pagination.pageIndex + 1) * pagination.pageSize,
             totalElements
           )}{' '}
@@ -179,7 +189,7 @@ export default function LogsTable() {
                   table.previousPage()
                 }}
                 aria-disabled={!table.getCanPreviousPage()}
-                className={!table.getCanPreviousPage() ? 'pointer-events-none opacity-50' : ''}
+                className={!table.getCanPreviousPage() ? 'cursor-not-allowed pointer-events-none opacity-75' : ''}
               />
             </PaginationItem>
             {Array.from({ length: Math.max(1, totalPages) }, (_, i) => (
@@ -204,12 +214,12 @@ export default function LogsTable() {
                   table.nextPage()
                 }}
                 aria-disabled={!table.getCanNextPage()}
-                className={!table.getCanNextPage() ? 'pointer-events-none opacity-50' : ''}
+                className={!table.getCanNextPage() ? 'cursor-not-allowed pointer-events-none opacity-75' : ''}
               />
             </PaginationItem>
           </PaginationContent>
         </Pagination>
       </div>
-    </div>
+    </section>
   )
 }
