@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { cookieStore, tokenUtils } from '@/lib/auth'
 
-import { SuperAdminClient, CreateUserCommand, SwaggerException } from '../../../../web-api-client'
+import { SuperAdminClient, UserRegister, CreateUserCommand, SwaggerException } from '../../../../web-api-client'
 
 export async function POST(request: NextRequest) {
   const token = cookieStore.get('auth_token')
@@ -14,15 +14,37 @@ export async function POST(request: NextRequest) {
 
   try {
     const createUserData = await request.json()
-    // console.log(createUserData)
-    const createUserCommand = CreateUserCommand.fromJS({ ...createUserData })
-    const client = new SuperAdminClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token, xsrfToken)
+    const userRegister = UserRegister.fromJS(createUserData.userRegister)
+    const createUserCommand = new CreateUserCommand({
+      userRegister: userRegister
+    })
+
+    const client = new SuperAdminClient(
+      process.env.NEXT_PUBLIC_BACKEND_API_URL!,
+      undefined,
+      token,
+      xsrfToken
+    )
     const result = await client.userRegister(createUserCommand)
+
+    if (result.statusCode === 400) {
+      return NextResponse.json(
+        { error: result.message },
+        { status: 400 }
+      )
+    }
+
     return NextResponse.json(result)
   } catch (error) {
     if (error instanceof SwaggerException) {
-      return NextResponse.json({ error: error.message, details: error.result }, { status: error.status })
+      return NextResponse.json(
+        { error: error.message, details: error.result },
+        { status: error.status }
+      )
     }
-    return NextResponse.json({ error: 'Failed to create user' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Failed to create user' },
+      { status: 500 }
+    )
   }
 }

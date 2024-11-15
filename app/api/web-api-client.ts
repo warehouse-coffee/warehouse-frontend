@@ -1787,6 +1787,8 @@ export class SuperAdminClient {
 
         const content_ = JSON.stringify(command);
 
+        console.log(content_)
+
         let options_: RequestInit = {
             body: content_,
             method: "POST",
@@ -1811,6 +1813,8 @@ export class SuperAdminClient {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = ResponseDto.fromJS(resultData200);
+
+            console.log(result200)
             return result200;
             });
         } else if (status !== 200 && status !== 204) {

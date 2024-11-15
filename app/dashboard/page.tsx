@@ -7,7 +7,7 @@ import { DashboardPieChart } from '@/components/dashboard/dashboard-pie-chart'
 import { DashboardTrendingChart } from '@/components/dashboard/dashboard-trending-chart'
 import NumberTicker from '@/components/magicui/number-ticker'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import 'driver.js/dist/driver.css'
+// import 'driver.js/dist/driver.css'
 
 export default function DashboardPage() {
   // useEffect(() => {
@@ -25,6 +25,7 @@ export default function DashboardPage() {
 
   //   tourObj.drive()
   // }, [])
+
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <Card id="tour-example">

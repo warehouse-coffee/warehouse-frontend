@@ -37,6 +37,7 @@ export default function AddUserForm({ onClose }: { onClose: () => void }) {
     e.preventDefault()
     const createData: CreateUserInput = { ...createForm }
     createUserMutation.mutate(createData)
+    console.log(createData)
   }, [createForm, createUserMutation])
 
   const handleResetForm = useCallback(() => {

@@ -1,6 +1,6 @@
 'use client'
 
-import * as React from 'react'
+import React, { useState } from 'react'
 import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts'
 
 import {
@@ -137,7 +137,7 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function DashboardTrendingChart({ id }: { id: string }) {
-  const [timeRange, setTimeRange] = React.useState('90d')
+  const [timeRange, setTimeRange] = useState<string>('90d')
 
   const filteredData = chartData.filter((item) => {
     const date = new Date(item.date)

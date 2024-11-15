@@ -6,13 +6,19 @@ import { handleApiError } from '@/lib/utils'
 import { CreateUser } from '@/types'
 
 const createNewUser = async (data: CreateUser) => {
+  const formattedData = {
+    userRegister: { ...data }
+  }
+
   const response = await fetch(API_ENDPOINTS.CREATE_USER, {
     method: METHODS.POST,
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(data)
+    body: JSON.stringify(formattedData)
   })
+
+  console.log(response)
   if (!response.ok) {
     throw new Error('Failed to create user')
   }
@@ -25,7 +31,7 @@ export const useCreateUser = (onComplete: () => void) => {
   return useMutation({
     mutationFn: createNewUser,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] })
+      queryClient.invalidateQueries({ queryKey: ['users'], refetchType: 'all' })
       toast.success('User created successfully')
     },
     onError: (error) => {
