@@ -178,7 +178,7 @@ export default function ChatBox() {
               whileHover={{
                 width: '9rem',
                 transition: {
-                  type: "spring",
+                  type: 'spring',
                   stiffness: 400,
                   damping: 25
                 }
@@ -190,7 +190,7 @@ export default function ChatBox() {
                   <MessageCircle className="h-5 w-5 text-white" />
                 </div>
                 <span
-                  className="text-white text-sm font-medium -ml-1 whitespace-nowrap overflow-hidden w-0 
+                  className="text-white text-sm font-medium -ml-1 whitespace-nowrap overflow-hidden w-0
                     group-hover:w-auto transition-all duration-250 opacity-0 group-hover:opacity-100"
                 >
                   Chat with AI
@@ -205,7 +205,7 @@ export default function ChatBox() {
                   scale: 1.2,
                   transition: {
                     repeat: Infinity,
-                    repeatType: "reverse",
+                    repeatType: 'reverse',
                     duration: 1
                   }
                 }}
@@ -297,24 +297,24 @@ export default function ChatBox() {
                       <motion.div
                         className="w-2 h-2 bg-[#4DA6FF] rounded-full"
                         animate={{
-                          y: [0, -6, 0],
+                          y: [0, -6, 0]
                         }}
                         transition={{
                           duration: 0.6,
                           repeat: Infinity,
-                          ease: "easeInOut",
+                          ease: 'easeInOut',
                           times: [0, 0.5, 1]
                         }}
                       />
                       <motion.div
                         className="w-2 h-2 bg-[#4DA6FF] rounded-full"
                         animate={{
-                          y: [0, -6, 0],
+                          y: [0, -6, 0]
                         }}
                         transition={{
                           duration: 0.6,
                           repeat: Infinity,
-                          ease: "easeInOut",
+                          ease: 'easeInOut',
                           times: [0, 0.5, 1],
                           delay: 0.15
                         }}
@@ -322,12 +322,12 @@ export default function ChatBox() {
                       <motion.div
                         className="w-2 h-2 bg-[#4DA6FF] rounded-full"
                         animate={{
-                          y: [0, -6, 0],
+                          y: [0, -6, 0]
                         }}
                         transition={{
                           duration: 0.6,
                           repeat: Infinity,
-                          ease: "easeInOut",
+                          ease: 'easeInOut',
                           times: [0, 0.5, 1],
                           delay: 0.3
                         }}
