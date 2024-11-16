@@ -13,11 +13,11 @@ export async function login(email: string, password: string) {
         maxAge: 60 * 60 * 24
       })
 
-      const xsrfToken = await ApiClientService.getAntiforgeryToken(res.token)
-      cookieStore.set('XSRF-TOKEN', xsrfToken, {
-        httpOnly: false,
-        secure: true
-      })
+      // const xsrfToken = await ApiClientService.getAntiforgeryToken(res.token)
+      // cookieStore.set('XSRF-TOKEN', xsrfToken, {
+      //   httpOnly: false,
+      //   secure: true
+      // })
 
       return { success: true }
     }
@@ -49,9 +49,9 @@ export async function logout(userId: string) {
 
 export async function checkAuth() {
   const token = cookieStore.get('auth_token')
-  const xsrfToken = cookieStore.get('XSRF-TOKEN')
+  // const xsrfToken = cookieStore.get('XSRF-TOKEN')
 
-  if (!token || !xsrfToken) return { isAuthenticated: false }
+  if (!token) return { isAuthenticated: false }
 
   try {
     const userInfo = tokenUtils.getUserInfo(token)

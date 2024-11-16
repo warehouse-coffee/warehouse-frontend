@@ -6,7 +6,6 @@ import { SuperAdminClient, UserRegister, CreateUserCommand, SwaggerException } f
 
 export async function POST(request: NextRequest) {
   const token = cookieStore.get('auth_token')
-  const xsrfToken = cookieStore.get('XSRF-TOKEN')
 
   if (!token || !tokenUtils.isValid(token)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -22,8 +21,7 @@ export async function POST(request: NextRequest) {
     const client = new SuperAdminClient(
       process.env.NEXT_PUBLIC_BACKEND_API_URL!,
       undefined,
-      token,
-      xsrfToken
+      token
     )
     const result = await client.userRegister(createUserCommand)
 

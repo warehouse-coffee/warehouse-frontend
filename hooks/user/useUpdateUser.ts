@@ -10,19 +10,30 @@ const updateUser = async (data: UpdateUser) => {
 
   Object.entries(data).forEach(([key, value]) => {
     if (value !== null && value !== undefined) {
-      formData.append(key, value.toString())
+      if (key === 'isActived') {
+        formData.append(key, value === true ? 'true' : 'false')
+      } else if (key === 'password' || key === 'avatarImage') {
+        formData.append(key, value?.toString() || '')
+      } else {
+        formData.append(key, value.toString())
+      }
     }
   })
+
+  // console.log('Sending update data:', Object.fromEntries(formData))
 
   const response = await fetch(`${API_ENDPOINTS.UPDATE_USER}?id=${data.id}`, {
     method: METHODS.PUT,
     body: formData
   })
 
+  const result = await response.json()
+
   if (!response.ok) {
-    throw new Error('Failed to update user')
+    throw new Error(result.error || 'Failed to update user')
   }
-  return response.json()
+
+  return result
 }
 
 export const useUpdateUser = (onComplete: () => void) => {
@@ -30,9 +41,9 @@ export const useUpdateUser = (onComplete: () => void) => {
 
   return useMutation({
     mutationFn: updateUser,
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['users'] })
-      toast.success('User updated successfully')
+      toast.success(data.message || 'User updated successfully')
     },
     onError: (error) => {
       handleApiError(error)

@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader } from '@/components/ui/loader'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ROLE_NAMES } from '@/constants'
 import { useCompanyList } from '@/hooks/company'
 import { useUpdateUser } from '@/hooks/user'
 import { cn, formatLabel, formatRoleLabel, getAvailableRoles } from '@/lib/utils'
@@ -20,16 +19,56 @@ export default function UsersEditForm({ user, onClose, isOpen }: { user: UpdateU
 
   const companyList = companyData?.companyList || []
 
-  const [editForm, setEditForm] = useState<EditFormType>({ ...user, password: '' })
+  const [editForm, setEditForm] = useState<EditFormType>({
+    ...user,
+    password: '',
+    email: user.email || '',
+    userName: user.userName || '',
+    phoneNumber: user.phoneNumber || '',
+    avatarImage: user.avatarImage || '',
+    companyId: user.companyId || '',
+    isActived: user.isActived ?? true,
+    roleName: user.roleName
+  })
   const [showPassword, setShowPassword] = useState(false)
-  const initialFormRef = useRef<EditFormType>({ ...user, password: '' })
+  const initialFormRef = useRef<EditFormType>({
+    ...user,
+    password: '',
+    email: user.email || '',
+    userName: user.userName || '',
+    phoneNumber: user.phoneNumber || '',
+    avatarImage: user.avatarImage || '',
+    companyId: user.companyId || '',
+    isActived: user.isActived ?? true,
+    roleName: user.roleName
+  })
 
   const updateUserMutation = useUpdateUser(onClose)
 
   useEffect(() => {
     if (user && isOpen) {
-      setEditForm({ ...user, password: '' })
-      initialFormRef.current = { ...user, password: '' }
+      setEditForm({
+        ...user,
+        password: '',
+        email: user.email || '',
+        userName: user.userName || '',
+        phoneNumber: user.phoneNumber || '',
+        avatarImage: user.avatarImage || '',
+        companyId: user.companyId || '',
+        isActived: user.isActived ?? true,
+        roleName: user.roleName
+      })
+      initialFormRef.current = {
+        ...user,
+        password: '',
+        email: user.email || '',
+        userName: user.userName || '',
+        phoneNumber: user.phoneNumber || '',
+        avatarImage: user.avatarImage || '',
+        companyId: user.companyId || '',
+        isActived: user.isActived ?? true,
+        roleName: user.roleName
+      }
     }
   }, [user, isOpen])
 

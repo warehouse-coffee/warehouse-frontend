@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+import { ApiClientService } from '@/lib/api-service'
 import { cookieStore, tokenUtils } from '@/lib/auth'
-
-import { SuperAdminClient, SwaggerException, UpdateUserCommand } from '../../../../web-api-client'
 
 export async function PUT(request: NextRequest) {
   const token = cookieStore.get('auth_token')
-  const xsrfToken = cookieStore.get('XSRF-TOKEN')
 
   if (!token || !tokenUtils.isValid(token)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -14,10 +12,6 @@ export async function PUT(request: NextRequest) {
 
   try {
     const formData = await request.formData()
-    const updateUserData = Object.fromEntries(formData)
-
-    // updateUserData: { abc: '123', ... }
-
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
 
@@ -25,27 +19,38 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
     }
 
-    const updateUserCommand = UpdateUserCommand.fromJS(updateUserData)
+    const xsrfToken = await ApiClientService.getAntiforgeryToken(token)
+    cookieStore.set('XSRF-TOKEN', xsrfToken, {
+      httpOnly: false,
+      secure: true
+    })
 
-    const client = new SuperAdminClient(
-      process.env.NEXT_PUBLIC_BACKEND_API_URL!,
-      undefined,
-      token,
-      xsrfToken
-    )
-    const result = await client.updateUser(updateUserCommand, id)
-    return NextResponse.json(result)
-  } catch (error) {
-    console.error('Update user error:', error)
-    if (error instanceof SwaggerException) {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/SuperAdmin/user/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'X-XSRF-TOKEN': xsrfToken
+      },
+      body: formData,
+      redirect: 'follow' as RequestRedirect
+    })
+
+    const text = await response.text()
+    const result = text ? JSON.parse(text) : {}
+
+    if (!response.ok) {
       return NextResponse.json(
-        { error: error.message, details: error.result },
-        { status: error.status }
+        { error: result.message || 'Failed to update user' },
+        { status: response.status }
       )
     }
-    return NextResponse.json(
-      { error: 'Failed to update user' },
-      { status: 500 }
-    )
+
+    return NextResponse.json(result || { message: 'User updated successfully' })
+  } catch (error) {
+    console.error('Update user error:', error)
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
+    return NextResponse.json({ error: 'Failed to update user' }, { status: 500 })
   }
 }

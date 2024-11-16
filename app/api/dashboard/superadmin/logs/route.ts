@@ -6,7 +6,6 @@ import { GetLogListQuery, Page, LogsClient } from '../../../web-api-client'
 
 export async function GET(request: NextRequest) {
   const token = cookieStore.get('auth_token')
-  const xsrfToken = cookieStore.get('XSRF-TOKEN')
 
   if (!token || !tokenUtils.isValid(token)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -17,7 +16,7 @@ export async function GET(request: NextRequest) {
     const pageNumber = parseInt(searchParams.get('pageNumber') || '1')
     const size = parseInt(searchParams.get('size') || '5')
 
-    const client = new LogsClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token, xsrfToken)
+    const client = new LogsClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token)
 
     const page = new Page({
       pageNumber: pageNumber,

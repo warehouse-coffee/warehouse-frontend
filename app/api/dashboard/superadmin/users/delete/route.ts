@@ -17,7 +17,6 @@ function canDeleteUser(userInfo: any, targetUserId: string) {
 
 export async function DELETE(request: NextRequest) {
   const token = cookieStore.get('auth_token')
-  const xsrfToken = cookieStore.get('XSRF-TOKEN')
 
   if (!token || !tokenUtils.isValid(token)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -38,7 +37,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error }, { status: 403 })
     }
 
-    const client = new SuperAdminClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token, xsrfToken)
+    const client = new SuperAdminClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token)
 
     const result = await client.deleteUser(id)
     return NextResponse.json(result)

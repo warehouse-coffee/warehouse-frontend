@@ -6,7 +6,7 @@ import { ConfigurationsClient, CreateConfigCommand } from '../../../../web-api-c
 
 export async function POST(request: NextRequest) {
   const token = cookieStore.get('auth_token')
-  const xsrfToken = cookieStore.get('XSRF-TOKEN')
+  // const xsrfToken = cookieStore.get('XSRF-TOKEN')
 
   if (!token || !tokenUtils.isValid(token)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -18,8 +18,7 @@ export async function POST(request: NextRequest) {
     const client = new ConfigurationsClient(
       process.env.NEXT_PUBLIC_BACKEND_API_URL!,
       undefined,
-      token,
-      xsrfToken
+      token
     )
     const result = await client.createConfig(createSettingCommand)
     return NextResponse.json(result)
