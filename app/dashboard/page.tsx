@@ -1,17 +1,17 @@
 import React from 'react'
 
+import { DashboardCards } from '@/components/dashboard/dashboard-cards'
 import { DashboardPieChart } from '@/components/dashboard/dashboard-pie-chart'
 import { DashboardTrendingChart } from '@/components/dashboard/dashboard-trending-chart'
-import { DashboardCards } from '@/components/dashboard/dashboard-cards'
 import { cookieStore, tokenUtils } from '@/lib/auth'
 
 async function getUserRole() {
   const token = cookieStore.get('auth_token')
-  
+
   if (!token || !tokenUtils.isValid(token)) {
     return null
   }
-  
+
   return tokenUtils.getUserInfo(token)?.role
 }
 

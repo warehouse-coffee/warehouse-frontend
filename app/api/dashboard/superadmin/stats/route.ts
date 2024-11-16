@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { cookieStore, tokenUtils } from '@/lib/auth'
+
 import { SuperAdminClient } from '../../../web-api-client'
 
 export async function GET(request: NextRequest) {
@@ -17,27 +18,15 @@ export async function GET(request: NextRequest) {
       token
     )
 
-    try {
-      const result = await client.getSuperAdminStats()
-      return NextResponse.json(result)
-    } catch (clientError: any) {
-      console.error('Client error:', {
-        message: clientError.message,
-        status: clientError.status,
-        response: clientError.response
-      })
-      return NextResponse.json(
-        { error: clientError.message || 'Failed to fetch stats' },
-        { status: clientError.status || 400 }
-      )
-    }
+    const result = await client.getSuperAdminStats()
+    return NextResponse.json(result)
   } catch (error: any) {
     console.error('Server error:', error)
     return NextResponse.json(
-      { 
+      {
         error: 'Internal server error',
-        details: error.message 
-      }, 
+        details: error.message
+      },
       { status: 500 }
     )
   }

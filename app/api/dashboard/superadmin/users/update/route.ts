@@ -32,7 +32,7 @@ export async function PUT(request: NextRequest) {
         'X-XSRF-TOKEN': xsrfToken
       },
       body: formData,
-      redirect: 'follow' as RequestRedirect
+      redirect: 'follow'
     })
 
     const text = await response.text()

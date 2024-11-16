@@ -1,8 +1,8 @@
 'use client'
 
-import { ROLE_NAMES } from '@/constants'
 import NumberTicker from '@/components/magicui/number-ticker'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ROLE_NAMES } from '@/constants'
 import { useGetStats } from '@/hooks/stats/useGetStats'
 
 interface DashboardCardsProps {
