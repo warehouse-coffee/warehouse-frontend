@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
   try {
     const createEmployeeData = await request.json()
     const createEmployeeCommand = new CreateEmployeeCommand({ ...createEmployeeData })  
-    const client = new EmployeesClient(process.env.NEXT_BACKEND_API_URL, undefined, token, xsrfToken)
+    const client = new EmployeesClient(process.env.NEXT_PUBLIC_BACKEND_API_URL, undefined, token, xsrfToken)
     const result = await client.createEmployee(createEmployeeCommand)
     return NextResponse.json(result)
   } catch (error) {

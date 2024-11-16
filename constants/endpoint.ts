@@ -13,7 +13,8 @@ export const API_ENDPOINTS = {
   DELETE_EMPLOYEE: '/api/dashboard/admin/employees/delete', 
   GET_STORAGE_OF_USER: '/api/dashboard/admin/storages/listofuser', 
   GET_CONFIG: '/api/dashboard/superadmin/settings/get',
-  CREATE_CONFIG: '/api/dashboard/superadmin/settings/create'
+  CREATE_CONFIG: '/api/dashboard/superadmin/settings/create',
+  CREATE_STORAGE: '/api/dashboard/admin/storages/create',   
 } as const
 
 export type ApiEndpoint = typeof API_ENDPOINTS[keyof typeof API_ENDPOINTS]

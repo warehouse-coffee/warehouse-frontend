@@ -12,16 +12,12 @@ import {
 import { Dialog, DialogTrigger, DialogContent, DialogClose, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import DashboardFetchLoader from "@/components/dashboard/dashboard-fetch-loader";
 import StoragesCreatePage from "./storages-create";
+import { useDialog } from "@/hooks/useDialog";
 
 export default function StoragesPage(){
-    
-    const [isDialogOpen, setDialogOpen] = useState(false)
-    const openDialog = () => {
-        setDialogOpen(true)
-      }
-      const closeDialog = () => {
-        setDialogOpen(false)
-      }
+      const { closeDialog, dialogsOpen, setDialogsOpen } = useDialog({
+        add: false
+      })
     return (
         <> <Breadcrumb>
         <BreadcrumbList>
@@ -42,13 +38,13 @@ export default function StoragesPage(){
               Manage Storages effectively here.
             </p>
           </div>
-          <button onClick={openDialog}  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+          <button onClick={() => setDialogsOpen(prev => ({ ...prev, add: true }))} className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
             Create
           </button>
         </div>
       </div>
       
-      <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog open={dialogsOpen.add ?? false} onOpenChange={(open) => setDialogsOpen(prev => ({ ...prev, add: open }))}>
         <DialogTrigger asChild>
           <button className="hidden"></button>
         </DialogTrigger>
@@ -61,7 +57,7 @@ export default function StoragesPage(){
             </DialogDescription>
           </DialogHeader>
           <Suspense fallback={<DashboardFetchLoader />}>
-            <StoragesCreatePage/>
+            <StoragesCreatePage onClose={() => closeDialog('add')}/>
           </Suspense>
         </DialogContent>
       </Dialog>

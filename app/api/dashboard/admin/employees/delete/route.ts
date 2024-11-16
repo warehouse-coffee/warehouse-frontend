@@ -20,7 +20,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Employee ID is required' }, { status: 400 })
     }
 
-    const client = new EmployeesClient(process.env.NEXT_BACKEND_API_URL, undefined, token, xsrfToken)
+    const client = new EmployeesClient(process.env.NEXT_PUBLIC_BACKEND_API_URL, undefined, token, xsrfToken)
 
     const result = await client.deleteEmployee(id)
     return NextResponse.json(result)

@@ -5,7 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CreateEmployeeInput } from "@/types";
-import { useUserStorageList } from "@/hooks/storage/useStorageOfUser";
+import { useUserStorageList } from "@/hooks/storage";
+import { useCreateEmployee } from "@/hooks/employee";
+
 const initialFormState: CreateEmployeeInput = {
   userName: "",
   password: "",
@@ -14,17 +16,21 @@ const initialFormState: CreateEmployeeInput = {
   warehouses: [],
 };
 import {Storage} from "@/types/storage";
+import { PaginationState } from "@tanstack/react-table";
+import { StorageDto, StorageDto2 } from "@/app/api/web-api-client";
 
 export default function EmployeesCreatePage() {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [currentPage, setCurrentPage] = React.useState(0);
   const [selectedStorages, setSelectedStorages] = React.useState<number[]>([]);
-  
+  const [pagination, setPagination] = React.useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 5
+  })
   // set data to storages
-  const { data: storageData } = useUserStorageList(currentPage, 5); 
+  const { data }  = useUserStorageList(currentPage, 5); 
   // set page and storage 
-  const storages: Storage[] = [];
-  
+  const storages: StorageDto2[] = data.storages || [];    
   const filteredStorages = storages.filter((storage) =>
     storage.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -46,6 +52,7 @@ export default function EmployeesCreatePage() {
       warehouses: selectedStorages,
     };
     console.log(data);
+
   };
 
   const getStatusColor = (status: Storage["status"]) => {

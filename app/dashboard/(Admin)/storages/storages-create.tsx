@@ -21,8 +21,10 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { CreateStorageCommand, AreaDto } from "../../../../app/api/web-api-client";
+import {useCreateStorage} from "@/hooks/storage";
 
-export default function StoragesCreatePage() {
+export default function StoragesCreatePage({ onClose }: { onClose: () => void }) {
   const [name, setName] = useState('')
   const [location, setLocation] = useState('')
   const [status, setStatus] = useState('0')
@@ -32,6 +34,8 @@ export default function StoragesCreatePage() {
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const dragItem = useRef<number | null>(null)
   const dragOverItem = useRef<number | null>(null)
+
+  const createUserMutation = useCreateStorage(onClose)
 
   const handleAddArea = () => {
     setAreas([...areas, ''])
@@ -82,19 +86,21 @@ export default function StoragesCreatePage() {
     e.preventDefault()
     if (validateForm()) {
       setIsSubmitting(true)
-      const formData = {
+      const areasDto: AreaDto[] = areas.map((area) => new AreaDto({ name: area }))
+      const formData = new CreateStorageCommand({
         name,
         location,
         status: parseInt(status),
-        areas: areas.map(area => ({ name: area }))
-      }
+        areas: areasDto
+      })
       console.log('Submitting:', formData)
       // Simulating API call
+      createUserMutation.mutate(formData);
       await new Promise(resolve => setTimeout(resolve, 1000))
       setIsSubmitting(false)
       setShowSuccessModal(true)
       setTimeout(() => setShowSuccessModal(false), 3000)
-      toast.success('Storage created successfully')
+      // toast.success('Storage created successfully')
     }
   }
 

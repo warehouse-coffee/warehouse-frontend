@@ -1,13 +1,12 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { API_ENDPOINTS } from "@/constants";
-import {  Page } from "../../app/api/web-api-client"; 
-import { Storage } from "@/types/storage";
+import {  UserStorageList } from "../../app/api/web-api-client"; 
 interface FetchUserStorageListParams {  
     pageIndex: number;
     pageSize: number;
 }
 
-const fetchUserStorageList = async ({ pageIndex, pageSize }: FetchUserStorageListParams): Promise<{ userStorageList: Storage[], page: Page }> => {
+const fetchUserStorageList = async ({ pageIndex, pageSize }: FetchUserStorageListParams): Promise<UserStorageList> => {
     const params = new URLSearchParams({
         pageNumber: (pageIndex + 1).toString(),
         size: pageSize.toString(),
