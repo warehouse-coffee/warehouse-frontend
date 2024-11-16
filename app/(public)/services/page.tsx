@@ -1,8 +1,9 @@
 'use client'
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { BarChart3, Coffee, DollarSign, LineChart, ShoppingCart, Users } from 'lucide-react'
+
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function Services() {
   const handleGetStarted = () => {
@@ -11,29 +12,29 @@ export default function Services() {
 
   const services = [
     {
-      title: "Coffee Inventory Management",
-      description: "Streamline your coffee inventory with real-time tracking and management tools.",
+      title: 'Coffee Inventory Management',
+      description: 'Streamline your coffee inventory with real-time tracking and management tools.',
       icon: Coffee,
-      benefits: ["Reduce waste", "Optimize stock levels", "Improve order accuracy"],
+      benefits: ['Reduce waste', 'Optimize stock levels', 'Improve order accuracy']
     },
     {
-      title: "AI-Driven Coffee Price Forecasting",
-      description: "Utilize advanced AI algorithms to predict coffee price trends and make informed purchasing decisions.",
+      title: 'AI-Driven Coffee Price Forecasting',
+      description: 'Utilize advanced AI algorithms to predict coffee price trends and make informed purchasing decisions.',
       icon: LineChart,
-      benefits: ["Stay ahead of market fluctuations", "Maximize profit margins", "Enhance budgeting accuracy"],
+      benefits: ['Stay ahead of market fluctuations', 'Maximize profit margins', 'Enhance budgeting accuracy']
     },
     {
-      title: "Supplier Management",
-      description: "Manage relationships with coffee suppliers efficiently through our integrated platform.",
+      title: 'Supplier Management',
+      description: 'Manage relationships with coffee suppliers efficiently through our integrated platform.',
       icon: Users,
-      benefits: ["Simplify communication", "Track supplier performance", "Negotiate better deals"],
+      benefits: ['Simplify communication', 'Track supplier performance', 'Negotiate better deals']
     },
     {
-      title: "Sales Analytics Dashboard",
-      description: "Access comprehensive analytics to monitor sales performance and customer preferences.",
+      title: 'Sales Analytics Dashboard',
+      description: 'Access comprehensive analytics to monitor sales performance and customer preferences.',
       icon: BarChart3,
-      benefits: ["Make data-driven decisions", "Identify growth opportunities", "Enhance marketing strategies"],
-    },
+      benefits: ['Make data-driven decisions', 'Identify growth opportunities', 'Enhance marketing strategies']
+    }
   ]
 
   return (
@@ -41,7 +42,7 @@ export default function Services() {
       <section className="relative h-[40vh] flex items-center justify-center">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/placeholder.svg?height=1080&width=1920')" }}
+          style={{ backgroundImage: 'url(\'/placeholder.svg?height=1080&width=1920\')' }}
         />
         <div className="absolute inset-0 bg-black/50" />
         <div className="relative z-10 text-center">

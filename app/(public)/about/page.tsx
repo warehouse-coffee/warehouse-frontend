@@ -1,9 +1,10 @@
-'use client';
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Coffee, Heart, Lightbulb, Mail, MapPin, Phone, Send, Star, Twitter } from "lucide-react"
+'use client'
+import { Coffee, Heart, Lightbulb, Mail, MapPin, Phone, Send, Star, Twitter } from 'lucide-react'
+
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 
 export default function AboutUs() {
   return (
@@ -11,7 +12,7 @@ export default function AboutUs() {
       <section className="relative h-[50vh] flex items-center justify-center">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/placeholder.svg?height=1080&width=1920')" }}
+          style={{ backgroundImage: 'url(\'/placeholder.svg?height=1080&width=1920\')' }}
         />
         <div className="absolute inset-0 bg-black/50" />
         <div className="relative z-10 text-center">
@@ -27,9 +28,9 @@ export default function AboutUs() {
           <h2 className="text-3xl font-bold mb-8 text-center">Our Core Values</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { icon: Coffee, title: "Passion for Coffee", description: "We live and breathe coffee culture." },
-              { icon: Lightbulb, title: "Innovation", description: "Constantly pushing the boundaries of AI in coffee storage." },
-              { icon: Heart, title: "Customer-Centric", description: "Your satisfaction is our top priority." },
+              { icon: Coffee, title: 'Passion for Coffee', description: 'We live and breathe coffee culture.' },
+              { icon: Lightbulb, title: 'Innovation', description: 'Constantly pushing the boundaries of AI in coffee storage.' },
+              { icon: Heart, title: 'Customer-Centric', description: 'Your satisfaction is our top priority.' }
             ].map((value, index) => (
               <Card key={index}>
                 <CardHeader>
@@ -50,10 +51,10 @@ export default function AboutUs() {
           <h2 className="text-3xl font-bold mb-8 text-center">Our Story</h2>
           <div className="space-y-8">
             {[
-              { year: "2020", event: "Coffee TD founded with a vision to revolutionize coffee storage" },
-              { year: "2021", event: "Launched our first AI-powered storage management system" },
-              { year: "2022", event: "Expanded services to include price prediction and trend analysis" },
-              { year: "2023", event: "Introduced AI chatbot for personalized assistance" },
+              { year: '2020', event: 'Coffee TD founded with a vision to revolutionize coffee storage' },
+              { year: '2021', event: 'Launched our first AI-powered storage management system' },
+              { year: '2022', event: 'Expanded services to include price prediction and trend analysis' },
+              { year: '2023', event: 'Introduced AI chatbot for personalized assistance' }
             ].map((item, index) => (
               <div key={index} className="flex items-center gap-4">
                 <div className="w-24 text-right font-bold">{item.year}</div>
@@ -68,9 +69,9 @@ export default function AboutUs() {
           <h2 className="text-3xl font-bold mb-8 text-center">Why Choose Coffee TD?</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { icon: Star, title: "AI Price Prediction", description: "Stay ahead of market trends" },
-              { icon: Send, title: "AI Chatbot Assistance", description: "Get instant, personalized help" },
-              { icon: Coffee, title: "Comprehensive Storage", description: "Effortlessly manage multiple units" },
+              { icon: Star, title: 'AI Price Prediction', description: 'Stay ahead of market trends' },
+              { icon: Send, title: 'AI Chatbot Assistance', description: 'Get instant, personalized help' },
+              { icon: Coffee, title: 'Comprehensive Storage', description: 'Effortlessly manage multiple units' }
             ].map((feature, index) => (
               <Card key={index}>
                 <CardHeader>

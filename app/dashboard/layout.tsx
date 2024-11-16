@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import React from 'react'
 
 import { AuthWrapper } from '@/components/auth-wrapper'
+import ChatBox from '@/components/chat'
 import DashboardMain from '@/components/dashboard/dashboard-main'
 import { ThemeProvider } from '@/components/theme-provider'
 
@@ -22,6 +23,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     >
       <AuthWrapper>
         <DashboardMain>
+          <ChatBox />
           {children}
         </DashboardMain>
       </AuthWrapper>
