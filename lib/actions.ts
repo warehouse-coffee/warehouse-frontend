@@ -30,6 +30,7 @@ export async function login(email: string, password: string) {
 export async function logout(userId: string) {
   try {
     const token = cookieStore.get('auth_token')
+    const xsrfToken = cookieStore.get('XSRF-TOKEN')
 
     if (!token) {
       throw new Error('No auth tokens found')
@@ -38,7 +39,9 @@ export async function logout(userId: string) {
     await ApiClientService.logout(userId, token)
 
     cookieStore.delete('auth_token')
-    cookieStore.delete('XSRF-TOKEN')
+    if (xsrfToken) {
+      cookieStore.delete('XSRF-TOKEN')
+    }
 
     return { success: true }
   } catch (error) {
