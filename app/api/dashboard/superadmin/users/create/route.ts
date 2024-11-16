@@ -27,6 +27,14 @@ export async function POST(request: NextRequest) {
     )
     const result = await client.userRegister(createUserCommand)
 
+    if (result.statusCode === 400 && result.data?.id && result.message?.includes('mail Fail')) {
+      return NextResponse.json({
+        statusCode: 200,
+        message: result.message,
+        data: result.data
+      })
+    }
+
     if (result.statusCode === 400) {
       return NextResponse.json(
         { error: result.message },

@@ -11,16 +11,9 @@ import dynamic from 'next/dynamic'
 import React, { useState, useEffect } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
+import DashboardTablePagination from '@/components/dashboard/dashboard-table-pagination'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious
-} from '@/components/ui/pagination'
 import {
   Table,
   TableBody,
@@ -168,58 +161,12 @@ export default function LogsTable() {
           </TableBody>
         </Table>
       </div>
-      <div className="w-full flex items-center justify-between mt-[1.25rem]">
-        <p className="text-[.85rem] text-muted-foreground">
-          Showing {' '}
-          {table.getRowModel().rows.length === 0 ? 0 : totalElements === 0 ? 0 : pagination.pageIndex * pagination.pageSize + 1} {' '}
-          to {' '}
-          {table.getRowModel().rows.length === 0 ? 0 : Math.min(
-            (pagination.pageIndex + 1) * pagination.pageSize,
-            totalElements
-          )}{' '}
-          of {totalElements} log{totalElements > 1 ? 's' : ''}
-        </p>
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault()
-                  table.previousPage()
-                }}
-                aria-disabled={!table.getCanPreviousPage()}
-                className={!table.getCanPreviousPage() ? 'cursor-not-allowed pointer-events-none opacity-75' : ''}
-              />
-            </PaginationItem>
-            {Array.from({ length: Math.max(1, totalPages) }, (_, i) => (
-              <PaginationItem key={i}>
-                <PaginationLink
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    table.setPageIndex(i)
-                  }}
-                  isActive={i === pagination.pageIndex}
-                >
-                  {i + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            <PaginationItem>
-              <PaginationNext
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault()
-                  table.nextPage()
-                }}
-                aria-disabled={!table.getCanNextPage()}
-                className={!table.getCanNextPage() ? 'cursor-not-allowed pointer-events-none opacity-75' : ''}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      </div>
+      <DashboardTablePagination
+        itemName="log"
+        table={table}
+        totalElements={totalElements}
+        totalPages={totalPages}
+      />
     </section>
   )
 }

@@ -1787,8 +1787,6 @@ export class SuperAdminClient {
 
         const content_ = JSON.stringify(command);
 
-        console.log(content_)
-
         let options_: RequestInit = {
             body: content_,
             method: "POST",

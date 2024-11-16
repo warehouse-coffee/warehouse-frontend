@@ -18,11 +18,17 @@ const createNewUser = async (data: CreateUser) => {
     body: JSON.stringify(formattedData)
   })
 
-  console.log(response)
+  const result = await response.json()
+
+  if (result.statusCode === 400) {
+    throw new Error(result.message)
+  }
+
   if (!response.ok) {
     throw new Error('Failed to create user')
   }
-  return response.json()
+
+  return result
 }
 
 export const useCreateUser = (onComplete: () => void) => {
@@ -30,11 +36,11 @@ export const useCreateUser = (onComplete: () => void) => {
 
   return useMutation({
     mutationFn: createNewUser,
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['users'], refetchType: 'all' })
-      toast.success('User created successfully')
+      toast.success(data.message || 'User created successfully')
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       handleApiError(error)
     },
     onSettled: () => {
