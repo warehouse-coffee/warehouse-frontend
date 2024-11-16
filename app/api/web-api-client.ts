@@ -200,6 +200,57 @@ export class CategoriesClient {
     }
 }
 
+export class CoffeePriceClient {
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
+    private token: string;
+    private XSRF: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string, XSRF?: string) {
+         this.http = http || { fetch: fetch as any };
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+        this.token = token || "";
+        this.XSRF = XSRF || "";
+    }
+
+    getCoffeePricePredictGraph(): Promise<GraphVM> {
+        let url_ = this.baseUrl + "/api/CoffeePrice/predict-graph";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetCoffeePricePredictGraph(_response);
+        });
+    }
+
+    protected processGetCoffeePricePredictGraph(response: Response): Promise<GraphVM> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GraphVM.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<GraphVM>(null as any);
+    }
+}
+
 export class CompaniesClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
@@ -1276,6 +1327,61 @@ export class InventoriesOutboundClient {
     }
 }
 
+export class LLMClient {
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
+    private token: string;
+    private XSRF: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string, XSRF?: string) {
+         this.http = http || { fetch: fetch as any };
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+        this.token = token || "";
+        this.XSRF = XSRF || "";
+    }
+
+    getResponseIntent(intent: string | undefined): Promise<ResponseDto> {
+        let url_ = this.baseUrl + "/api/LLM/intent?";
+        if (intent === null)
+            throw new Error("The parameter 'intent' cannot be null.");
+        else if (intent !== undefined)
+            url_ += "intent=" + encodeURIComponent("" + intent) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetResponseIntent(_response);
+        });
+    }
+
+    protected processGetResponseIntent(response: Response): Promise<ResponseDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResponseDto.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<ResponseDto>(null as any);
+    }
+}
+
 export class LogsClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
@@ -1811,8 +1917,6 @@ export class SuperAdminClient {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = ResponseDto.fromJS(resultData200);
-
-            console.log(result200)
             return result200;
             });
         } else if (status !== 200 && status !== 204) {
@@ -1943,61 +2047,82 @@ export class SuperAdminClient {
     }
 
     updateUser(command: UpdateUserCommand, id: string): Promise<ResponseDto> {
-        let url_ = this.baseUrl + "/api/SuperAdmin/user/{id}";
+        let url_ = this.baseUrl + "/api/SuperAdmin/user/{id}?";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
-    
-        const formData = new FormData();
-        const commandData = command.toJSON();
-        
-        Object.entries(commandData).forEach(([key, value]) => {
-            if (value !== null && value !== undefined) {
-                if (typeof value === 'boolean') {
-                    formData.append(key, value.toString());
-                } else {
-                    formData.append(key, value as string);
-                }
-            }
-        });
-    
+        if (command === undefined || command === null)
+            throw new Error("The parameter 'command' must be defined and cannot be null.");
+        else
+            url_ += "command=" + encodeURIComponent("" + command) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
         let options_: RequestInit = {
             method: "PUT",
-            body: formData,
             headers: {
                 "Accept": "application/json",
                 "Authorization": `Bearer ${this.token}`,
-                "X-XSRF-TOKEN": `${this.XSRF}`
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
         };
-    
+
         return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processUpdateUser(_response);
         });
     }
-    
+
     protected processUpdateUser(response: Response): Promise<ResponseDto> {
         const status = response.status;
-        console.log(status)
-        let _headers: any = {}; 
-        if (response.headers && response.headers.forEach) { 
-            response.headers.forEach((v: any, k: any) => _headers[k] = v); 
-        };
-        return response.text().then(_responseText => {
-            try {
-                console.log(_responseText)
-                const result = _responseText ? JSON.parse(_responseText) : {};
-                return ResponseDto.fromJS(result);
-            } catch (e) {
-                if (status === 200 || status === 204) {
-                    return ResponseDto.fromJS({
-                        statusCode: status,
-                        message: "User updated successfully"
-                    });
-                }
-                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResponseDto.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<ResponseDto>(null as any);
+    }
+
+    getSuperAdminStats(): Promise<SuperAdminStatsVM> {
+        let url_ = this.baseUrl + "/api/SuperAdmin/stats";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
             }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetSuperAdminStats(_response);
         });
+    }
+
+    protected processGetSuperAdminStats(response: Response): Promise<SuperAdminStatsVM> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SuperAdminStatsVM.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<SuperAdminStatsVM>(null as any);
     }
 }
 
@@ -2323,6 +2448,94 @@ export interface ICategoryDto2 {
     id?: number;
     name?: string | undefined;
     companyId?: string | undefined;
+}
+
+export class GraphVM implements IGraphVM {
+    pointInfos?: PointInfo[];
+
+    constructor(data?: IGraphVM) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["pointInfos"])) {
+                this.pointInfos = [] as any;
+                for (let item of _data["pointInfos"])
+                    this.pointInfos!.push(PointInfo.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): GraphVM {
+        data = typeof data === 'object' ? data : {};
+        let result = new GraphVM();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.pointInfos)) {
+            data["pointInfos"] = [];
+            for (let item of this.pointInfos)
+                data["pointInfos"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IGraphVM {
+    pointInfos?: PointInfo[];
+}
+
+export class PointInfo implements IPointInfo {
+    date?: string | undefined;
+    ai_predict?: number;
+    real_price_difference_rate?: number;
+
+    constructor(data?: IPointInfo) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.date = _data["date"];
+            this.ai_predict = _data["ai_predict"];
+            this.real_price_difference_rate = _data["real_price_difference_rate"];
+        }
+    }
+
+    static fromJS(data: any): PointInfo {
+        data = typeof data === 'object' ? data : {};
+        let result = new PointInfo();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["date"] = this.date;
+        data["ai_predict"] = this.ai_predict;
+        data["real_price_difference_rate"] = this.real_price_difference_rate;
+        return data;
+    }
+}
+
+export interface IPointInfo {
+    date?: string | undefined;
+    ai_predict?: number;
+    real_price_difference_rate?: number;
 }
 
 export class CreateCompanyCommand implements ICreateCompanyCommand {
@@ -2804,6 +3017,7 @@ export enum StorageStatus {
 
 export class Area extends BaseAuditableEntity implements IArea {
     name?: string;
+    storageId?: number;
     products?: Product[];
 
     constructor(data?: IArea) {
@@ -2814,6 +3028,7 @@ export class Area extends BaseAuditableEntity implements IArea {
         super.init(_data);
         if (_data) {
             this.name = _data["name"];
+            this.storageId = _data["storageId"];
             if (Array.isArray(_data["products"])) {
                 this.products = [] as any;
                 for (let item of _data["products"])
@@ -2832,6 +3047,7 @@ export class Area extends BaseAuditableEntity implements IArea {
     override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["name"] = this.name;
+        data["storageId"] = this.storageId;
         if (Array.isArray(this.products)) {
             data["products"] = [];
             for (let item of this.products)
@@ -2844,6 +3060,7 @@ export class Area extends BaseAuditableEntity implements IArea {
 
 export interface IArea extends IBaseAuditableEntity {
     name?: string;
+    storageId?: number;
     products?: Product[];
 }
 
@@ -6464,6 +6681,54 @@ export interface IUpdateUserCommand {
     companyId?: string | undefined;
     isActived?: boolean;
     avatarImage?: string | undefined;
+}
+
+export class SuperAdminStatsVM implements ISuperAdminStatsVM {
+    totalUser?: number;
+    totalCompany?: number;
+    cpu?: number;
+    ram?: number;
+
+    constructor(data?: ISuperAdminStatsVM) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalUser = _data["totalUser"];
+            this.totalCompany = _data["totalCompany"];
+            this.cpu = _data["cpu"];
+            this.ram = _data["ram"];
+        }
+    }
+
+    static fromJS(data: any): SuperAdminStatsVM {
+        data = typeof data === 'object' ? data : {};
+        let result = new SuperAdminStatsVM();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalUser"] = this.totalUser;
+        data["totalCompany"] = this.totalCompany;
+        data["cpu"] = this.cpu;
+        data["ram"] = this.ram;
+        return data;
+    }
+}
+
+export interface ISuperAdminStatsVM {
+    totalUser?: number;
+    totalCompany?: number;
+    cpu?: number;
+    ram?: number;
 }
 
 export class SwaggerException extends Error {

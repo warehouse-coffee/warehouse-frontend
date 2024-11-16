@@ -39,14 +39,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { Loader } from '@/components/ui/loader'
 import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious
-} from '@/components/ui/pagination'
-import {
   Table,
   TableBody,
   TableHead,

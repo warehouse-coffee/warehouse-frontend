@@ -7,7 +7,8 @@ export const API_ENDPOINTS = {
   GET_ALL_LOGS: '/api/dashboard/superadmin/logs',
   GET_ALL_COMPANIES: '/api/dashboard/superadmin/companies/list',
   GET_CONFIG: '/api/dashboard/superadmin/settings/get',
-  CREATE_CONFIG: '/api/dashboard/superadmin/settings/create'
+  CREATE_CONFIG: '/api/dashboard/superadmin/settings/create',
+  GET_ALL_STATS: '/api/dashboard/superadmin/stats'
 } as const
 
 export type ApiEndpoint = typeof API_ENDPOINTS[keyof typeof API_ENDPOINTS]
