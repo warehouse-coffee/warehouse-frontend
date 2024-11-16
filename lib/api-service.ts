@@ -32,9 +32,9 @@ export class ApiClientService {
     }
   }
 
-  static async logout(userId: string, token: string, xsrfToken: string) {
+  static async logout(userId: string, token: string) {
     try {
-      const client = this.createClient(IdentityUserClient, { token, xsrfToken })
+      const client = this.createClient(IdentityUserClient, { token })
       return await client.logout(userId)
     } catch (error) {
       throw new Error('Logout failed')

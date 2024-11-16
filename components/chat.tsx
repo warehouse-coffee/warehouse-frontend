@@ -88,7 +88,7 @@ export default function ChatBox() {
             })
           })
           const response_obj = await request.json()
-          console.log(response_obj)
+          // console.log(response_obj)
           api_count = 0
           setIsThinking(false)
           if (response_obj.statusText) {
@@ -101,7 +101,7 @@ export default function ChatBox() {
       } catch (error) {
         api_count = 0
         setIsThinking(false)
-        console.log('Error sending message:', error)
+        // console.log('Error sending message:', error)
         setError('Failed to send message. wait a few seconds and try again')
       }
     }
