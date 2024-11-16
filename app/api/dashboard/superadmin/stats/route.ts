@@ -12,16 +12,33 @@ export async function GET(request: NextRequest) {
 
   try {
     const client = new SuperAdminClient(
-      process.env.NEXT_PUBLIC_WEB_API_URL!,
+      process.env.NEXT_PUBLIC_BACKEND_API_URL!,
       undefined,
       token
     )
 
-    const result = await client.getSuperAdminStast()
-
-    return NextResponse.json(result)
-  } catch (error) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    try {
+      const result = await client.getSuperAdminStats()
+      return NextResponse.json(result)
+    } catch (clientError: any) {
+      console.error('Client error:', {
+        message: clientError.message,
+        status: clientError.status,
+        response: clientError.response
+      })
+      return NextResponse.json(
+        { error: clientError.message || 'Failed to fetch stats' },
+        { status: clientError.status || 400 }
+      )
+    }
+  } catch (error: any) {
+    console.error('Server error:', error)
+    return NextResponse.json(
+      { 
+        error: 'Internal server error',
+        details: error.message 
+      }, 
+      { status: 500 }
+    )
   }
 }
-

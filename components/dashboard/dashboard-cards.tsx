@@ -3,63 +3,59 @@
 import { ROLE_NAMES } from '@/constants'
 import NumberTicker from '@/components/magicui/number-ticker'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-// import { SystemHealthIndicator } from './system-health-indicator'
-
-import { useStats } from '@/hooks/stats/useStats'
+import { useGetStats } from '@/hooks/stats/useGetStats'
 
 interface DashboardCardsProps {
   userRole: string | null
 }
 
 export function DashboardCards({ userRole }: DashboardCardsProps) {
-  const { data: stats } = useStats()
+  const { data: stats } = useGetStats()
 
   if (userRole === ROLE_NAMES.SUPER_ADMIN) {
     return (
       <>
-        <Card >
+        <Card>
           <CardHeader>
             <CardTitle>Total Users</CardTitle>
             <CardDescription>All registered users across system</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">
-              <NumberTicker value={stats?.totalUsers ?? 0} />
+              <NumberTicker value={stats?.totalUser ?? 0} />
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Total Products</CardTitle>
-            <CardDescription>All products in warehouse system</CardDescription>
+            <CardTitle>Total Companies</CardTitle>
+            <CardDescription>All companies registered in system</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">
-              <NumberTicker value={stats?.totalProducts ?? 0} />
+              <NumberTicker value={stats?.totalCompany ?? 0} />
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>System Errors</CardTitle>
-            <CardDescription>Total errors in last 24 hours</CardDescription>
+            <CardTitle>CPU Usage</CardTitle>
+            <CardDescription>Current CPU usage</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">
-              <NumberTicker value={stats?.totalErrors ?? 0} />
-            </p>
+            <p className="text-2xl font-bold">{stats?.cpu}%</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>System Health</CardTitle>
-            <CardDescription>Current system status</CardDescription>
+            <CardTitle>RAM Usage</CardTitle>
+            <CardDescription>Current RAM usage</CardDescription>
           </CardHeader>
           <CardContent>
-            {/* <SystemHealthIndicator /> */}
+            <p className="text-2xl font-bold">{stats?.ram}%</p>
           </CardContent>
         </Card>
       </>
