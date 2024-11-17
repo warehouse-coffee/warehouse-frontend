@@ -4,8 +4,8 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 
-import { useAuthStore } from '@/stores/auth-store'
 import { login, logout, checkAuth } from '@/lib/actions'
+import { useAuthStore } from '@/stores/auth-store'
 
 export function useAuth() {
   const router = useRouter()

@@ -39,9 +39,6 @@ const fetchUsers = async ({ pageIndex, pageSize }: FetchUsersParams): Promise<{ 
 export const useUserList = (pageIndex: number, pageSize: number, searchText?: string) => {
   return useSuspenseQuery({
     queryKey: ['users', pageIndex, pageSize, searchText],
-    queryFn: () => fetchUsers({ pageIndex, pageSize }),
-    // staleTime: 1000 * 60 * 5,
-    // retry: 1,
-    refetchOnWindowFocus: false
+    queryFn: () => fetchUsers({ pageIndex, pageSize })
   })
 }

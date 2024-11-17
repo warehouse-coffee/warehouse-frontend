@@ -15,6 +15,7 @@ export const API_ENDPOINTS = {
   GET_CONFIG: '/api/dashboard/superadmin/settings/get',
   CREATE_CONFIG: '/api/dashboard/superadmin/settings/create',
   CREATE_STORAGE: '/api/dashboard/admin/storages/create',   
+  GET_ALL_STATS: '/api/dashboard/superadmin/stats'
 } as const
 
 export type ApiEndpoint = typeof API_ENDPOINTS[keyof typeof API_ENDPOINTS]

@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader } from '@/components/ui/loader'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ROLE_NAMES } from '@/constants'
 import { useCompanyList } from '@/hooks/company'
 import { useCreateUser } from '@/hooks/user'
 import { cn, formatLabel, formatRoleLabel, getAvailableRoles } from '@/lib/utils'
@@ -37,6 +36,7 @@ export default function AddUserForm({ onClose }: { onClose: () => void }) {
     e.preventDefault()
     const createData: CreateUserInput = { ...createForm }
     createUserMutation.mutate(createData)
+    // console.log(createData)
   }, [createForm, createUserMutation])
 
   const handleResetForm = useCallback(() => {

@@ -1,10 +1,17 @@
+import type { Metadata } from 'next'
 import React from 'react'
 
 import { AuthWrapper } from '@/components/auth-wrapper'
+import ChatBox from '@/components/chat'
 import DashboardMain from '@/components/dashboard/dashboard-main'
 import { ThemeProvider } from '@/components/theme-provider'
 
 // import DashboardLoading from './loading'
+
+export const metadata: Metadata = {
+  title: 'Coffee Today | Dashboard',
+  description: 'Coffee Today dashboard page'
+}
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -16,6 +23,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     >
       <AuthWrapper>
         <DashboardMain>
+          <ChatBox />
           {children}
         </DashboardMain>
       </AuthWrapper>

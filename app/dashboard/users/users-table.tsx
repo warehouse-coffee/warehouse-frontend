@@ -17,6 +17,7 @@ import dynamic from 'next/dynamic'
 import React, { useState, useEffect, useMemo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
+import DashboardTablePagination from '@/components/dashboard/dashboard-table-pagination'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -38,14 +39,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { Loader } from '@/components/ui/loader'
 import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious
-} from '@/components/ui/pagination'
-import {
   Table,
   TableBody,
   TableHead,
@@ -59,9 +52,7 @@ import { useUserList } from '@/hooks/user'
 import { User } from '@/types'
 
 import AddUserForm from './add-user-form'
-// import DashboardFetchLoader from '@/components/dashboard/dashboard-fetch-loader'
 import UsersDataLoading from './users-data-loading'
-// import UsersData from './users-data'
 
 const UserDataMain = dynamic(() => import('./users-data'), {
   ssr: false,
@@ -320,58 +311,12 @@ export default function UsersTable() {
           </TableBody>
         </Table>
       </div>
-      <div className="w-full flex items-center justify-between mt-[1.25rem]">
-        <p className="text-[.85rem] text-muted-foreground">
-           Showing {' '}
-          {table.getRowModel().rows.length === 0 ? 0 : totalElements === 0 ? 0 : pagination.pageIndex * pagination.pageSize + 1} {' '}
-          to {' '}
-          {table.getRowModel().rows.length === 0 ? 0 : Math.min(
-            (pagination.pageIndex + 1) * pagination.pageSize,
-            totalElements
-          )} {' '}
-          of {totalElements} user{totalElements > 1 ? 's' : ''}
-        </p>
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault()
-                  table.previousPage()
-                }}
-                aria-disabled={!table.getCanPreviousPage()}
-                className={!table.getCanPreviousPage() ? 'pointer-events-none opacity-50' : ''}
-              />
-            </PaginationItem>
-            {Array.from({ length: Math.max(1, totalPages) }, (_, i) => (
-              <PaginationItem key={i}>
-                <PaginationLink
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    table.setPageIndex(i)
-                  }}
-                  isActive={i === pagination.pageIndex}
-                >
-                  {i + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            <PaginationItem>
-              <PaginationNext
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault()
-                  table.nextPage()
-                }}
-                aria-disabled={!table.getCanNextPage()}
-                className={!table.getCanNextPage() ? 'pointer-events-none opacity-50' : ''}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      </div>
+      <DashboardTablePagination
+        itemName="user"
+        table={table}
+        totalElements={totalElements}
+        totalPages={totalPages}
+      />
     </section>
   )
 }

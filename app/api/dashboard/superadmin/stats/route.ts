@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { cookieStore, tokenUtils } from '@/lib/auth'
 
-import { ConfigurationsClient } from '../../../../web-api-client'
+import { SuperAdminClient } from '../../../web-api-client'
 
 export async function GET(request: NextRequest) {
   const token = cookieStore.get('auth_token')
@@ -12,15 +12,22 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const client = new ConfigurationsClient(
+    const client = new SuperAdminClient(
       process.env.NEXT_PUBLIC_BACKEND_API_URL!,
       undefined,
       token
     )
-    const result = await client.getAllConfig()
-    // console.log(result)
+
+    const result = await client.getSuperAdminStats()
     return NextResponse.json(result)
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to get config' }, { status: 500 })
+  } catch (error: any) {
+    console.error('Server error:', error)
+    return NextResponse.json(
+      {
+        error: 'Internal server error',
+        details: error.message
+      },
+      { status: 500 }
+    )
   }
 }
