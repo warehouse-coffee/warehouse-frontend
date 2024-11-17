@@ -14,45 +14,29 @@ import {
 } from "@/components/ui/dialog";
 import { Loader } from "@/components/ui/loader";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { useDeleteEmployee } from "@/hooks/employee/useDeleteEmployee";
+import { useDeleteEmployee } from "@/hooks/employee";
 import { useDialog } from "@/hooks/useDialog";
-import { Employee, EmployeeDetail } from "@/types";
+import { Employee } from "@/types";
 import {
-  ChevronsLeft,
-  ChevronsRight,
   Eye,
-  MoreHorizontal,
   Pencil,
   Trash,
 } from "lucide-react";
 import React from "react";
-
-interface EmployeesDataProps {
-  data: Employee[];
-  table: any;
-}
+import DashboardFetchLoader from "@/components/dashboard/dashboard-fetch-loader";
+import { EmployeeDto } from "@/app/api/web-api-client";
+import dynamic from "next/dynamic";
 const EmployeeActions = React.memo(
   ({
     employee,
-    onView,
     onEdit,
     onDelete,
   }: {
     employee: Employee;
-    onView: (employee: Employee) => void;
     onEdit: (employee: Employee) => void;
     onDelete: (employee: Employee) => void;
   }) => (
     <TableCell className="text-right">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-8 w-8"
-        onClick={() => onView(employee)}
-      >
-        <Eye className="h-4 w-4" />
-        <span className="sr-only">View Details</span>
-      </Button>
       <Button
         variant="ghost"
         size="icon"
@@ -75,22 +59,11 @@ const EmployeeActions = React.memo(
   )
 );
 EmployeeActions.displayName = "EmployeeActions";
-
-interface PageInfo {
-  size: number;
-  pageNumber: number;
-  totalElements: number;
-  totalPages: number;
-}
-
-interface EmployeeTableProps {
-  initialEmployees?: Employee[];
-  pageInfo: PageInfo;
-}
-type SortDirection = "asc" | "desc" | null;
-type SortField = "userName" | "email" | "phoneNumber" | "isActived" | null;
-
-export default function EmployeesData({ data, table }: EmployeesDataProps) {
+const EmployeeUpdateForm = dynamic(() => import('./employees-update'), {
+  ssr: false,
+  loading: () => <DashboardFetchLoader />
+})
+export default function EmployeesData({ table }: { table: any }) {
   const {
     dialogsOpen,
     itemRef: employeeRef,
@@ -98,7 +71,6 @@ export default function EmployeesData({ data, table }: EmployeesDataProps) {
     closeDialog,
     setDialogsOpen,
   } = useDialog<Employee>({
-    detail: false,
     edit: false,
     delete: false,
   });
@@ -161,56 +133,6 @@ export default function EmployeesData({ data, table }: EmployeesDataProps) {
     );
   }
 
-  const initialEmployees: Employee[] = [
-    {
-      id: "1",
-      userName: "Customer@ute.com",
-      email: "customer@ute.com",
-      phoneNumber: null,
-      isActived: false,
-      avatarImage: null,
-    },
-    {
-      id: "2",
-      userName: "JohnDoe",
-      email: "john.doe@ute.com",
-      phoneNumber: "0123456789",
-      isActived: true,
-      avatarImage: null,
-    },
-    {
-      id: "3",
-      userName: "JaneSmith",
-      email: "jane.smith@ute.com",
-      phoneNumber: "0987654321",
-      isActived: true,
-      avatarImage: null,
-    },
-    {
-      id: "4",
-      userName: "BobJohnson",
-      email: "bob.johnson@ute.com",
-      phoneNumber: "0369852147",
-      isActived: false,
-      avatarImage: null,
-    },
-    {
-      id: "5",
-      userName: "AliceWilliams",
-      email: "alice.williams@ute.com",
-      phoneNumber: null,
-      isActived: true,
-      avatarImage: null,
-    },
-  ];
-  const pageInfo = { size: 5, pageNumber: 1, totalElements: 0, totalPages: 5 };
-  const [searchQuery, setSearchQuery] = useState("");
-  const [employees, setEmployees] = useState(initialEmployees);
-  const [sortField, setSortField] = useState<SortField>(null);
-  const [sortDirection, setSortDirection] = useState<SortDirection>(null);
-  const [filters, setFilters] = useState<{ [key: string]: string }>({});
-  const [currentPage, setCurrentPage] = useState(pageInfo.pageNumber);
-
   const getInitials = (userName: string) => {
     return userName
       .split(/[@.]/)
@@ -218,72 +140,6 @@ export default function EmployeesData({ data, table }: EmployeesDataProps) {
       .join("")
       .toUpperCase()
       .slice(0, 2);
-  };
-
-  // Sort employees
-  const sortEmployees = (field: SortField) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
-  };
-  const filterEmployees = () => {
-    return employees.filter((employee) => {
-      return Object.entries(filters).every(([key, value]) => {
-        if (value === "") return true;
-        if (key === "isActived") {
-          return (
-            employee[key] !== undefined && employee[key].toString() === value
-          );
-        }
-        return employee[key as keyof Employee]
-          ?.toString()
-          .toLowerCase()
-          .includes(value.toLowerCase());
-      });
-    });
-  };
-  const filteredAndSortedEmployees = filterEmployees().sort((a, b) => {
-    if (sortField) {
-      if (
-        sortField &&
-        a[sortField] != null &&
-        b[sortField] != null &&
-        a[sortField] < b[sortField]
-      )
-        return sortDirection === "asc" ? -1 : 1;
-      if (
-        sortField &&
-        a[sortField] != null &&
-        b[sortField] != null &&
-        a[sortField] > b[sortField]
-      )
-        return sortDirection === "asc" ? 1 : -1;
-    }
-    return 0;
-  });
-  const getPageNumbers = () => {
-    const pageNumbers = [];
-    const maxVisiblePages = 5;
-    const halfVisible = Math.floor(maxVisiblePages / 2);
-
-    let startPage = Math.max(currentPage - halfVisible, 1);
-    let endPage = Math.min(
-      startPage + maxVisiblePages - 1,
-      pageInfo.totalPages
-    );
-
-    if (endPage - startPage + 1 < maxVisiblePages) {
-      startPage = Math.max(endPage - maxVisiblePages + 1, 1);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      pageNumbers.push(i);
-    }
-
-    return pageNumbers;
   };
 
   return (
@@ -316,7 +172,6 @@ export default function EmployeesData({ data, table }: EmployeesDataProps) {
           <TableCell>
             <EmployeeActions
               employee={row.original}
-              onView={handleViewEmployee}
               onEdit={handleEditEmployee}
               onDelete={handleDeleteEmployee}
             />
@@ -363,6 +218,23 @@ export default function EmployeesData({ data, table }: EmployeesDataProps) {
               )}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={dialogsOpen.edit} onOpenChange={(open) => setDialogsOpen(prev => ({ ...prev, edit: open }))}>
+        <DialogContent className="w-[800px] sm:w-[1000px] !max-w-none">
+          <DialogHeader>
+            <DialogTitle>Edit User</DialogTitle>
+            <DialogDescription>
+              Make changes to user details here. Click save when you&apos;re done.
+            </DialogDescription>
+          </DialogHeader>
+          {employeeRef.current && (
+            <EmployeeUpdateForm
+              id={employeeRef.current.id ?? ""}
+              onClose={() => closeDialog('edit')}
+              isOpen={dialogsOpen.edit ?? false}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </>

@@ -4,6 +4,7 @@ import {toast} from 'sonner'
 import {API_ENDPOINTS, METHODS} from '@/constants'
 import {handleApiError} from '@/lib/utils'
 import {CreateEmployee} from '@/types'
+import { ResponseDto } from '@/app/api/web-api-client'
 
 const createNewEmployee = async (data: CreateEmployee) => {
   const response = await fetch(API_ENDPOINTS.CREATE_EMPLOYEE, {
@@ -16,7 +17,13 @@ const createNewEmployee = async (data: CreateEmployee) => {
   if (!response.ok) {
     throw new Error('Failed to create employee')
   }
-  return response.json()
+  var responseDto: ResponseDto = await response.json()
+  if (responseDto.statusCode !== 200) {
+    throw new Error(responseDto.message)
+  }
+  else {
+    return responseDto.data
+  }
 }
 
 export const useCreateEmployee = (onComplete: () => void) => {

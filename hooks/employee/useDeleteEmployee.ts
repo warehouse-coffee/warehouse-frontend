@@ -4,7 +4,7 @@ import { API_ENDPOINTS, METHODS } from '@/constants'
 import { handleApiError } from '@/lib/utils'
 
 const deleteEmployee = async (id: string) => {
-    const response = await fetch(`${API_ENDPOINTS.DELETE_USER}?id=${id}`, {
+    const response = await fetch(`${API_ENDPOINTS.DELETE_EMPLOYEE}?id=${id}`, {
       method: METHODS.DELETE
     })
     if (!response.ok) {

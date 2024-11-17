@@ -1,17 +1,16 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 
-import { Page } from '@/app/api/web-api-client'
+import { EmployeeListVM } from '@/app/api/web-api-client'
 import { API_ENDPOINTS } from '@/constants'
-import { Employee } from '@/types'
 
 interface FetchEmployeesParams {
   pageIndex: number
   pageSize: number
 }
 
-const fetchEmployees = async ({ pageIndex, pageSize }: FetchEmployeesParams): Promise<{ employee: Employee[], page: Page }> => {
+const fetchEmployees = async ({ pageIndex, pageSize }: FetchEmployeesParams): Promise<EmployeeListVM> => {
   const params = new URLSearchParams({
-    pageNumber: (pageIndex + 1).toString(),
+    pageNumber: (pageIndex).toString(),
     size: pageSize.toString()
   })
   const response = await fetch(`${API_ENDPOINTS.GET_ALL_EMPLOYEES}?${params}`, {
@@ -27,14 +26,12 @@ const fetchEmployees = async ({ pageIndex, pageSize }: FetchEmployeesParams): Pr
   if (!data || data.error) {
     throw new Error(data?.error || 'No data received')
   }
-
-
   return data
 }
 
 export const useEmployeeList = (pageIndex: number, pageSize: number) => {
   return useSuspenseQuery({
-    queryKey: ['employees', pageIndex, pageSize],
+    queryKey: ['employeeListVM', pageIndex, pageSize],
     queryFn: () => fetchEmployees({ pageIndex, pageSize }),
     // staleTime: 1000 * 60 * 5,
     // retry: 1,

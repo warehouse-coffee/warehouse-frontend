@@ -13,17 +13,12 @@ import { Dialog, DialogTrigger, DialogContent, DialogClose, DialogHeader, Dialog
 import EmployeesCreatePage from "./employees-create";
 import EmployeesTable from "./employees-table";
 import DashboardFetchLoader from "@/components/dashboard/dashboard-fetch-loader";
+import { useDialog } from "@/hooks/useDialog";
 
 export default function EmployeesPage() {
-  const [isDialogOpen, setDialogOpen] = useState(false)
-
-  const openDialog = () => {
-    setDialogOpen(true)
-  }
-
-  const closeDialog = () => {
-    setDialogOpen(false)
-  }
+  const { closeDialog, dialogsOpen, setDialogsOpen } = useDialog({
+    add: false
+  })
 
   return (
     <>
@@ -46,13 +41,13 @@ export default function EmployeesPage() {
               Manage employees and assign their roles effectively here.
             </p>
           </div>
-          <button onClick={openDialog}  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+          <button onClick={() => setDialogsOpen(prev => ({ ...prev, add: true }))}  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
             Create
           </button>
         </div>
       </div>
       <EmployeesTable />
-      <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog open={dialogsOpen.add ?? false} onOpenChange={(open) => setDialogsOpen(prev => ({ ...prev, add: open }))}>
         <DialogTrigger asChild>
           <button className="hidden"></button>
         </DialogTrigger>
@@ -64,7 +59,7 @@ export default function EmployeesPage() {
             </DialogDescription>
           </DialogHeader>
           <Suspense fallback={<DashboardFetchLoader />}>
-            <EmployeesCreatePage/>
+            <EmployeesCreatePage onClose={() => closeDialog('add')}/>
           </Suspense>
         </DialogContent>
       </Dialog>

@@ -1,8 +1,8 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { API_ENDPOINTS } from "@/constants";
-import { EmployeeDetail } from "@/types";
+import {EmployeeDetailVM} from "@/app/api/web-api-client";
 
-const fetchEmployeeDetail = async (id: string): Promise<EmployeeDetail> => {
+const fetchEmployeeDetail = async (id: string): Promise<EmployeeDetailVM> => {
   const response = await fetch(`${API_ENDPOINTS.GET_EMPLOYEE_DETAIL}?id=${id}`);
   if (!response.ok) {
     throw new Error("Failed to fetch employee details");
@@ -11,7 +11,7 @@ const fetchEmployeeDetail = async (id: string): Promise<EmployeeDetail> => {
 };
 
 export const useEmployeeDetail = (employeeId: string) => {
-  return useSuspenseQuery<EmployeeDetail>({
+  return useSuspenseQuery<EmployeeDetailVM>({
     queryKey: ["employeeDetail", employeeId],
     queryFn: () => fetchEmployeeDetail(employeeId),
   });

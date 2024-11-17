@@ -1,13 +1,19 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import {
+  ArrowDownAZ,
+  ArrowUpAZ,
+  ArrowUpDown,
   ChevronDown,
   ChevronsLeft,
   ChevronsRight,
   ChevronUp,
+  Eye,
   Filter,
   MoreHorizontal,
+  Pencil,
+  Trash,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,10 +28,12 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import EmployeesData from "./employees-data";
 import EmployeesDataLoading from "./employees-data-loading";
 import { ErrorBoundary } from "react-error-boundary";
 import { useQueryErrorResetBoundary } from "@tanstack/react-query";
@@ -37,22 +45,111 @@ import {
   ColumnDef,
   FilterFn,
   getFilteredRowModel,
-  getSortedRowModel
-} from '@tanstack/react-table'
-import { rankItem } from '@tanstack/match-sorter-utils'
+  getSortedRowModel,
+} from "@tanstack/react-table";
+import { rankItem } from "@tanstack/match-sorter-utils";
 import { useEmployeeList } from "@/hooks/employee/useEmployeeList";
 import { Employee } from "@/types";
+import { EmployeeDto, EmployeeListVM, Page } from "@/app/api/web-api-client";
+import { useDialog } from "@/hooks/useDialog";
+import React from "react";
+import dynamic from 'next/dynamic'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious
+} from '@/components/ui/pagination'
 
 type SortDirection = "asc" | "desc" | null;
 type SortField = "userName" | "email" | "phoneNumber" | "isActived" | null;
 
+const EmployeeDataMain = dynamic(() => import('./employees-data'), {
+  ssr: false,
+  loading: () => <EmployeesDataLoading />
+})
+const EmployeeActions = React.memo(
+  ({
+    employee,
+    onEdit,
+    onDelete,
+  }: {
+    employee: Employee;
+    onEdit: (employee: Employee) => void;
+    onDelete: (employee: Employee) => void;
+  }) => (
+    <TableCell className="text-right">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-8 w-8"
+        onClick={() => onEdit(employee)}
+      >
+        <Pencil className="h-4 w-4" />
+        <span className="sr-only">Edit</span>
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-8 w-8"
+        onClick={() => onDelete(employee)}
+      >
+        <Trash className="h-4 w-4" />
+        <span className="sr-only">Delete</span>
+      </Button>
+    </TableCell>
+  )
+);
+EmployeeActions.displayName = "EmployeeActions";
+const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+  const itemRank = rankItem(row.getValue(columnId), value);
+  addMeta({ itemRank });
+  return itemRank.passed;
+};
+
 export default function EmployeesTable() {
-  const { reset } = useQueryErrorResetBoundary()
+  const { reset } = useQueryErrorResetBoundary();
+
   const [sortField, setSortField] = useState<SortField>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const [filters, setFilters] = useState<{ [key: string]: string }>({});
-  const pageInfo = { size: 5, pageNumber: 1, totalElements: 0, totalPages: 5 };
-  const [currentPage, setCurrentPage] = useState(pageInfo.pageNumber);
+  //page
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageInfo, setPageInfo] = useState<Page>(new Page({
+    size: 2,
+    pageNumber: 0,
+    totalElements: 0,
+    totalPages: 0,
+  }));
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize:  2,
+  });
+  const [totalElements, setTotalElements] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(0)
+
+  // Employee list  
+  const [data, setData] = useState<EmployeeListVM>();
+  const [employees, setEmployees] = useState<EmployeeDto[]>([]);
+  const { data: employeeListVM } = useEmployeeList(
+    pagination.pageIndex,
+    pagination.pageSize
+  );
+ 
+  useEffect(() => {
+    if (employeeListVM) {
+      setData(employeeListVM);
+      setEmployees(employeeListVM.employees || []);
+      setTotalElements(employeeListVM.page?.totalElements || 0);
+      if(employeeListVM.page) {
+        setPageInfo(employeeListVM.page);
+      }
+      setCurrentPage(employeeListVM.page?.pageNumber || 0); 
+      setTotalPages(employeeListVM.page?.totalPages || 0);
+    }
+  }, [employeeListVM]);
 
   const sortEmployees = (field: SortField) => {
     if (sortField === field) {
@@ -62,51 +159,38 @@ export default function EmployeesTable() {
       setSortDirection("asc");
     }
   };
-  const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-    const itemRank = rankItem(row.getValue(columnId), value)
-    addMeta({ itemRank })
-    return itemRank.passed
-  }
-  const [data, setData] = useState<Employee[]>([])
-  const columns = useMemo<ColumnDef<Employee>[]>(() => [
-    // {
-    //   accessorKey: 'userName',
-    //   header: 'Username',
-    //   filterFn: fuzzyFilter
-    // },
+
+ 
+  const columns = useMemo<ColumnDef<EmployeeDto>[]> (() => [
     {
-      accessorKey: 'email',
-      header: 'Email',
-      filterFn: fuzzyFilter
+      accessorKey: "userName",
+      header: "User Name",
     },
-    // {
-    //   accessorKey: 'isActived',
-    //   header: 'Status',
-    //   filterFn: fuzzyFilter
-    // },
-    // {
-    //   accessorKey: 'roleName',
-    //   header: 'Role',
-    //   filterFn: fuzzyFilter
-    // }
-  ], [])
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 5
-  })
-  const [totalElements, setTotalElements] = useState<number>(0)
-  const { data: employeeData } = useEmployeeList(
-    pagination.pageIndex,
-    pagination.pageSize
-  )
-  useEffect(() => {
-    if (employeeData?.employee) {
-      setData(employeeData.employee)
-      setTotalElements(employeeData.page?.totalElements ?? 0)
-    }
-  }, [employeeData])
+    {
+      accessorKey: "email",
+      header: "Email",
+    },
+    {
+      accessorKey: "phoneNumber",
+      header: "Phone Number",
+    },
+    {
+      accessorKey: "isActived",
+      header: "Active Status",
+    },
+    {
+      accessorKey: "action",
+      header: "Action",
+      cell: ({ row }) => (
+        <Button variant="outline" size="sm">
+          Action
+        </Button>
+      ),
+    },
+  ],[]);
+
   const table = useReactTable({
-    data,
+    data: employees || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -118,350 +202,256 @@ export default function EmployeesTable() {
     onPaginationChange: setPagination,
     globalFilterFn: fuzzyFilter,
     filterFns: {
-      fuzzy: fuzzyFilter
+      fuzzy: fuzzyFilter,
     },
     manualPagination: true,
-    pageCount: Math.ceil(totalElements / pagination.pageSize)
-  })
-  const initialEmployees: Employee[] = [
-    {
-      id: "1",
-      userName: "Customer@ute.com",
-      email: "customer@ute.com",
-      phoneNumber: null,
-      isActived: false,
-      avatarImage: null,
-    },
-    {
-      id: "2",
-      userName: "JohnDoe",
-      email: "john.doe@ute.com",
-      phoneNumber: "0123456789",
-      isActived: true,
-      avatarImage: null,
-    },
-    {
-      id: "3",
-      userName: "JaneSmith",
-      email: "jane.smith@ute.com",
-      phoneNumber: "0987654321",
-      isActived: true,
-      avatarImage: null,
-    },
-    {
-      id: "4",
-      userName: "BobJohnson",
-      email: "bob.johnson@ute.com",
-      phoneNumber: "0369852147",
-      isActived: false,
-      avatarImage: null,
-    },
-    {
-      id: "5",
-      userName: "AliceWilliams",
-      email: "alice.williams@ute.com",
-      phoneNumber: null,
-      isActived: true,
-      avatarImage: null,
-    },
-  ];
-  const [employees, setEmployees] = useState(initialEmployees);
-  const filterEmployees = () => {
-    return employees.filter((employee) => {
-      return Object.entries(filters).every(([key, value]) => {
-        if (value === "") return true;
-        if (key === "isActived") {
-          return (
-            employee[key] !== undefined && employee[key].toString() === value
-          );
-        }
-        return employee[key as keyof Employee]
-          ?.toString()
-          .toLowerCase()
-          .includes(value.toLowerCase());
-      });
-    });
-  };
-  const filteredAndSortedEmployees = filterEmployees().sort((a, b) => {
-    if (sortField) {
-      if (
-        sortField &&
-        a[sortField] != null &&
-        b[sortField] != null &&
-        a[sortField] < b[sortField]
-      )
-        return sortDirection === "asc" ? -1 : 1;
-      if (
-        sortField &&
-        a[sortField] != null &&
-        b[sortField] != null &&
-        a[sortField] > b[sortField]
-      )
-        return sortDirection === "asc" ? 1 : -1;
-    }
-    return 0;
+    pageCount: Math.ceil(totalElements / pagination.pageSize),
   });
-  const getPageNumbers = () => {
-    const pageNumbers = [];
-    const maxVisiblePages = 5;
-    const halfVisible = Math.floor(maxVisiblePages / 2);
 
-    let startPage = Math.max(currentPage - halfVisible, 1);
-    let endPage = Math.min(
-      startPage + maxVisiblePages - 1,
-      pageInfo.totalPages
-    );
-
-    if (endPage - startPage + 1 < maxVisiblePages) {
-      startPage = Math.max(endPage - maxVisiblePages + 1, 1);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      pageNumbers.push(i);
-    }
-
-    return pageNumbers;
-  };
-  
   return (
     <>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>
-                <div className="flex items-center space-x-2">
-                  <span
-                    onClick={() => sortEmployees("userName")}
-                    className="cursor-pointer"
-                  >
-                    User Name
-                    {sortField === "userName" &&
-                      (sortDirection === "asc" ? (
-                        <ChevronUp className="inline-block w-4 h-4" />
-                      ) : (
-                        <ChevronDown className="inline-block w-4 h-4" />
-                      ))}
-                  </span>
-                  <DropdownMenu>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>
+              <div className="flex items-center space-x-2">
+                <span
+                  onClick={() => sortEmployees("userName")}
+                  className="cursor-pointer"
+                >
+                  User Name
+                  
+                </span>
+                <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm">
-                        <Filter className="w-4 h-4" />
-                      </Button>
+                      <ArrowUpDown className="h-4 w-4 cursor-pointer" />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <Input
-                        placeholder="Filter User Name"
-                        value={filters.userName || ""}
-                        onChange={(e) =>
-                          setFilters({ ...filters, userName: e.target.value })
-                        }
-                      />
+                    <DropdownMenuContent align="start" className="min-w-[10rem]">
+                      <DropdownMenuLabel>
+                        Sort by
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727] mb-2" />
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem>
+                          <ArrowUpAZ className="mr-2 h-4 w-4" />
+                          <span>Ascending</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <ArrowDownAZ className="mr-2 h-4 w-4" />
+                          <span>Descending</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="flex items-center space-x-2">
-                  <span
-                    onClick={() => sortEmployees("email")}
-                    className="cursor-pointer"
-                  >
-                    Email
-                    {sortField === "email" &&
-                      (sortDirection === "asc" ? (
-                        <ChevronUp className="inline-block w-4 h-4" />
-                      ) : (
-                        <ChevronDown className="inline-block w-4 h-4" />
-                      ))}
-                  </span>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm">
-                        <Filter className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <Input
-                        placeholder="Filter Email"
-                        value={filters.email || ""}
-                        onChange={(e) =>
-                          setFilters({ ...filters, email: e.target.value })
-                        }
-                      />
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="flex items-center space-x-2">
-                  <span
-                    onClick={() => sortEmployees("phoneNumber")}
-                    className="cursor-pointer"
-                  >
-                    Phone Number
-                    {sortField === "phoneNumber" &&
-                      (sortDirection === "asc" ? (
-                        <ChevronUp className="inline-block w-4 h-4" />
-                      ) : (
-                        <ChevronDown className="inline-block w-4 h-4" />
-                      ))}
-                  </span>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm">
-                        <Filter className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <Input
-                        placeholder="Filter Phone Number"
-                        value={filters.phoneNumber || ""}
-                        onChange={(e) =>
-                          setFilters({
-                            ...filters,
-                            phoneNumber: e.target.value,
-                          })
-                        }
-                      />
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="flex items-center space-x-2">
-                  <span
-                    onClick={() => sortEmployees("isActived")}
-                    className="cursor-pointer"
-                  >
-                    Active Status
-                    {sortField === "isActived" &&
-                      (sortDirection === "asc" ? (
-                        <ChevronUp className="inline-block w-4 h-4" />
-                      ) : (
-                        <ChevronDown className="inline-block w-4 h-4" />
-                      ))}
-                  </span>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm">
-                        <Filter className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem
-                        onClick={() =>
-                          setFilters({ ...filters, isActived: "" })
-                        }
-                      >
-                        All
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() =>
-                          setFilters({ ...filters, isActived: "true" })
-                        }
-                      >
-                        Active
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() =>
-                          setFilters({ ...filters, isActived: "false" })
-                        }
-                      >
-                        Inactive
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </TableHead>
-              <TableHead>Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-          <ErrorBoundary
-              onReset={reset}
-              fallbackRender={({ resetErrorBoundary }) => (
-                <TableRow>
-                  <TableCell className="w-full flex flex-col items-center justify-center">
-                    There was an error! Please try again.
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary"
-                      onClick={() => resetErrorBoundary()}
-                    >
-                      Try again
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      <Filter className="w-4 h-4" />
                     </Button>
-                  </TableCell>
-                </TableRow>
-              )}
-            > 
-             <Suspense fallback={<EmployeesDataLoading />}>
-              <EmployeesData   
-                  data={data}
-                  table={table}/>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <Input
+                      placeholder="Filter User Name"
+                      value={filters.userName || ""}
+                      onChange={(e) =>
+                        setFilters({ ...filters, userName: e.target.value })
+                      }
+                    />
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </TableHead>
+            <TableHead>
+              <div className="flex items-center space-x-2">
+                <span
+                  onClick={() => sortEmployees("email")}
+                  className="cursor-pointer"
+                >
+                  Email
+                  {sortField === "email" &&
+                    (sortDirection === "asc" ? (
+                      <ChevronUp className="inline-block w-4 h-4" />
+                    ) : (
+                      <ChevronDown className="inline-block w-4 h-4" />
+                    ))}
+                </span>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      <Filter className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <Input
+                      placeholder="Filter Email"
+                      value={filters.email || ""}
+                      onChange={(e) =>
+                        setFilters({ ...filters, email: e.target.value })
+                      }
+                    />
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </TableHead>
+            <TableHead>
+              <div className="flex items-center space-x-2">
+                <span
+                  onClick={() => sortEmployees("phoneNumber")}
+                  className="cursor-pointer"
+                >
+                  Phone Number
+                  {sortField === "phoneNumber" &&
+                    (sortDirection === "asc" ? (
+                      <ChevronUp className="inline-block w-4 h-4" />
+                    ) : (
+                      <ChevronDown className="inline-block w-4 h-4" />
+                    ))}
+                </span>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      <Filter className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <Input
+                      placeholder="Filter Phone Number"
+                      value={filters.phoneNumber || ""}
+                      onChange={(e) =>
+                        setFilters({
+                          ...filters,
+                          phoneNumber: e.target.value,
+                        })
+                      }
+                    />
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </TableHead>
+            <TableHead>
+              <div className="flex items-center space-x-2">
+                <span
+                  onClick={() => sortEmployees("isActived")}
+                  className="cursor-pointer"
+                >
+                  Active Status
+                  {sortField === "isActived" &&
+                    (sortDirection === "asc" ? (
+                      <ChevronUp className="inline-block w-4 h-4" />
+                    ) : (
+                      <ChevronDown className="inline-block w-4 h-4" />
+                    ))}
+                </span>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      <Filter className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={() => setFilters({ ...filters, isActived: "" })}
+                    >
+                      All
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        setFilters({ ...filters, isActived: "true" })
+                      }
+                    >
+                      Active
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        setFilters({ ...filters, isActived: "false" })
+                      }
+                    >
+                      Inactive
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </TableHead>
+            <TableHead>Action</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <ErrorBoundary
+            onReset={reset}
+            fallbackRender={({ resetErrorBoundary }) => (
+              <TableRow>
+                <TableCell className="w-full flex flex-col items-center justify-center">
+                  There was an error! Please try again.
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary"
+                    onClick={() => resetErrorBoundary()}
+                  >
+                    Try again
+                  </Button>
+                </TableCell>
+              </TableRow>
+            )}
+          >
+            <Suspense fallback={<EmployeesDataLoading />}>
+              <EmployeeDataMain table={table} />
             </Suspense>
-            </ErrorBoundary>
-          </TableBody>
-        </Table>
-       
-        <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          Showing {Math.min(pageInfo.size, filteredAndSortedEmployees.length)}{" "}
-          of {filteredAndSortedEmployees.length} employees
+          </ErrorBoundary>
+        </TableBody>
+      </Table>
+      <div className="w-full flex items-center justify-between mt-[1.25rem]">
+        <p className="text-[.85rem] text-muted-foreground">
+           Showing {' '}
+          {table.getRowModel().rows.length === 0 ? 0 : totalElements === 0 ? 0 : pagination.pageIndex * pagination.pageSize + 1} {' '}
+          to {' '}
+          {table.getRowModel().rows.length === 0 ? 0 : Math.min(
+            (pagination.pageIndex + 1) * pagination.pageSize,
+            totalElements
+          )} {' '}
+          of {totalElements} user{totalElements > 1 ? 's' : ''}
         </p>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage(1)}
-            disabled={currentPage === 1}
-          >
-            <ChevronsLeft className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </Button>
-          {getPageNumbers().map((pageNum) => (
-            <Button
-              key={pageNum}
-              variant={pageNum === currentPage ? "default" : "outline"}
-              size="sm"
-              onClick={() => setCurrentPage(pageNum)}
-            >
-              {pageNum}
-            </Button>
-          ))}
-          {pageInfo.totalPages > 5 && currentPage < pageInfo.totalPages - 2 && (
-            <Button variant="outline" size="sm" disabled>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          )}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, pageInfo.totalPages))
-            }
-            disabled={currentPage === pageInfo.totalPages}
-          >
-            Next
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage(pageInfo.totalPages)}
-            disabled={currentPage === pageInfo.totalPages}
-          >
-            <ChevronsRight className="h-4 w-4" />
-          </Button>
-        </div>
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault()
+                  table.previousPage()
+                }}
+                aria-disabled={!table.getCanPreviousPage()}
+                className={!table.getCanPreviousPage() ? 'pointer-events-none opacity-50' : ''}
+              />
+            </PaginationItem>
+            {Array.from({ length: Math.max(1, totalPages) }, (_, i) => (
+              <PaginationItem key={i}>
+                <PaginationLink
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    table.setPageIndex(i)
+                  }}
+                  isActive={i === pagination.pageIndex}
+                >
+                  {i + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault()
+                  table.nextPage()
+                }}
+                aria-disabled={!table.getCanNextPage()}
+                className={!table.getCanNextPage() ? 'pointer-events-none opacity-50' : ''}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       </div>
     </>
   );
 }
-

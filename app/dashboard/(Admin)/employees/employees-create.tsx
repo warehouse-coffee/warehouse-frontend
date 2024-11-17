@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { CreateEmployeeInput } from "@/types";
 import { useUserStorageList } from "@/hooks/storage";
 import { useCreateEmployee } from "@/hooks/employee";
+import {CreateEmployeeCommand } from "@/app/api/web-api-client";
 
 const initialFormState: CreateEmployeeInput = {
   userName: "",
@@ -17,9 +18,9 @@ const initialFormState: CreateEmployeeInput = {
 };
 import {Storage} from "@/types/storage";
 import { PaginationState } from "@tanstack/react-table";
-import { StorageDto, StorageDto2 } from "@/app/api/web-api-client";
+import { StorageDto2 } from "@/app/api/web-api-client";
 
-export default function EmployeesCreatePage() {
+export default function EmployeesCreatePage({ onClose }: { onClose: () => void }) {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [currentPage, setCurrentPage] = React.useState(0);
   const [selectedStorages, setSelectedStorages] = React.useState<number[]>([]);
@@ -37,20 +38,23 @@ export default function EmployeesCreatePage() {
 
   const itemsPerPage = 5;
   const totalPages = Math.ceil(filteredStorages.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
+  const startIndex = currentPage  * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentStorages = filteredStorages.slice(startIndex, endIndex);
+  const createEmployeeMutation = useCreateEmployee(onClose);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
-    const data = {
-      userName: formData.get("username"),
-      password: formData.get("password"),
-      email: formData.get("email"),
-      phoneNumber: formData.get("phoneNumber"),
+    
+    const data = new CreateEmployeeCommand ({
+      userName: formData.get("username") as string,
+      password: formData.get("password") as string,
+      email: formData.get("email") as string,
+      phoneNumber: formData.get("phoneNumber") as string,
       warehouses: selectedStorages,
-    };
+    })
+    createEmployeeMutation.mutate(data);
     console.log(data);
 
   };
