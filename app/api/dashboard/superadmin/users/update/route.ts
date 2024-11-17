@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { cookieStore, tokenUtils } from '@/lib/auth'
 
 export async function PUT(request: NextRequest) {
@@ -18,27 +19,27 @@ export async function PUT(request: NextRequest) {
       console.error('User ID is missing in the request parameters')
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
     }
-    const tokenX = await fetch('https://coffeewarehouse.zapto.org/antiforgery/token', {
+    const tokenX = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/antiforgery/token`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`, 
-      },
-    });
-    
-    const cookies = tokenX.headers.get('Set-Cookie');
+        'Authorization': `Bearer ${token}`
+      }
+    })
 
-    const xsrfToken = await tokenX.text();
+    const cookies = tokenX.headers.get('Set-Cookie')
+
+    const xsrfToken = await tokenX.text()
     const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/SuperAdmin/user/${id}`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,
-        'X-XSRF-TOKEN': xsrfToken,  
+        'X-XSRF-TOKEN': xsrfToken,
         'Cookie': cookies || ''
       },
       body: formData,
       redirect: 'follow'
     })
-    
+
     const text = await response.text()
 
     if (!response.ok) {
