@@ -21,12 +21,11 @@ export default function ChatBox() {
   const [inputMessage, setInputMessage] = useState('')
   const [isThinking, setIsThinking] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const scrollAreaRef = useRef<HTMLDivElement>(null)
-  const lastMessageRef = useRef<HTMLDivElement>(null)
   const isInitialMount = useRef(true)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   var api_count = 0
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
     const storedMessages = sessionStorage.getItem('chatMessages')
@@ -77,6 +76,7 @@ export default function ChatBox() {
       try {
         if (api_count == 0) {
           api_count++
+          abortControllerRef.current = new AbortController()
           const request = await fetch('/api/gemini', {
             method: 'POST',
             headers: {
@@ -85,7 +85,8 @@ export default function ChatBox() {
             body: JSON.stringify({
               'api_key': 'FpK202Eu5u98M3Ikv7Yo',
               'user_prompt': inputMessage.trim()
-            })
+            }),
+            signal: abortControllerRef.current.signal
           })
           const response_obj = await request.json()
           // console.log(response_obj)
@@ -117,6 +118,9 @@ export default function ChatBox() {
   }
 
   const resetChat = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
     setMessages([])
     setError(null)
     setIsThinking(false)
@@ -193,7 +197,7 @@ export default function ChatBox() {
                   className="text-white text-sm font-medium -ml-1 whitespace-nowrap overflow-hidden w-0
                     group-hover:w-auto transition-all duration-250 opacity-0 group-hover:opacity-100"
                 >
-                  Chat with AI
+                                    Chat with AI
                 </span>
               </div>
 
