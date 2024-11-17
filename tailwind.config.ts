@@ -1,3 +1,5 @@
+/* eslint-disable no-mixed-spaces-and-tabs */
+
 import type { Config } from 'tailwindcss'
 import { fontFamily } from 'tailwindcss/defaultTheme'
 
@@ -10,14 +12,14 @@ const config = {
   ],
   prefix: '',
   theme: {
-  	container: {
-  		center: 'true',
-  		padding: '2rem',
-  		screens: {
-  			'2xl': '1400px'
-  		}
-  	},
-  	extend: {
+    container: {
+      center: true,
+      padding: '2rem',
+      screens: {
+        '2xl': '1400px'
+      }
+    },
+    extend: {
   		fontFamily: {
   			sans: ['var(--font-sans)', ...fontFamily.sans],
   			italiana: ['var(--font-italiana)', ...fontFamily.sans]
