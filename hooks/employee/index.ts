@@ -1,5 +1,0 @@
-export * from './useCreateEmployee'
-export * from './useUpdateEmployee'
-export * from './useEmployeeDetail'
-export * from './useEmployeeList'
-export * from './useDeleteEmployee'
