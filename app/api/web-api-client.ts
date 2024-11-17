@@ -2095,6 +2095,24 @@ export class SuperAdminClient {
         return Promise.resolve<ResponseDto>(null as any);
     }
 
+    getSuperAdminStats(): Promise<SuperAdminStatsVM> {
+        let url_ = this.baseUrl + "/api/SuperAdmin/stats";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetSuperAdminStats(_response);
+        });
+    }
+
     protected processGetSuperAdminStats(response: Response): Promise<SuperAdminStatsVM> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
