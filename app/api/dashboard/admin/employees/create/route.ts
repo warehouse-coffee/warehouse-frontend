@@ -6,14 +6,13 @@ import { CreateEmployeeCommand, EmployeesClient, SwaggerException } from '../../
 
 export async function POST(request: NextRequest) {
   const token = cookieStore.get('auth_token')
-  const xsrfToken = cookieStore.get('XSRF-TOKEN')
   if (!token || !tokenUtils.isValid(token)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   try {
     const createEmployeeData = await request.json()
     const createEmployeeCommand = new CreateEmployeeCommand({ ...createEmployeeData })
-    const client = new EmployeesClient(process.env.NEXT_PUBLIC_BACKEND_API_URL, undefined, token, xsrfToken)
+    const client = new EmployeesClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token)
     const result = await client.createEmployee(createEmployeeCommand)
     return NextResponse.json(result)
   } catch (error) {

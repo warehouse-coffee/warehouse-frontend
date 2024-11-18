@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   try {
-    const client = new StorageClient(process.env.NEXT_PUBLIC_BACKEND_API_URL, undefined, token, undefined)
+    const client = new StorageClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token)
     const { searchParams } = new URL(request.url)
     const pageNumber = parseInt(searchParams.get('pageNumber') || '')
     const size = parseInt(searchParams.get('size') || '')

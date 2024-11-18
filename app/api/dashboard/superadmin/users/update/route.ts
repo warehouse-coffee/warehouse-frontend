@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+import { ApiClientService } from '@/lib/api-service'
 import { cookieStore, tokenUtils } from '@/lib/auth'
 
 export async function PUT(request: NextRequest) {
@@ -19,22 +20,15 @@ export async function PUT(request: NextRequest) {
       console.error('User ID is missing in the request parameters')
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
     }
-    const tokenX = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/antiforgery/token`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
 
-    const cookies = tokenX.headers.get('Set-Cookie')
+    const antiforgeryData = await ApiClientService.getAntiforgeryData(token)
 
-    const xsrfToken = await tokenX.text()
     const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/SuperAdmin/user/${id}`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,
-        'X-XSRF-TOKEN': xsrfToken,
-        'Cookie': cookies || ''
+        'X-XSRF-TOKEN': antiforgeryData.token,
+        ...(antiforgeryData.cookie && { 'Cookie': antiforgeryData.cookie })
       },
       body: formData,
       redirect: 'follow'

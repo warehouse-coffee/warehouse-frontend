@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   try {
-    const client = new StorageClient(process.env.NEXT_PUBLIC_BACKEND_API_URL, undefined, token, undefined)
+    const client = new StorageClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token)
     const data = await request.json()
     const result = await client.createStorage(data)
     return NextResponse.json(result)
