@@ -25,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import { useGetCharts } from '@/hooks/stats/useGetCharts'
+import { useGetTrendingChart } from '@/hooks/stats/useGetTrendingCharts'
 
 const chartConfig = {
   price: {
@@ -43,7 +43,7 @@ const chartConfig = {
 
 export function DashboardTrendingChart({ id }: { id: string }) {
   const [timeRange, setTimeRange] = useState<string>('90d')
-  const { data: chartData } = useGetCharts()
+  const { data: chartData } = useGetTrendingChart()
 
   const filteredData = chartData?.filter((item) => {
     const date = new Date(item.date)

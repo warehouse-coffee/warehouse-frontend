@@ -8,7 +8,7 @@ interface CoffeePriceGraph {
   real_price_difference_rate: number
 }
 
-const fetchCharts = async (): Promise<CoffeePriceGraph[]> => {
+const fetchTrendingChart = async (): Promise<CoffeePriceGraph[]> => {
   const response = await fetch(API_ENDPOINTS.GET_COFFEE_PRICE_PREDICT_GRAPH, {
     credentials: 'include'
   })
@@ -26,10 +26,10 @@ const fetchCharts = async (): Promise<CoffeePriceGraph[]> => {
   return data.pointInfos
 }
 
-export const useGetCharts = () => {
+export const useGetTrendingChart = () => {
   return useSuspenseQuery({
-    queryKey: ['charts'],
-    queryFn: fetchCharts,
+    queryKey: ['trending-chart'],
+    queryFn: fetchTrendingChart,
     refetchInterval: 5000,
     staleTime: 0
   })
