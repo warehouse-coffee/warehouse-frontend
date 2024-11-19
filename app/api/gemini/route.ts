@@ -10,22 +10,22 @@ import { LLMClient } from '../web-api-client'
 
 const cases = {
   'empty_storage': {
-    'response_instruction': 'Respond with a message indicating that the storage is currently empty and may require restocking. Provide any relevant next steps or suggestions for replenishment.'
+    'response_instruction': "Respond with a message indicating that the storage is currently empty and may require restocking. If there are items in the 'data' array, list them in bullet points. Additionally, provide relevant next steps or suggestions for replenishment. If the 'data' array is empty, congratulate the user and inform them that there is no empty storages currently."
   },
   'empty_area': {
-    'response_instruction': 'Acknowledge the inquiry and confirm that the specified area is empty. If applicable, suggest actions to fill or utilize the area effectively.'
+    'response_instruction': "Upon receiving an inquiry, acknowledge the request and confirm that the specified area is empty. If applicable, suggest actions to effectively fill or utilize the area. Additionally, present the contents of the 'data' array in bullet point format. If the 'data' array is empty, congratulate the user and inform them that there is no empty areas currently"
   },
   'coffee_price_today': {
     'response_instruction': 'Provide the current price of coffee for today. If there are different types or brands, specify the price for each if relevant. the price is measured in USd/Lbs.'
   },
   'near_expired_product': {
-    'response_instruction': 'Inform the user about any products that are nearing their expiration date. Include details such as product names, expiration dates, and recommendations for usage or disposal.'
+    'response_instruction': "Inform the user about any products that are nearing their expiration date. If the 'data' array contains products, list each product in bullet points, including details such as product names and expiration dates. Additionally, provide recommendations for usage or disposal. If the 'data' array is empty, notify the user that there are no products nearing expiration at this time."
   },
   'most_valuable_product': {
-    'response_instruction': 'Identify and describe the product that is considered the most valuable. Include information on its value, significance, and any relevant context that supports its status.'
+    'response_instruction': "Identify and describe the product that is considered the most valuable. If the 'data' array contains products, provide details in bullet points, including information on its value, significance, and any relevant context that supports its status. If the 'data' array is null or empty, inform the user that no products were found and therefore, no valuable product can be identified."
   },
   'coffee_price_tomorrow': {
-    'response_instruction': 'Provide the expected price of coffee for tomorrow. If there are factors that may influence the price, such as market trends or promotions, please include that information. Additionally, interpret the given data as follows: a positive value indicates that the price of coffee is likely to increase, with larger values suggesting a greater likelihood of a significant price rise. Conversely, a negative value suggests that the price is likely to decrease, with larger negative values indicating a stronger likelihood of a substantial drop.'
+    'response_instruction': "Please provide the expected price of coffee for tomorrow, based on the provided data. The relevant data includes: + aI_predict: This value indicates the predicted change in coffee prices. A positive value suggests that the price is likely to increase, with larger values indicating a greater likelihood of a significant price rise. Conversely, a negative value suggests that the price is likely to decrease, with larger negative values indicating a stronger likelihood of a substantial drop. + aI_predict_money: This represents the expected price of coffee in USD per pound. Additionally, if there are any factors that may influence the price, such as market trends, promotions, or other relevant information, please include that in your response."
   },
   'others': {
     'response_instruction': 'Respond to the user\'s inquiry with a general message indicating that the question does not match any specific intents. Offer assistance or ask for clarification if needed.'
@@ -116,6 +116,7 @@ export async function POST(req: NextRequest) {
   // console.log(prompt_obj)
   const naturalResponse = await naturalResponseLLM.generateContent(JSON.stringify(prompt_obj))
   text_res = naturalResponse.response.text()
+  text_res = text_res.replaceAll('*', '')
   // text_res = text_res.replace(/\n/g, '')
 
   return NextResponse.json({

@@ -5,6 +5,11 @@ import {
   SwaggerException
 } from '@/app/api/web-api-client'
 
+interface AntiforgeryResponse {
+  token: string
+  cookie?: string
+}
+
 export class ApiClientService {
   private static createClient<T>(
     ClientClass: new (baseUrl: string, http?: any, token?: string, xsrf?: string) => T,
@@ -16,6 +21,27 @@ export class ApiClientService {
       config.token,
       config.xsrfToken
     )
+  }
+
+  static async getAntiforgeryData(token: string): Promise<AntiforgeryResponse> {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/antiforgery/token`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      const xsrfToken = await response.text()
+      const cookie = response.headers.get('Set-Cookie')
+
+      return {
+        token: xsrfToken,
+        cookie: cookie || undefined
+      }
+    } catch (error) {
+      throw new Error('Failed to get antiforgery data')
+    }
   }
 
   static async signIn(email: string, password: string) {
@@ -39,10 +65,5 @@ export class ApiClientService {
     } catch (error) {
       throw new Error('Logout failed')
     }
-  }
-
-  static async getAntiforgeryToken(token: string) {
-    const client = this.createClient(Client, { token })
-    return await client.getAntiforgeryToken()
   }
 }

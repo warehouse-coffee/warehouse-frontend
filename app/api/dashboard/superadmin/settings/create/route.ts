@@ -6,7 +6,6 @@ import { ConfigurationsClient, CreateConfigCommand } from '../../../../web-api-c
 
 export async function POST(request: NextRequest) {
   const token = cookieStore.get('auth_token')
-  // const xsrfToken = cookieStore.get('XSRF-TOKEN')
 
   if (!token || !tokenUtils.isValid(token)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
