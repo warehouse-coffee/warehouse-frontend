@@ -10,6 +10,7 @@ export const API_ENDPOINTS = {
   CREATE_CONFIG: '/api/dashboard/superadmin/settings/create',
   GET_ALL_SUPER_ADMIN_STATS: '/api/dashboard/superadmin/stats',
   GET_ALL_ADMIN_STATS: '/api/dashboard/admin/stats',
+  GET_ALL_EMPLOYEE_STATS: '/api/dashboard/employee/stats',
   GET_COFFEE_PRICE_PREDICT_GRAPH: '/api/dashboard/admin/charts',
   GET_ALL_EMPLOYEES: '/api/dashboard/admin/employees/list',
   GET_EMPLOYEE_DETAIL: '/api/dashboard/admin/employees/detail',
@@ -17,7 +18,8 @@ export const API_ENDPOINTS = {
   UPDATE_EMPLOYEE: '/api/dashboard/admin/employees/update',
   DELETE_EMPLOYEE: '/api/dashboard/admin/employees/delete',
   GET_STORAGE_OF_USER: '/api/dashboard/admin/storages/listOfUser',
-  CREATE_STORAGE: '/api/dashboard/admin/storages/create'
+  CREATE_STORAGE: '/api/dashboard/admin/storages/create',
+  GET_STORAGE_OF_USER_DETAIL: '/api/dashboard/employee/listOfUser'
 } as const
 
 export type ApiEndpoint = typeof API_ENDPOINTS[keyof typeof API_ENDPOINTS]

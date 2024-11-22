@@ -161,7 +161,7 @@ export default function ChatBox() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 100 }}
       transition={{ duration: 0.3 }}
-      className="fixed bottom-5 right-5 z-[9999]"
+      className="fixed bottom-5 right-5 z-[999]"
     >
       <motion.div
         layout

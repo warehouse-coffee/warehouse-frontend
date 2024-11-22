@@ -5,9 +5,15 @@ export type Navbar = {
   href: string
 }
 
+type SubItem = {
+  name: string
+  href: string
+}
+
 export type DashboardSidebarItems = {
   name: string
   href: string
   icon: React.ElementType
   requiredRoles: string[]
+  subItems?: SubItem[]
 }

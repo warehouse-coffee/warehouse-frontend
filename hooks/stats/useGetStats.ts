@@ -3,6 +3,12 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { ROLE_NAMES } from '@/constants'
 import { API_ENDPOINTS } from '@/constants/endpoint'
 
+interface Prediction {
+  aI_predict: number
+  accuracy: number
+  date: string
+}
+
 interface SuperAdminStats {
   totalUser: number
   totalCompany: number
@@ -14,10 +20,19 @@ interface AdminStats {
   totalInventoryValue: number
   onlineEmployeeCount: number
   orderCompletionRate: number
-  highDemandItemSummary: string | null
+  highDemandItemName: string
+  highDemandItemCount: number
+  prediction: Prediction
 }
 
-type StatsData = SuperAdminStats | AdminStats
+interface EmployeeStats {
+  outboundInventoryCompletePerMonth: number
+  productExpirationCount: number
+  totalProductImportPerMonth: number
+  totalProductExportPerMonth: number
+}
+
+type StatsData = SuperAdminStats | AdminStats | EmployeeStats
 
 const fetchStats = async (role: string | null): Promise<StatsData> => {
   if (!role) throw new Error('Role is required')
@@ -25,7 +40,9 @@ const fetchStats = async (role: string | null): Promise<StatsData> => {
   const endpoint =
     role === ROLE_NAMES.SUPER_ADMIN
       ? API_ENDPOINTS.GET_ALL_SUPER_ADMIN_STATS
-      : API_ENDPOINTS.GET_ALL_ADMIN_STATS
+      : role === ROLE_NAMES.ADMIN
+        ? API_ENDPOINTS.GET_ALL_ADMIN_STATS
+        : API_ENDPOINTS.GET_ALL_EMPLOYEE_STATS
 
   const response = await fetch(endpoint, {
     credentials: 'include'
@@ -54,11 +71,33 @@ export const useGetStats = (role: string | null) => {
 }
 
 export const isSuperAdminStats = (stats: StatsData): stats is SuperAdminStats => {
-  const requiredKeys: (keyof SuperAdminStats)[] = ['totalUser', 'totalCompany', 'cpu', 'ram']
+  const requiredKeys: (keyof SuperAdminStats)[] = [
+    'totalUser',
+    'totalCompany',
+    'cpu',
+    'ram'
+  ]
   return requiredKeys.every(key => key in stats)
 }
 
 export const isAdminStats = (stats: StatsData): stats is AdminStats => {
-  const requiredKeys: (keyof AdminStats)[] = ['totalInventoryValue', 'onlineEmployeeCount', 'orderCompletionRate', 'highDemandItemSummary']
+  const requiredKeys: (keyof AdminStats)[] = [
+    'totalInventoryValue',
+    'onlineEmployeeCount',
+    'orderCompletionRate',
+    'highDemandItemName',
+    'highDemandItemCount',
+    'prediction'
+  ]
+  return requiredKeys.every(key => key in stats)
+}
+
+export const isEmployeeStats = (stats: StatsData): stats is EmployeeStats => {
+  const requiredKeys: (keyof EmployeeStats)[] = [
+    'outboundInventoryCompletePerMonth',
+    'productExpirationCount',
+    'totalProductImportPerMonth',
+    'totalProductExportPerMonth'
+  ]
   return requiredKeys.every(key => key in stats)
 }

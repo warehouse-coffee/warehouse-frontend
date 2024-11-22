@@ -45,7 +45,7 @@ export function DashboardTrendingChart({ id }: { id: string }) {
   const [timeRange, setTimeRange] = useState<string>('90d')
   const { data: chartData } = useGetTrendingChart()
 
-  const filteredData = chartData?.filter((item) => {
+  const filteredData = chartData?.slice(0, chartData.length - 1).filter((item) => {
     const date = new Date(item.date)
     const now = new Date()
     let daysToSubtract = 90

@@ -2,8 +2,9 @@
 
 import NumberTicker from '@/components/magicui/number-ticker'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { ROLE_NAMES } from '@/constants'
-import { useGetStats, isSuperAdminStats, isAdminStats } from '@/hooks/stats/useGetStats'
+import { useGetStats, isSuperAdminStats, isAdminStats, isEmployeeStats } from '@/hooks/stats/useGetStats'
 
 interface DashboardCardsProps {
   userRole: string | null
@@ -11,6 +12,8 @@ interface DashboardCardsProps {
 
 export function DashboardCards({ userRole }: DashboardCardsProps) {
   const { data: stats } = useGetStats(userRole)
+
+  console.log(stats)
 
   if (userRole === ROLE_NAMES.SUPER_ADMIN && isSuperAdminStats(stats)) {
     return (
@@ -105,10 +108,74 @@ export function DashboardCards({ userRole }: DashboardCardsProps) {
             <CardDescription>Current top-selling items</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{stats.highDemandItemSummary ?? 'Not updated'}</p>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <p className="text-2xl font-bold cursor-help">
+                    <NumberTicker value={stats.highDemandItemCount} />
+                  </p>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{stats.highDemandItemName}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </CardContent>
         </Card>
       </>
+    )
+  } else if (userRole === ROLE_NAMES.EMPLOYEE && isEmployeeStats(stats)) {
+    return (
+      <>
+        <Card>
+          <CardHeader>
+            <CardTitle>Outbound Inventory</CardTitle>
+            <CardDescription>Completed this month</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">
+              <NumberTicker value={stats.outboundInventoryCompletePerMonth} />
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Exported Products</CardTitle>
+            <CardDescription>Exported this month</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">
+              <NumberTicker value={stats.totalProductExportPerMonth} />
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Expiring Products</CardTitle>
+            <CardDescription>Count this month</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">
+              <NumberTicker value={stats.productExpirationCount} />
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Imported Products</CardTitle>
+            <CardDescription>Imported this month</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">
+              <NumberTicker value={stats.totalProductImportPerMonth} />
+            </p>
+          </CardContent>
+        </Card>
+      </>
+
     )
   }
 
