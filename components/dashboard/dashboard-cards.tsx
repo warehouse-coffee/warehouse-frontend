@@ -13,8 +13,6 @@ interface DashboardCardsProps {
 export function DashboardCards({ userRole }: DashboardCardsProps) {
   const { data: stats } = useGetStats(userRole)
 
-  console.log(stats)
-
   if (userRole === ROLE_NAMES.SUPER_ADMIN && isSuperAdminStats(stats)) {
     return (
       <>

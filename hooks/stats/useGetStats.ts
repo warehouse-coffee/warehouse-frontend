@@ -3,7 +3,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { ROLE_NAMES } from '@/constants'
 import { API_ENDPOINTS } from '@/constants/endpoint'
 
-interface Prediction {
+export interface Prediction {
   aI_predict: number
   accuracy: number
   date: string
@@ -14,6 +14,7 @@ interface SuperAdminStats {
   totalCompany: number
   cpu: number
   ram: number
+  prediction: Prediction
 }
 
 interface AdminStats {
@@ -75,7 +76,8 @@ export const isSuperAdminStats = (stats: StatsData): stats is SuperAdminStats =>
     'totalUser',
     'totalCompany',
     'cpu',
-    'ram'
+    'ram',
+    'prediction'
   ]
   return requiredKeys.every(key => key in stats)
 }

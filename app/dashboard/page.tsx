@@ -18,7 +18,7 @@ export default async function DashboardPage() {
           <div className="md:col-span-2 lg:col-span-3">
             <DashboardTrendingChart id="dashboard-trending-chart" />
           </div>
-          <DashboardPieChart id="dashboard-pie-chart" userRole={userRole} />
+          <DashboardPieChart id="dashboard-pie-chart" userRole={userRole!} />
         </>
       )}
     </div>

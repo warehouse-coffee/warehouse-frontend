@@ -18,7 +18,9 @@ import {
   ChartTooltip,
   ChartTooltipContent
 } from '@/components/ui/chart'
-import { useGetStats, isAdminStats } from '@/hooks/stats/useGetStats'
+import { ROLE_NAMES } from '@/constants'
+import { useGetStats, isAdminStats, isSuperAdminStats } from '@/hooks/stats/useGetStats'
+import { Prediction } from '@/hooks/stats/useGetStats'
 
 type DashboardPieChartProps = {
   id: string
@@ -40,25 +42,33 @@ export function DashboardPieChart({ id, userRole }: DashboardPieChartProps) {
   const { data: stats } = useGetStats(userRole)
 
   const chartData = React.useMemo(() => {
-    if (!stats || !isAdminStats(stats)) {
-      return []
+    if (!stats) return []
+
+    let predictionData: Prediction | undefined
+
+    if (userRole === ROLE_NAMES.SUPER_ADMIN && isSuperAdminStats(stats)) {
+      predictionData = stats.prediction
+    } else if (userRole === ROLE_NAMES.ADMIN && isAdminStats(stats)) {
+      predictionData = stats.prediction
     }
+
+    if (!predictionData) return []
 
     const data = [
       {
         type: 'prediction',
-        value: stats.prediction.accuracy,
+        value: predictionData.accuracy,
         fill: 'hsl(var(--chart-1))'
       },
       {
         type: 'real_time',
-        value: 100 - stats.prediction.accuracy,
+        value: 100 - predictionData.accuracy,
         fill: 'hsl(var(--chart-2))'
       }
     ]
 
     return data
-  }, [stats])
+  }, [stats, userRole])
 
   const getTrendIcon = (prediction: number) => {
     if (prediction > 0) {
@@ -69,18 +79,26 @@ export function DashboardPieChart({ id, userRole }: DashboardPieChartProps) {
     return <Minus className="h-4 w-4" />
   }
 
-  if (!isAdminStats(stats)) {
+  let predictionData: Prediction | undefined
+
+  if (userRole === ROLE_NAMES.SUPER_ADMIN && isSuperAdminStats(stats)) {
+    predictionData = stats.prediction
+  } else if (userRole === ROLE_NAMES.ADMIN && isAdminStats(stats)) {
+    predictionData = stats.prediction
+  }
+
+  if (!predictionData) {
     return (
       <Card className="flex flex-col" id={id}>
         <CardHeader className="items-center pb-0">
           <CardTitle>Prediction Analysis</CardTitle>
-          <CardDescription>Invalid data type</CardDescription>
+          <CardDescription>No prediction data available</CardDescription>
         </CardHeader>
       </Card>
     )
   }
 
-  const predictionDate = new Date(stats.prediction.date)
+  const predictionDate = new Date(predictionData.date)
   const formattedDate = predictionDate.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -126,7 +144,7 @@ export function DashboardPieChart({ id, userRole }: DashboardPieChartProps) {
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          {stats.prediction.accuracy}%
+                          {predictionData.accuracy}%
                         </tspan>
                         <tspan
                           x={viewBox.cx}
@@ -146,8 +164,8 @@ export function DashboardPieChart({ id, userRole }: DashboardPieChartProps) {
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2 font-medium leading-none">
-          Prediction Confidence: {(stats.prediction.aI_predict).toFixed(2)}
-          {getTrendIcon(stats.prediction.aI_predict)}
+          Prediction Confidence: {(predictionData.aI_predict).toFixed(2)}
+          {getTrendIcon(predictionData.aI_predict)}
         </div>
         <div className="leading-none text-muted-foreground">
           Coffee price forecast
