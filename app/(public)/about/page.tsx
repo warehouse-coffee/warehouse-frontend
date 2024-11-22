@@ -1,3 +1,5 @@
+'use client'
+
 import { Coffee, Heart, Lightbulb, Mail, MapPin, Phone, Send, Star, Twitter } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'

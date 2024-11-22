@@ -1,3 +1,5 @@
+'use client'
+
 import { BarChart3, Coffee, LineChart, ShoppingCart, Users } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
