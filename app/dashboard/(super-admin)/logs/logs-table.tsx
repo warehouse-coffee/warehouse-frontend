@@ -256,11 +256,11 @@ export default function LogsTable() {
                   Hour
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Filter className="h-4 w-4 cursor-pointer" />
+                      <ArrowUpDown className="h-4 w-4 cursor-pointer" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="min-w-[10rem]">
                       <DropdownMenuLabel>
-                        Filter by
+                        Sort by
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727] mb-2" />
                       <DropdownMenuGroup>
@@ -272,10 +272,9 @@ export default function LogsTable() {
                           <ArrowDownAZ className="mr-2 h-4 w-4" />
                           <span>Descending</span>
                         </DropdownMenuItem>
-                        <div className="mt-2 w-full relative">
-                          <Search className='absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4' />
-                          <Input placeholder="Search by hour..." className="flex-grow pl-8 pr-2.5" />
-                        </div>
+                        {/* <DropdownMenuItem>
+                          <Input placeholder="Search..." className="w-full" />
+                        </DropdownMenuItem> */}
                       </DropdownMenuGroup>
                     </DropdownMenuContent>
                   </DropdownMenu>
