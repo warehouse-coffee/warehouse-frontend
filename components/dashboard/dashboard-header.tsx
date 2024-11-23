@@ -38,9 +38,20 @@ export default function DashboardHeader({ toggleSidebar, sidebarOpen, onLogout }
       </div>
       <div className="flex items-center space-x-3">
         <ThemeToggle storageKey="dashboard-theme" />
-        <Button variant="ghost" size="icon" className='hover:bg-transparent cursor-pointer'>
-          <Bell className="h-5 w-5 text-black dark:text-white" />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className='rounded-full hover:bg-[#dbdbdb7a] dark:hover:bg-[#272727] cursor-pointer'>
+              <Bell className="h-5 w-5 text-black dark:text-white" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className='bg-white dark:bg-[#141414] text-black dark:text-white border border-gray-200 dark:border-[#272727] shadow-lg rounded-md' align="end">
+            <DropdownMenuItem
+              className='text-black hover:text-black dark:text-white hover:bg-gray-200 dark:hover:bg-[#272727] cursor-pointer [&>*]:text-black [&>*]:dark:text-white [&>*]:hover:text-black [&>*]:dark:hover:text-white'
+            >
+              Hello
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">

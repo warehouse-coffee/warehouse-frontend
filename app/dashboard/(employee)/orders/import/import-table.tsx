@@ -7,13 +7,21 @@ import {
   useReactTable,
   PaginationState
 } from '@tanstack/react-table'
-import { ArrowUpAZ, ArrowDownAZ, ArrowUpDown } from 'lucide-react'
+import { ArrowUpAZ, ArrowDownAZ, ArrowUpDown, CirclePlus } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import React, { useState, useEffect } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import DashboardTablePagination from '@/components/dashboard/dashboard-table-pagination'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,71 +40,70 @@ import {
   TableRow,
   TableCell
 } from '@/components/ui/table'
-import { useLogList } from '@/hooks/log/useLogList'
+import { useImportOrderList } from '@/hooks/order/import/useGetImportOrderList'
+import { useDialog } from '@/hooks/useDialog'
 
-import LogsDataLoading from './logs-data-loading'
+// import AddOrderForm from './add-order-form'
+import ImportDataLoading from './import-data-loading'
 
-const LogsData = dynamic(() => import('./logs-data'), {
+const ImportData = dynamic(() => import('./import-data'), {
   ssr: false,
-  loading: () => <LogsDataLoading />
+  loading: () => <ImportDataLoading />
 })
 
-export default function LogsTable() {
+export default function ImportTable() {
   const { reset } = useQueryErrorResetBoundary()
+  const { closeDialog, dialogsOpen, setDialogsOpen } = useDialog({
+    add: false
+  })
+
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 5
   })
-  const [searchTerm, setSearchTerm] = useState('')
   const [totalPages, setTotalPages] = useState<number>(0)
   const [totalElements, setTotalElements] = useState<number>(0)
   const [data, setData] = useState<any[]>([])
 
-  const { data: logData } = useLogList(
+  const { data: orderData } = useImportOrderList(
     pagination.pageIndex,
     pagination.pageSize
   )
 
-  // console.log(logData)
-
   useEffect(() => {
-    if (logData?.logVMs) {
-      setData(logData.logVMs)
-      setTotalElements(logData.page?.totalElements ?? 0)
-      setTotalPages(logData.page?.totalPages ?? 0)
-
-      // console.log('Log Data:', {
-      //   totalElements: logData.page?.totalElements,
-      //   totalPages: logData.page?.totalPages,
-      //   currentPage: pagination.pageIndex + 1,
-      //   pageSize: pagination.pageSize,
-      //   dataLength: logData.logVMs.length
-      // })
+    if (orderData?.orders) {
+      setData(orderData.orders)
+      setTotalElements(orderData.page?.totalElements ?? 0)
+      setTotalPages(orderData.page?.totalPages ?? 0)
     }
-  }, [logData])
+  }, [orderData])
 
   const table = useReactTable({
     data,
     columns: [
       {
-        accessorKey: 'date',
-        header: 'Date'
-      },
-      {
-        accessorKey: 'logLevel',
-        header: 'Level'
-      },
-      {
-        accessorKey: 'message',
-        header: 'Message'
-      },
-      {
-        accessorKey: 'hour',
-        header: 'Hour'
+        accessorKey: 'orderId',
+        header: 'Order ID'
       },
       {
         accessorKey: 'type',
         header: 'Type'
+      },
+      {
+        accessorKey: 'date',
+        header: 'Date'
+      },
+      {
+        accessorKey: 'totalPrice',
+        header: 'Total Price'
+      },
+      {
+        accessorKey: 'orderDetailsCount',
+        header: 'Details Count'
+      },
+      {
+        accessorKey: 'totalQuantity',
+        header: 'Total Quantity'
       }
     ],
     getCoreRowModel: getCoreRowModel(),
@@ -109,27 +116,35 @@ export default function LogsTable() {
     pageCount: totalPages
   })
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value)
-  }
-
   return (
     <section className="w-full mt-[1.5rem]">
       <div className="flex items-center justify-between w-full mb-[.85rem]">
         <div className="flex items-center gap-4">
           <div className="relative">
             <Input
-              placeholder="Search logs..."
+              placeholder="Search order by ID..."
               className="min-w-[20rem]"
-              value={searchTerm}
-              onChange={handleSearch}
             />
-            {/* {isSearching && (
-              <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                <Loader color="#fff" size="1.15rem" />
-              </div>
-            )} */}
           </div>
+        </div>
+        <div>
+          <Dialog open={dialogsOpen.add} onOpenChange={(open) => setDialogsOpen(prev => ({ ...prev, add: open }))}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="bg-black text-white hover:bg-black hover:text-white dark:bg-primary/10 dark:text-primary">
+                <CirclePlus className="mr-2 h-4 w-4" />
+                <span>Add Order</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-[30rem]">
+              <DialogHeader>
+                <DialogTitle>Add Import Order</DialogTitle>
+                <DialogDescription>
+                  Fill in the required details to create a new import order.
+                </DialogDescription>
+              </DialogHeader>
+              {/* <AddOrderForm onClose={() => closeDialog('add')} /> */}
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
       <div className="rounded-md border">
@@ -137,7 +152,65 @@ export default function LogsTable() {
           <TableHeader>
             <TableRow>
               <TableHead>
-                <div className="flex items-center justify-center gap-2">
+                <div className="flex justify-center items-center gap-2">
+                  Order ID
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <ArrowUpDown className="h-4 w-4 cursor-pointer" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="min-w-[10rem]">
+                      <DropdownMenuLabel>
+                        Sort by
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727] mb-2" />
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem>
+                          <ArrowUpAZ className="mr-2 h-4 w-4" />
+                          <span>Ascending</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <ArrowDownAZ className="mr-2 h-4 w-4" />
+                          <span>Descending</span>
+                        </DropdownMenuItem>
+                        {/* <DropdownMenuItem>
+                          <Input placeholder="Search..." className="w-full" />
+                        </DropdownMenuItem> */}
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </TableHead>
+              <TableHead>
+                <div className="flex justify-center items-center gap-2">
+                  Type
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <ArrowUpDown className="h-4 w-4 cursor-pointer" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="min-w-[10rem]">
+                      <DropdownMenuLabel>
+                        Sort by
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727] mb-2" />
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem>
+                          <ArrowUpAZ className="mr-2 h-4 w-4" />
+                          <span>Ascending</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <ArrowDownAZ className="mr-2 h-4 w-4" />
+                          <span>Descending</span>
+                        </DropdownMenuItem>
+                        {/* <DropdownMenuItem>
+                          <Input placeholder="Search..." className="w-full" />
+                        </DropdownMenuItem> */}
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </TableHead>
+              <TableHead>
+                <div className="flex justify-center items-center gap-2">
                   Date
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -166,8 +239,8 @@ export default function LogsTable() {
                 </div>
               </TableHead>
               <TableHead>
-                <div className="flex items-center justify-center gap-2">
-                  Level
+                <div className="flex justify-center items-center gap-2">
+                  Total Price
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <ArrowUpDown className="h-4 w-4 cursor-pointer" />
@@ -195,8 +268,8 @@ export default function LogsTable() {
                 </div>
               </TableHead>
               <TableHead>
-                <div className="flex items-center justify-center gap-2">
-                  Message
+                <div className="flex justify-center items-center gap-2">
+                  Details Count
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <ArrowUpDown className="h-4 w-4 cursor-pointer" />
@@ -224,8 +297,8 @@ export default function LogsTable() {
                 </div>
               </TableHead>
               <TableHead>
-                <div className="flex items-center justify-center gap-2">
-                  Hour
+                <div className="flex justify-center items-center gap-2">
+                  Total Quantity
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <ArrowUpDown className="h-4 w-4 cursor-pointer" />
@@ -252,35 +325,7 @@ export default function LogsTable() {
                   </DropdownMenu>
                 </div>
               </TableHead>
-              <TableHead>
-                <div className="flex items-center justify-center gap-2">
-                  Type
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <ArrowUpDown className="h-4 w-4 cursor-pointer" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="min-w-[10rem]">
-                      <DropdownMenuLabel>
-                        Sort by
-                      </DropdownMenuLabel>
-                      <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727] mb-2" />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                          <ArrowUpAZ className="mr-2 h-4 w-4" />
-                          <span>Ascending</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <ArrowDownAZ className="mr-2 h-4 w-4" />
-                          <span>Descending</span>
-                        </DropdownMenuItem>
-                        {/* <DropdownMenuItem>
-                          <Input placeholder="Search..." className="w-full" />
-                        </DropdownMenuItem> */}
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </TableHead>
+              <TableHead className="text-center">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -288,9 +333,9 @@ export default function LogsTable() {
               onReset={reset}
               fallbackRender={({ resetErrorBoundary }) => (
                 <TableRow>
-                  <TableCell colSpan={5} className="h-24 text-center">
+                  <TableCell colSpan={6} className="h-24 text-center">
                     <div className="flex flex-col items-center gap-2">
-                      <span>There was an error loading the logs.</span>
+                      <span>There was an error loading the import orders.</span>
                       <Button
                         onClick={() => resetErrorBoundary()}
                         variant="outline"
@@ -303,7 +348,7 @@ export default function LogsTable() {
                 </TableRow>
               )}
             >
-              <LogsData
+              <ImportData
                 data={data}
                 table={table}
               />
@@ -312,7 +357,7 @@ export default function LogsTable() {
         </Table>
       </div>
       <DashboardTablePagination
-        itemName="log"
+        itemName="order"
         table={table}
         totalElements={totalElements}
         totalPages={totalPages}

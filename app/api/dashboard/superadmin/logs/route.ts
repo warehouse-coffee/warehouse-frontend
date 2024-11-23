@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+import { LOG_TYPES } from '@/constants'
 import { cookieStore, tokenUtils } from '@/lib/auth'
 
 import { GetLogListQuery, Page, LogsClient } from '../../../web-api-client'
@@ -18,13 +19,20 @@ export async function GET(request: NextRequest) {
 
     const client = new LogsClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token)
 
-    const page = new Page({
+    const pageData = new Page({
       pageNumber: pageNumber,
       size: size
     })
 
+    const date = new Date()
+    const typeLog = LOG_TYPES.INFO
+    const hour = date.getHours()
+
     const query = new GetLogListQuery({
-      page: page
+      page: pageData,
+      date: date,
+      typeLog: typeLog,
+      hour: hour
     })
 
     const result = await client.getLogs(query)

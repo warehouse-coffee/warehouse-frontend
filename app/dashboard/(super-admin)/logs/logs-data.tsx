@@ -2,22 +2,22 @@ import React from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { TableCell, TableRow } from '@/components/ui/table'
+import { LOG_TYPES } from '@/constants'
 import { formatDate } from '@/lib/utils'
 import { Log, LogLevel } from '@/types'
-
 interface LogsDataProps {
   data: Log[]
   table: any
 }
 
 const LOG_LEVEL_STYLES: Record<LogLevel, { className: string }> = {
-  INFO: {
+  [LOG_TYPES.INFO]: {
     className: 'dark:bg-primary/10 dark:text-primary'
   },
-  WARNING: {
+  [LOG_TYPES.WARNING]: {
     className: 'dark:bg-yellow-500/30 dark:text-yellow-500'
   },
-  ERROR: {
+  [LOG_TYPES.ERROR]: {
     className: 'dark:bg-destructive/30 dark:text-red-500'
   }
 } as const

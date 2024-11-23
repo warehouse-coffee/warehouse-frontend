@@ -26,7 +26,6 @@ export async function GET(request: NextRequest) {
 
     const query = new GetUserListQuery({
       page: page
-      // searchText: searchText || ''
     })
 
     const response = await client.getAllUsers(query)

@@ -7,6 +7,8 @@ import {
   BreadcrumbSeparator
 } from '@/components/ui/breadcrumb'
 
+import ImportTable from './import-table'
+
 export default function ImportOrdersPage() {
   return (
     <>
@@ -33,6 +35,7 @@ export default function ImportOrdersPage() {
           </p>
         </div>
       </div>
+      <ImportTable />
     </>
   )
 }

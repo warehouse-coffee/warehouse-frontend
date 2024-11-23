@@ -19,7 +19,10 @@ export const API_ENDPOINTS = {
   DELETE_EMPLOYEE: '/api/dashboard/admin/employees/delete',
   GET_STORAGE_OF_USER: '/api/dashboard/admin/storages/listOfUser',
   CREATE_STORAGE: '/api/dashboard/admin/storages/create',
-  GET_STORAGE_OF_USER_DETAIL: '/api/dashboard/employee/listOfUser'
+  GET_STORAGE_OF_USER_DETAIL: '/api/dashboard/employee/listOfUser',
+  GET_IMPORT_ORDERS: '/api/dashboard/employee/orders/import/list',
+  CREATE_IMPORT_ORDER: '/api/dashboard/employee/orders/import/create',
+  DELETE_IMPORT_ORDER: '/api/dashboard/employee/orders/import/delete'
 } as const
 
 export type ApiEndpoint = typeof API_ENDPOINTS[keyof typeof API_ENDPOINTS]

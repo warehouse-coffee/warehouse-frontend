@@ -43,3 +43,10 @@ export const getAvailableRoles = () => {
   const { SUPER_ADMIN, ...otherRoles } = ROLE_NAMES
   return Object.values(otherRoles)
 }
+
+export const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD'
+  }).format(amount)
+}
