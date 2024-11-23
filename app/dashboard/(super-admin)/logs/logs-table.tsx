@@ -14,6 +14,7 @@ import { ErrorBoundary } from 'react-error-boundary'
 
 import DashboardTablePagination from '@/components/dashboard/dashboard-table-pagination'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,7 +36,6 @@ import {
 import { useLogList } from '@/hooks/log/useLogList'
 
 import LogsDataLoading from './logs-data-loading'
-import { Checkbox } from '@/components/ui/checkbox'
 
 const LogsData = dynamic(() => import('./logs-data'), {
   ssr: false,
