@@ -11,6 +11,6 @@ export const loginSchema = z.object({
 
 export const settingsFormSchema = z.object({
   aiServiceKey: z.string().min(1, 'AI Service Key is required'),
-  emailServiceKey: z.string().min(1, 'Email Service Key is required'), 
+  emailServiceKey: z.string().min(1, 'Email Service Key is required'),
   aiDriverServer: z.string().min(1, 'AI Driver Server URL is required').url('Must be a valid URL')
 })

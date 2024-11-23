@@ -1,8 +1,6 @@
 'use client'
 
 import { Suspense, useState } from 'react'
-import { StorageTable } from './storage-table'
-import { UpdateStorage } from './update-storage'
 
 interface Storage {
   id: number
@@ -28,21 +26,21 @@ const initialData = {
   storages: [
     {
       id: 1,
-      name: "manufacturing A",
+      name: 'manufacturing A',
       address: null as string | null,
-      status: "Active"
+      status: 'Active'
     },
     {
       id: 2,
-      name: "manufacturing B",
+      name: 'manufacturing B',
       address: null,
-      status: "Active"
+      status: 'Active'
     },
     {
       id: 3,
-      name: "manufacturing C",
+      name: 'manufacturing C',
       address: null,
-      status: "Active"
+      status: 'Active'
     }
   ],
   page: {
@@ -50,7 +48,7 @@ const initialData = {
     pageNumber: 1,
     totalElements: 3,
     totalPages: 1,
-    sortBy: "id",
+    sortBy: 'id',
     sortAsc: true
   }
 }
@@ -64,11 +62,13 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from '@/components/ui/breadcrumb'
+import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { useDialog } from '@/hooks/useDialog'
 
+import { StorageTable } from './storage-table'
 import StoragesCreatePage from './storages-create'
-import { Button } from '@/components/ui/button'
+import { UpdateStorage } from './update-storage'
 
 export default function StoragesPage() {
   const { closeDialog, dialogsOpen, setDialogsOpen } = useDialog({
@@ -79,7 +79,6 @@ export default function StoragesPage() {
   const [deletingStorage, setDeletingStorage] = useState<Storage | null>(null)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-
 
   const handleSort = (column: string) => {
     // In a real application, you would fetch sorted data from the backend
@@ -116,7 +115,7 @@ export default function StoragesPage() {
     // In a real application, you would send the update to the backend
     setData(prevData => ({
       ...prevData,
-      storages: prevData.storages.map(storage => 
+      storages: prevData.storages.map(storage =>
         storage.id === updatedStorage.id ? updatedStorage : storage
       )
     }))
@@ -169,26 +168,26 @@ export default function StoragesPage() {
       </div>
     </div>
     <StorageTable
-        storages={data.storages}
-        page={data.page}
-        onSort={handleSort}
-        onPageChange={handlePageChange}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
-       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Update Storage</DialogTitle>
-          </DialogHeader>
-          {editingStorage && (
-            <UpdateStorage
-              storage={editingStorage}
-              onUpdate={handleUpdate}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      storages={data.storages}
+      page={data.page}
+      onSort={handleSort}
+      onPageChange={handlePageChange}
+      onEdit={handleEdit}
+      onDelete={handleDelete}
+    />
+    <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Update Storage</DialogTitle>
+        </DialogHeader>
+        {editingStorage && (
+          <UpdateStorage
+            storage={editingStorage}
+            onUpdate={handleUpdate}
+          />
+        )}
+      </DialogContent>
+    </Dialog>
     <Dialog open={dialogsOpen.add} onOpenChange={(open) => setDialogsOpen(prev => ({ ...prev, add: open }))}>
       <DialogTrigger asChild>
         <button className="hidden"></button>
@@ -207,23 +206,23 @@ export default function StoragesPage() {
       </DialogContent>
     </Dialog>
     <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirm Deletion</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete the storage "{deletingStorage?.name}"? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Confirm Deletion</DialogTitle>
+          <DialogDescription>
+              Are you sure you want to delete the storage &quot;{deletingStorage?.name}&quot;? This action cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
               Cancel
-            </Button>
-            <Button variant="destructive" onClick={confirmDelete}>
+          </Button>
+          <Button variant="destructive" onClick={confirmDelete}>
               Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
     </>
   )
 }

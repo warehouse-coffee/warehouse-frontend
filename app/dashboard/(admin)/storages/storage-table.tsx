@@ -1,7 +1,6 @@
-'use client'
-
-import { useState } from 'react'
 import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Pencil, Trash2 } from 'lucide-react'
+import { useState } from 'react'
+
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -9,7 +8,7 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 } from '@/components/ui/table'
 
 interface Storage {
