@@ -1,6 +1,59 @@
 'use client'
 
-import { Suspense } from 'react'
+import { Suspense, useState } from 'react'
+import { StorageTable } from './storage-table'
+import { UpdateStorage } from './update-storage'
+
+interface Storage {
+  id: number
+  name: string
+  address: string | null
+  status: string
+}
+
+interface PageInfo {
+  size: number
+  pageNumber: number
+  totalElements: number
+  totalPages: number
+  sortBy: string
+  sortAsc: boolean
+}
+
+interface Data {
+  storages: Storage[]
+  page: PageInfo
+}
+const initialData = {
+  storages: [
+    {
+      id: 1,
+      name: "manufacturing A",
+      address: null as string | null,
+      status: "Active"
+    },
+    {
+      id: 2,
+      name: "manufacturing B",
+      address: null,
+      status: "Active"
+    },
+    {
+      id: 3,
+      name: "manufacturing C",
+      address: null,
+      status: "Active"
+    }
+  ],
+  page: {
+    size: 5,
+    pageNumber: 1,
+    totalElements: 3,
+    totalPages: 1,
+    sortBy: "id",
+    sortAsc: true
+  }
+}
 
 import DashboardFetchLoader from '@/components/dashboard/dashboard-fetch-loader'
 import {
@@ -11,15 +64,85 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from '@/components/ui/breadcrumb'
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { useDialog } from '@/hooks/useDialog'
 
 import StoragesCreatePage from './storages-create'
+import { Button } from '@/components/ui/button'
 
 export default function StoragesPage() {
   const { closeDialog, dialogsOpen, setDialogsOpen } = useDialog({
     add: false
   })
+  const [data, setData] = useState<Data>(initialData)
+  const [editingStorage, setEditingStorage] = useState<Storage | null>(null)
+  const [deletingStorage, setDeletingStorage] = useState<Storage | null>(null)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+
+
+  const handleSort = (column: string) => {
+    // In a real application, you would fetch sorted data from the backend
+    setData(prevData => ({
+      ...prevData,
+      page: {
+        ...prevData.page,
+        sortBy: column,
+        sortAsc: prevData.page.sortBy === column ? !prevData.page.sortAsc : true
+      }
+    }))
+  }
+
+  const handlePageChange = (pageNumber: number) => {
+    // In a real application, you would fetch the new page from the backend
+    setData(prevData => ({
+      ...prevData,
+      page: {
+        ...prevData.page,
+        pageNumber
+      }
+    }))
+  }
+
+  const handleEdit = (id: number) => {
+    const storageToEdit = data.storages.find(storage => storage.id === id)
+    if (storageToEdit) {
+      setEditingStorage(storageToEdit)
+      setDialogsOpen(prev => ({ ...prev, add: true }))
+    }
+  }
+
+  const handleUpdate = (updatedStorage: Storage) => {
+    // In a real application, you would send the update to the backend
+    setData(prevData => ({
+      ...prevData,
+      storages: prevData.storages.map(storage => 
+        storage.id === updatedStorage.id ? updatedStorage : storage
+      )
+    }))
+    setDialogsOpen(prev => ({ ...prev, add: false }))
+  }
+
+  const handleDelete = (id: number) => {
+    const storageToDelete = data.storages.find(storage => storage.id === id)
+    if (storageToDelete) {
+      setDeletingStorage(storageToDelete)
+      setIsDeleteDialogOpen(true)
+    }
+  }
+
+  const confirmDelete = () => {
+    if (deletingStorage) {
+      // In a real application, you would send the delete request to the backend
+      setData(prevData => ({
+        ...prevData,
+        storages: prevData.storages.filter(storage => storage.id !== deletingStorage.id)
+      }))
+      setIsDeleteDialogOpen(false)
+      setDeletingStorage(null)
+    }
+  }
+
   return (
     <> <Breadcrumb>
       <BreadcrumbList>
@@ -45,8 +168,28 @@ export default function StoragesPage() {
         </button>
       </div>
     </div>
-
-    <Dialog open={dialogsOpen.add ?? false} onOpenChange={(open) => setDialogsOpen(prev => ({ ...prev, add: open }))}>
+    <StorageTable
+        storages={data.storages}
+        page={data.page}
+        onSort={handleSort}
+        onPageChange={handlePageChange}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
+       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Update Storage</DialogTitle>
+          </DialogHeader>
+          {editingStorage && (
+            <UpdateStorage
+              storage={editingStorage}
+              onUpdate={handleUpdate}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+    <Dialog open={dialogsOpen.add} onOpenChange={(open) => setDialogsOpen(prev => ({ ...prev, add: open }))}>
       <DialogTrigger asChild>
         <button className="hidden"></button>
       </DialogTrigger>
@@ -63,6 +206,24 @@ export default function StoragesPage() {
         </Suspense>
       </DialogContent>
     </Dialog>
+    <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete the storage "{deletingStorage?.name}"? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }
