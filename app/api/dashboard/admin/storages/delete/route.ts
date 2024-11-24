@@ -4,20 +4,23 @@ import { cookieStore, tokenUtils } from '@/lib/auth'
 
 import { StorageClient } from '../../../../web-api-client'
 
-export async function POST(request: NextRequest) {
+export async function DELETE(request: NextRequest) {
   const token = cookieStore.get('auth_token')
   if (!token || !tokenUtils.isValid(token)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
   try {
-    const client = new StorageClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token)
-    const data = await request.json()
-    const result = await client.createStorage(data)
-    return NextResponse.json(result)
-  } catch (error) {
-    if (error instanceof Error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+    if (!id) {
+      return NextResponse.json({ error: 'Employee ID is required' }, { status: 400 })
     }
-    return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 })
+    const client = new StorageClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token)
+    const result = await client.deleteStorage(Number(id))
+    return NextResponse.json(result)
+  } catch (error: any) {
+    const errorMessage = error.message || 'Failed to delete employee'
+    return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
 }

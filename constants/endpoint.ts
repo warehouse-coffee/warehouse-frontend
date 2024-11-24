@@ -1,3 +1,4 @@
+
 export const API_ENDPOINTS = {
   CREATE_USER: '/api/dashboard/superadmin/users/create',
   UPDATE_USER: '/api/dashboard/superadmin/users/update',
@@ -23,7 +24,9 @@ export const API_ENDPOINTS = {
   GET_IMPORT_ORDERS: '/api/dashboard/employee/orders/import/list',
   CREATE_IMPORT_ORDER: '/api/dashboard/employee/orders/import/create',
   DELETE_IMPORT_ORDER: '/api/dashboard/employee/orders/import/delete',
-  GET_REPORT_STORAGE: '/api/dashboard/admin/reports'
+  GET_REPORT_STORAGE: '/api/dashboard/admin/reports',
+  PUT_STORAGE: '/api/dashboard/admin/storages/update',
+  DELETE_STORAGE: '/api/dashboard/admin/storages/delete'
 } as const
 
 export type ApiEndpoint = typeof API_ENDPOINTS[keyof typeof API_ENDPOINTS]

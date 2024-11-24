@@ -53,8 +53,8 @@ import { WarehouseStatistics } from './warehouse-statistics'
 
 export default function ReportStorages() {
   // using UTC date to avoid timezone issues
-  const [startDate, endDate] = [new Date(Date.UTC(2023, 0, 1)), new Date(Date.UTC(2023, 11, 31))]
-
+  const [startDate, setStartDate] = useState<Date>(new Date(Date.UTC(2023, 0, 1)))
+  const [endDate, setEndDate] = useState<Date>(new Date(Date.UTC(2025, 0, 31)))
   const { data }: { data: ReportVM } = useReportStorage(
     startDate,
     endDate
@@ -73,8 +73,20 @@ export default function ReportStorages() {
   }, [data])
 
   const [month, setMonth] = useState<string>('1')
-  const [year, setYear] = useState<string>('2023')
-
+  const [year, setYear] = useState<string>('2024')
+  // update StartDate and EndDate based on selected month and year
+  useEffect(() => {
+    const newStartDate = new Date(Date.UTC(parseInt(year), parseInt(month), 1))
+    // set last day of the month
+    const lastDay = month === '2' ? 28 : 30
+    const newEndDate = new Date(Date.UTC(parseInt(year), parseInt(month), lastDay))
+    setStartDate(newStartDate)
+    setEndDate(newEndDate)
+  }, [month])
+  useEffect(() => {
+    const newEndDate = new Date(Date.UTC(parseInt(year), parseInt(month), 1))
+    setEndDate(newEndDate)
+  }, [year])
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value)
   }
