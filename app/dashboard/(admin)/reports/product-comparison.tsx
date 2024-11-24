@@ -1,3 +1,4 @@
+import { ProductPerformance } from '@/app/api/web-api-client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import {
@@ -7,19 +8,11 @@ import {
   TooltipTrigger
 } from '@/components/ui/tooltip'
 
-interface Product {
-  storageId: number
-  productName: string
-  totalSold: number
-  averageStorageTime: string
-}
-
 interface ProductComparisonProps {
-  topProducts: Product[]
-  slowMovingProducts: Product[]
+  topProducts: ProductPerformance[];
+  slowMovingProducts: ProductPerformance[];
 }
-
-export function ProductComparison({ topProducts = [], slowMovingProducts = [] }: ProductComparisonProps) {
+export function ProductComparison({ topProducts, slowMovingProducts }: ProductComparisonProps) {
   const formatNumber = (value: number | string) => {
     return new Intl.NumberFormat('en-US', { maximumFractionDigits: 4 }).format(Number(value))
   }
@@ -28,7 +21,7 @@ export function ProductComparison({ topProducts = [], slowMovingProducts = [] }:
     return value.length > maxLength ? value.slice(0, 4) + '...' : value
   }
 
-  const renderProductTable = (products: Product[], title: string) => (
+  const renderProductTable = (products: ProductPerformance[], title: string) => (
     <Card>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
@@ -53,11 +46,11 @@ export function ProductComparison({ topProducts = [], slowMovingProducts = [] }:
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <TableCell className="text-right">
-                          {truncateValue(formatNumber(item.totalSold))}
+                          {truncateValue(formatNumber(item.totalSold ?? 0))}
                         </TableCell>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>{formatNumber(item.totalSold)}</p>
+                        <p>{formatNumber(item.totalSold ?? 0)}</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -65,12 +58,12 @@ export function ProductComparison({ topProducts = [], slowMovingProducts = [] }:
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <TableCell className="text-right">
-                          {truncateValue(formatNumber(item.averageStorageTime))}
+                          {truncateValue(formatNumber(item.averageStorageTime ?? 0))}
                         </TableCell>
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>{formatNumber(
-                          item.averageStorageTime)}</p>
+                          item.averageStorageTime ?? 0)}</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>

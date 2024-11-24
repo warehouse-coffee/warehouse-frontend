@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
+import { ReportVM, WarehousePerformance, ImportSummary, ProductPerformance } from '@/app/api/web-api-client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Select,
@@ -17,40 +18,60 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip'
+import { useReportStorage } from '@/hooks/report'
 
 import { ImportStatistics } from './import-statistics'
 import { ProductComparison } from './product-comparison'
 import { WarehouseStatistics } from './warehouse-statistics'
 
-// Updated sample data with longer numbers
-const sampleData = {
-  warehouseStatistics: Array(10).fill(null).map((_, index) => ({
-    id: index + 1,
-    warehouseName: `Warehouse ${String.fromCharCode(65 + index)}`,
-    revenue: (Math.random() * 20000000 - 10000000).toFixed(4)
-  })),
-  importStatistics: Array(10).fill(null).map((_, index) => ({
-    supplierName: `Supplier ${index + 1}`,
-    totalImportCost: (Math.random() * 10000000 + 5000000).toFixed(2)
-  })),
-  topProducts: Array(10).fill(null).map((_, index) => ({
-    storageId: Math.floor(Math.random() * 5) + 1,
-    productName: `Product ${index + 1}`,
-    totalSold: Math.floor(Math.random() * 1000000),
-    averageStorageTime: (Math.random() * 1000).toFixed(4)
-  })),
-  slowMovingProducts: Array(10).fill(null).map((_, index) => ({
-    storageId: Math.floor(Math.random() * 5) + 1,
-    productName: `Slow Product ${index + 1}`,
-    totalSold: Math.floor(Math.random() * 1000),
-    averageStorageTime: (Math.random() * 10000).toFixed(4)
-  })),
-  totalRevenue: 15000000.75,
-  totalImportCost: 8500000.50,
-  totalOrders: 2500000
-}
+// const sampleData = {
+//   warehouseStatistics: Array(10).fill(null).map((_, index) => ({
+//     id: index + 1,
+//     warehouseName: `Warehouse ${String.fromCharCode(65 + index)}`,
+//     revenue: (Math.random() * 20000000 - 10000000).toFixed(4)
+//   })),
+//   importStatistics: Array(10).fill(null).map((_, index) => ({
+//     supplierName: `Supplier ${index + 1}`,
+//     totalImportCost: (Math.random() * 10000000 + 5000000).toFixed(2)
+//   })),
+//   topProducts: Array(10).fill(null).map((_, index) => ({
+//     storageId: Math.floor(Math.random() * 5) + 1,
+//     productName: `Product ${index + 1}`,
+//     totalSold: Math.floor(Math.random() * 1000000),
+//     averageStorageTime: (Math.random() * 1000).toFixed(4)
+//   })),
+//   slowMovingProducts: Array(10).fill(null).map((_, index) => ({
+//     storageId: Math.floor(Math.random() * 5) + 1,
+//     productName: `Slow Product ${index + 1}`,
+//     totalSold: Math.floor(Math.random() * 1000),
+//     averageStorageTime: (Math.random() * 10000).toFixed(4)
+//   })),
+//   totalRevenue: 15000000.75,
+//   totalImportCost: 8500000.50,
+//   totalOrders: 2500000
+// }
 
 export default function ReportStorages() {
+  // using UTC date to avoid timezone issues
+  const [startDate, endDate] = [new Date(Date.UTC(2023, 0, 1)), new Date(Date.UTC(2023, 11, 31))]
+
+  const { data }: { data: ReportVM } = useReportStorage(
+    startDate,
+    endDate
+  )
+  const [warehouseStatistics, setWarehouseStatistics] = useState<WarehousePerformance[]>([])
+  const [importStatistics, setImportStatistics] = useState<ImportSummary[]>([])
+  const [topProducts, setTopProducts] = useState<ProductPerformance[]>([])
+  const [slowMovingProducts, setSlowMovingProducts] = useState<ProductPerformance[]>([])
+  useEffect(() => {
+    if (data) {
+      setWarehouseStatistics((data.warehouseStatistics ?? []))
+      setImportStatistics((data.importStatistics ?? []))
+      setTopProducts((data.topProducts ?? []))
+      setSlowMovingProducts((data.slowMovingProducts ?? []))
+    }
+  }, [data])
+
   const [month, setMonth] = useState<string>('1')
   const [year, setYear] = useState<string>('2023')
 
@@ -96,9 +117,9 @@ export default function ReportStorages() {
         <CardContent>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div className="grid grid-cols-3 gap-4">
-              {renderSummaryItem('Total Revenue', sampleData.totalRevenue)}
-              {renderSummaryItem('Total Import Cost', sampleData.totalImportCost)}
-              {renderSummaryItem('Total Orders', sampleData.totalOrders, false)}
+              {renderSummaryItem('Total Revenue', data.totalRevenue ?? 0)}
+              {renderSummaryItem('Total Import Cost', data.totalImportCost ?? 0)}
+              {renderSummaryItem('Total Orders', data.totalOrders ?? 0, false)}
             </div>
             <div className="flex flex-col sm:flex-row gap-4">
               <Select onValueChange={setMonth} defaultValue={month}>
@@ -137,13 +158,13 @@ export default function ReportStorages() {
           <TabsTrigger value="products">Product Comparison</TabsTrigger>
         </TabsList>
         <TabsContent value="warehouse">
-          <WarehouseStatistics data={sampleData.warehouseStatistics || []} />
+          <WarehouseStatistics {...warehouseStatistics} />
         </TabsContent>
         <TabsContent value="import">
-          <ImportStatistics data={sampleData.importStatistics || []} />
+          <ImportStatistics {...importStatistics} />
         </TabsContent>
         <TabsContent value="products">
-          <ProductComparison topProducts={sampleData.topProducts || []} slowMovingProducts={sampleData.slowMovingProducts || []} />
+          <ProductComparison topProducts={topProducts} slowMovingProducts={slowMovingProducts} />
         </TabsContent>
       </Tabs>
     </div>

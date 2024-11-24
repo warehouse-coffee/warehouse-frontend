@@ -1,3 +1,4 @@
+import { ImportSummary } from '@/app/api/web-api-client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import {
@@ -7,16 +8,7 @@ import {
   TooltipTrigger
 } from '@/components/ui/tooltip'
 
-interface ImportStatistic {
-  supplierName: string
-  totalImportCost: string
-}
-
-interface ImportStatisticsProps {
-  data: ImportStatistic[]
-}
-
-export function ImportStatistics({ data = [] }: ImportStatisticsProps) {
+export function ImportStatistics(data: ImportSummary[]) {
   const formatCurrency = (value: string) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(parseFloat(value))
   }
@@ -47,11 +39,11 @@ export function ImportStatistics({ data = [] }: ImportStatisticsProps) {
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <TableCell className="text-right">
-                          {truncateValue(formatCurrency(item.totalImportCost))}
+                          {truncateValue(formatCurrency(item.totalImportCost?.toString() || '0'))}
                         </TableCell>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>{formatCurrency(item.totalImportCost)}</p>
+                        <p>{formatCurrency(item.totalImportCost?.toString() || '0')}</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>

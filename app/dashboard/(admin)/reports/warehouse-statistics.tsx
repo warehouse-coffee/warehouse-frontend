@@ -1,3 +1,4 @@
+import { WarehousePerformance } from '@/app/api/web-api-client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import {
@@ -7,17 +8,7 @@ import {
   TooltipTrigger
 } from '@/components/ui/tooltip'
 
-interface WarehouseStatistic {
-  id: number
-  warehouseName: string
-  revenue: string
-}
-
-interface WarehouseStatisticsProps {
-  data: WarehouseStatistic[]
-}
-
-export function WarehouseStatistics({ data = [] }: WarehouseStatisticsProps) {
+export function WarehouseStatistics(data: WarehousePerformance[]) {
   const formatCurrency = (value: string) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(parseFloat(value))
   }
@@ -49,12 +40,12 @@ export function WarehouseStatistics({ data = [] }: WarehouseStatisticsProps) {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <TableCell className={`text-right ${parseFloat(item.revenue) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {truncateValue(formatCurrency(item.revenue))}
+                        <TableCell className={`text-right ${parseFloat(item.revenue?.toString() ?? '0') >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {truncateValue(formatCurrency(item.revenue?.toString() ?? '0'))}
                         </TableCell>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>{formatCurrency(item.revenue)}</p>
+                        <p>{formatCurrency(item.revenue?.toString() ?? '0')}</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
