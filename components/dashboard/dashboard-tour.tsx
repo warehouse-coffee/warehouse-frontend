@@ -7,13 +7,14 @@ import { useEffect } from 'react'
 import { ROLE_NAMES } from '@/constants'
 
 interface DashboardTourProps {
+  userId: string | null
   userRole: string | null
 }
 
-export const DashboardTour = ({ userRole }: DashboardTourProps) => {
+export const DashboardTour = ({ userId, userRole }: DashboardTourProps) => {
   useEffect(() => {
     const timer = setTimeout(() => {
-      const tourKey = `dashboard-tour-completed-${userRole}`
+      const tourKey = `dashboard-tour-completed-${userId}`
       const hasSeenTour = localStorage.getItem(tourKey)
 
       if (!hasSeenTour) {
@@ -195,7 +196,7 @@ export const DashboardTour = ({ userRole }: DashboardTourProps) => {
     }, 1000)
 
     return () => clearTimeout(timer)
-  }, [userRole])
+  }, [userId, userRole])
 
   return null
 }

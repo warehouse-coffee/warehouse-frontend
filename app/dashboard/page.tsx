@@ -6,7 +6,7 @@ import { DashboardPieChart } from '@/components/dashboard/dashboard-pie-chart'
 import { DashboardTour } from '@/components/dashboard/dashboard-tour'
 import { DashboardTrendingChart } from '@/components/dashboard/dashboard-trending-chart'
 import { ROLE_NAMES } from '@/constants'
-import { getUserRole } from '@/lib/auth'
+import { cookieStore, tokenUtils } from '@/lib/auth'
 
 import { TopOrders } from './top-orders'
 
@@ -18,11 +18,12 @@ export const metadata: Metadata = {
 }
 
 export default async function DashboardPage() {
-  const userRole = await getUserRole()
+  const userRole = tokenUtils.getUserInfo(cookieStore.get('auth_token')!)?.role
+  const userId = tokenUtils.getUserInfo(cookieStore.get('auth_token')!)?.userId
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <DashboardTour userRole={userRole!} />
+      <DashboardTour userId={userId!} userRole={userRole!} />
 
       <DashboardCards id="dashboard-cards" userRole={userRole!} />
 

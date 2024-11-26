@@ -41,13 +41,3 @@ export const tokenUtils = {
     }
   }
 }
-
-export const getUserRole = async () => {
-  const token = cookieStore.get('auth_token')
-
-  if (!token || !tokenUtils.isValid(token)) {
-    return null
-  }
-
-  return tokenUtils.getUserInfo(token)?.role
-}
