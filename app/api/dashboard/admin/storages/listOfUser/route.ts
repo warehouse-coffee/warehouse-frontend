@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { cookieStore, tokenUtils } from '@/lib/auth'
 
-import { StorageClient, Page } from '../../../../web-api-client'
+import { StorageClient, Page, GetStorageOfUserQuery } from '../../../../web-api-client'
 export async function GET(request: NextRequest) {
   const token = cookieStore.get('auth_token')
   if (!token || !tokenUtils.isValid(token)) {
@@ -17,7 +17,8 @@ export async function GET(request: NextRequest) {
       pageNumber: pageNumber,
       size: size
     })
-    const result = await client.getStorageOfUser(page)
+    const query = new GetStorageOfUserQuery({ page: page })
+    const result = await client.getStorageOfUser(query)
     return NextResponse.json(result)
   } catch (error) {
     if (error instanceof Error) {
