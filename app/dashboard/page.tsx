@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import React from 'react'
 
 import { DashboardCards } from '@/components/dashboard/dashboard-cards'
@@ -8,6 +9,13 @@ import { ROLE_NAMES } from '@/constants'
 import { getUserRole } from '@/lib/auth'
 
 import { TopOrders } from './top-orders'
+
+export const metadata: Metadata = {
+  title: 'Dashboard',
+  icons: {
+    icon: '/icon.png'
+  }
+}
 
 export default async function DashboardPage() {
   const userRole = await getUserRole()

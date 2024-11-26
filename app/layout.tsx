@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import { Metadata } from 'next'
 import React from 'react'
 
 import Providers from '@/app/providers'
@@ -9,7 +9,10 @@ import { cn } from '@/lib/utils'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Coffee Today',
+  title: {
+    template: 'Coffee Today | %s',
+    default: 'Coffee Today.'
+  },
   description: 'Coffee Today home page'
 }
 
