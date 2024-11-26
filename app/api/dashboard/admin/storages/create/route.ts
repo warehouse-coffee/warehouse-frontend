@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { cookieStore, tokenUtils } from '@/lib/auth'
 
-import { StorageClient, Page } from '../../../../web-api-client'
+import { StorageClient } from '../../../../web-api-client'
 
 export async function POST(request: NextRequest) {
   const token = cookieStore.get('auth_token')
@@ -16,7 +16,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result)
   } catch (error) {
     if (error instanceof Error) {
-      console.error(error.message)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
     return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 })

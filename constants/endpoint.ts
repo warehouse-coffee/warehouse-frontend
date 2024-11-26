@@ -1,3 +1,4 @@
+
 export const API_ENDPOINTS = {
   CREATE_USER: '/api/dashboard/superadmin/users/create',
   UPDATE_USER: '/api/dashboard/superadmin/users/update',
@@ -10,6 +11,7 @@ export const API_ENDPOINTS = {
   CREATE_CONFIG: '/api/dashboard/superadmin/settings/create',
   GET_ALL_SUPER_ADMIN_STATS: '/api/dashboard/superadmin/stats',
   GET_ALL_ADMIN_STATS: '/api/dashboard/admin/stats',
+  GET_ALL_EMPLOYEE_STATS: '/api/dashboard/employee/stats',
   GET_COFFEE_PRICE_PREDICT_GRAPH: '/api/dashboard/admin/charts',
   GET_ALL_EMPLOYEES: '/api/dashboard/admin/employees/list',
   GET_EMPLOYEE_DETAIL: '/api/dashboard/admin/employees/detail',
@@ -17,7 +19,15 @@ export const API_ENDPOINTS = {
   UPDATE_EMPLOYEE: '/api/dashboard/admin/employees/update',
   DELETE_EMPLOYEE: '/api/dashboard/admin/employees/delete',
   GET_STORAGE_OF_USER: '/api/dashboard/admin/storages/listOfUser',
-  CREATE_STORAGE: '/api/dashboard/admin/storages/create'
+  CREATE_STORAGE: '/api/dashboard/admin/storages/create',
+  GET_STORAGE_OF_USER_DETAIL: '/api/dashboard/employee/listOfUser',
+  GET_IMPORT_ORDERS: '/api/dashboard/employee/orders/import/list',
+  CREATE_IMPORT_ORDER: '/api/dashboard/employee/orders/import/create',
+  DELETE_IMPORT_ORDER: '/api/dashboard/employee/orders/import/delete',
+  GET_REPORT_STORAGE: '/api/dashboard/admin/reports',
+  PUT_STORAGE: '/api/dashboard/admin/storages/update',
+  DELETE_STORAGE: '/api/dashboard/admin/storages/delete',
+  GET_TOP_ORDERS: '/api/dashboard/employee/orders/top5'
 } as const
 
 export type ApiEndpoint = typeof API_ENDPOINTS[keyof typeof API_ENDPOINTS]

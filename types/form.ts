@@ -15,5 +15,12 @@ export type CreateEmployeeInput = {
   warehouses?: number[] | undefined;
 }
 
+export type CreateImportOrderInput = {
+  orderNumber: string;
+  orderDate: string;
+  supplierId: string;
+}
+
 export type CreateUser = CreateUserInput
 export type CreateEmployee = CreateEmployeeInput
+export type CreateImportOrder = CreateImportOrderInput

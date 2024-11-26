@@ -1,12 +1,6 @@
-import type { Metadata } from 'next'
 import React from 'react'
 
 import { ThemeProvider } from '@/components/theme-provider'
-
-export const metadata: Metadata = {
-  title: 'Coffee Today | Login',
-  description: 'Coffee Today login page'
-}
 
 interface AuthLayoutProps {
   children: React.ReactNode

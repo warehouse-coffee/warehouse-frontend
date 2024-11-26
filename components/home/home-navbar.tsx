@@ -11,11 +11,11 @@ export default function HomeNavbar({ navItems }: { navItems: Navbar[] }) {
   const pathname = usePathname()
 
   return (
-    <nav className="w-full h-16 fixed top-[.5rem] z-[1000] flex items-center justify-between">
-      <div className="w-1/3 ml-[2rem]">
+    <nav className={`w-full fixed z-[1000] flex items-center justify-between ${pathname !== '/' ? 'border-b border-solid border-[#2c2c2c] bg-opacity-25 backdrop-filter backdrop-blur-[.6rem] top-0 h-20' : 'h-16 top-[.5rem]'}`}>
+      <div className="w-1/3 h-full flex items-center ml-[2rem]">
         <HyperText className='text-[1.75rem] uppercase font-bold font-sans' text='cofee td.' />
       </div>
-      <div className="w-1/3 flex justify-center">
+      <div className="w-1/3 h-full flex justify-center">
         <div className="flex items-center gap-6">
           {navItems.map(({ name, href }) => (
             <div key={href} className="relative group">
@@ -34,7 +34,7 @@ export default function HomeNavbar({ navItems }: { navItems: Navbar[] }) {
           ))}
         </div>
       </div>
-      <div className="w-1/3 flex justify-end mr-[1rem]">
+      <div className="w-1/3 h-full flex items-center justify-end mr-[1rem]">
         <Link href='/dashboard'>
           <button className="relative inline-flex w-[7.5rem] h-[2.75rem] outline-none overflow-hidden rounded-full p-[.08rem] focus:outline-none">
             <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#35B5FF_0%,#2E2E2E_50%,#35B5FF_100%)]" />

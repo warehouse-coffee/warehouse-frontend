@@ -1270,6 +1270,46 @@ export class InventoriesClient {
         }
         return Promise.resolve<ResponseDto>(null as any);
     }
+
+    getInventoriesByStorage(query: GetInventoriesByStorageQuery): Promise<InventoryListVM> {
+        let url_ = this.baseUrl + "/api/Inventories/storageId";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(query);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetInventoriesByStorage(_response);
+        });
+    }
+
+    protected processGetInventoriesByStorage(response: Response): Promise<InventoryListVM> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = InventoryListVM.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<InventoryListVM>(null as any);
+    }
 }
 
 export class InventoriesOutboundClient {
@@ -1649,6 +1689,122 @@ export class OrdersClient {
         }
         return Promise.resolve<ResponseDto>(null as any);
     }
+
+    getTopOrder(): Promise<SaleAndImportOrderVM> {
+        let url_ = this.baseUrl + "/api/Orders/top5";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetTopOrder(_response);
+        });
+    }
+
+    protected processGetTopOrder(response: Response): Promise<SaleAndImportOrderVM> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SaleAndImportOrderVM.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<SaleAndImportOrderVM>(null as any);
+    }
+
+    getImportOrderList(query: GetImportOrderListQuery): Promise<OrderListVM> {
+        let url_ = this.baseUrl + "/api/Orders/getimport";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(query);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetImportOrderList(_response);
+        });
+    }
+
+    protected processGetImportOrderList(response: Response): Promise<OrderListVM> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = OrderListVM.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<OrderListVM>(null as any);
+    }
+
+    getSaleOrderList(query: GetSaleOrderListQuery): Promise<OrderListVM> {
+        let url_ = this.baseUrl + "/api/Orders/getsale";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(query);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetSaleOrderList(_response);
+        });
+    }
+
+    protected processGetSaleOrderList(response: Response): Promise<OrderListVM> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = OrderListVM.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<OrderListVM>(null as any);
+    }
 }
 
 export class ProductsClient {
@@ -1665,13 +1821,17 @@ export class ProductsClient {
         this.XSRF = XSRF || "";
     }
 
-    getProductList(): Promise<ProductListVM> {
+    getProductList(query: GetProductListQuery): Promise<ProductListVM> {
         let url_ = this.baseUrl + "/api/Products";
         url_ = url_.replace(/[?&]$/, "");
 
+        const content_ = JSON.stringify(query);
+
         let options_: RequestInit = {
-            method: "GET",
+            body: content_,
+            method: "POST",
             headers: {
+                "Content-Type": "application/json",
                 "Accept": "application/json",
                 "Authorization": `Bearer ${this.token}`,
                 "X-XSRF-TOKEN": `${this.XSRF}`,
@@ -1699,6 +1859,65 @@ export class ProductsClient {
             });
         }
         return Promise.resolve<ProductListVM>(null as any);
+    }
+}
+
+export class ReportStorageClient {
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
+    private token: string;
+    private XSRF: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }, token?: string, XSRF?: string) {
+         this.http = http || { fetch: fetch as any };
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+        this.token = token || "";
+        this.XSRF = XSRF || "";
+    }
+
+    getReportStorage(dateStart: Date, dateEnd: Date): Promise<ReportVM> {
+        let url_ = this.baseUrl + "/api/ReportStorage?";
+        if (dateStart === undefined || dateStart === null)
+            throw new Error("The parameter 'dateStart' must be defined and cannot be null.");
+        else
+            url_ += "dateStart=" + encodeURIComponent(dateStart ? "" + dateStart.toISOString() : "") + "&";
+        if (dateEnd === undefined || dateEnd === null)
+            throw new Error("The parameter 'dateEnd' must be defined and cannot be null.");
+        else
+            url_ += "dateEnd=" + encodeURIComponent(dateEnd ? "" + dateEnd.toISOString() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetReportStorage(_response);
+        });
+    }
+
+    protected processGetReportStorage(response: Response): Promise<ReportVM> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ReportVM.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<ReportVM>(null as any);
     }
 }
 
@@ -1750,6 +1969,42 @@ export class StatsClient {
             });
         }
         return Promise.resolve<AdminStatsVM>(null as any);
+    }
+
+    getEmployeeStats(): Promise<EmployeeStatsVM> {
+        let url_ = this.baseUrl + "/api/Stats/employee";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetEmployeeStats(_response);
+        });
+    }
+
+    protected processGetEmployeeStats(response: Response): Promise<EmployeeStatsVM> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = EmployeeStatsVM.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<EmployeeStatsVM>(null as any);
     }
 }
 
@@ -1843,6 +2098,46 @@ export class StorageClient {
         return Promise.resolve<StorageListVM>(null as any);
     }
 
+    updateStorage(command: UpdateStorageCommand): Promise<ResponseDto> {
+        let url_ = this.baseUrl + "/api/Storage";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(command);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processUpdateStorage(_response);
+        });
+    }
+
+    protected processUpdateStorage(response: Response): Promise<ResponseDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResponseDto.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<ResponseDto>(null as any);
+    }
+
     getStorageOfUser(query: GetStorageOfUserQuery): Promise<UserStorageList> {
         let url_ = this.baseUrl + "/api/Storage/user";
         url_ = url_.replace(/[?&]$/, "");
@@ -1883,6 +2178,42 @@ export class StorageClient {
         return Promise.resolve<UserStorageList>(null as any);
     }
 
+    getListStorageInfoOfUser(): Promise<ListISorageInfoOfUserVM> {
+        let url_ = this.baseUrl + "/api/Storage/user-list";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetListStorageInfoOfUser(_response);
+        });
+    }
+
+    protected processGetListStorageInfoOfUser(response: Response): Promise<ListISorageInfoOfUserVM> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ListISorageInfoOfUserVM.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<ListISorageInfoOfUserVM>(null as any);
+    }
+
     getStorageProducts(query: GetStorageProductsQuery): Promise<StorageProductListVM> {
         let url_ = this.baseUrl + "/api/Storage/products";
         url_ = url_.replace(/[?&]$/, "");
@@ -1921,6 +2252,84 @@ export class StorageClient {
             });
         }
         return Promise.resolve<StorageProductListVM>(null as any);
+    }
+
+    getStorageDetailUpdate(id: number): Promise<StorageDto3> {
+        let url_ = this.baseUrl + "/api/Storage/detail/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetStorageDetailUpdate(_response);
+        });
+    }
+
+    protected processGetStorageDetailUpdate(response: Response): Promise<StorageDto3> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = StorageDto3.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<StorageDto3>(null as any);
+    }
+
+    deleteStorage(id: number): Promise<ResponseDto> {
+        let url_ = this.baseUrl + "/api/Storage/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "DELETE",
+            headers: {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processDeleteStorage(_response);
+        });
+    }
+
+    protected processDeleteStorage(response: Response): Promise<ResponseDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResponseDto.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<ResponseDto>(null as any);
     }
 }
 
@@ -2549,6 +2958,8 @@ export class PointInfo implements IPointInfo {
     date?: string | undefined;
     ai_predict?: number;
     real_price_difference_rate?: number;
+    aI_predict_money?: number;
+    real_price_money?: number;
 
     constructor(data?: IPointInfo) {
         if (data) {
@@ -2564,6 +2975,8 @@ export class PointInfo implements IPointInfo {
             this.date = _data["date"];
             this.ai_predict = _data["ai_predict"];
             this.real_price_difference_rate = _data["real_price_difference_rate"];
+            this.aI_predict_money = _data["aI_predict_money"];
+            this.real_price_money = _data["real_price_money"];
         }
     }
 
@@ -2579,6 +2992,8 @@ export class PointInfo implements IPointInfo {
         data["date"] = this.date;
         data["ai_predict"] = this.ai_predict;
         data["real_price_difference_rate"] = this.real_price_difference_rate;
+        data["aI_predict_money"] = this.aI_predict_money;
+        data["real_price_money"] = this.real_price_money;
         return data;
     }
 }
@@ -2587,6 +3002,8 @@ export interface IPointInfo {
     date?: string | undefined;
     ai_predict?: number;
     real_price_difference_rate?: number;
+    aI_predict_money?: number;
+    real_price_money?: number;
 }
 
 export class CreateCompanyCommand implements ICreateCompanyCommand {
@@ -3436,6 +3853,8 @@ export class Page implements IPage {
     pageNumber?: number;
     totalElements?: number;
     totalPages?: number;
+    sortBy?: string;
+    sortAsc?: boolean;
 
     constructor(data?: IPage) {
         if (data) {
@@ -3452,6 +3871,8 @@ export class Page implements IPage {
             this.pageNumber = _data["pageNumber"];
             this.totalElements = _data["totalElements"];
             this.totalPages = _data["totalPages"];
+            this.sortBy = _data["sortBy"];
+            this.sortAsc = _data["sortAsc"];
         }
     }
 
@@ -3468,6 +3889,8 @@ export class Page implements IPage {
         data["pageNumber"] = this.pageNumber;
         data["totalElements"] = this.totalElements;
         data["totalPages"] = this.totalPages;
+        data["sortBy"] = this.sortBy;
+        data["sortAsc"] = this.sortAsc;
         return data;
     }
 }
@@ -3477,6 +3900,8 @@ export interface IPage {
     pageNumber?: number;
     totalElements?: number;
     totalPages?: number;
+    sortBy?: string;
+    sortAsc?: boolean;
 }
 
 export class GetCompanyOwnerListQuery implements IGetCompanyOwnerListQuery {
@@ -5036,6 +5461,7 @@ export class StorageDto2 implements IStorageDto2 {
     name?: string | undefined;
     address?: string | undefined;
     status?: string | undefined;
+    areas?: AreaDto2[] | undefined;
 
     constructor(data?: IStorageDto2) {
         if (data) {
@@ -5052,6 +5478,11 @@ export class StorageDto2 implements IStorageDto2 {
             this.name = _data["name"];
             this.address = _data["address"];
             this.status = _data["status"];
+            if (Array.isArray(_data["areas"])) {
+                this.areas = [] as any;
+                for (let item of _data["areas"])
+                    this.areas!.push(AreaDto2.fromJS(item));
+            }
         }
     }
 
@@ -5068,6 +5499,11 @@ export class StorageDto2 implements IStorageDto2 {
         data["name"] = this.name;
         data["address"] = this.address;
         data["status"] = this.status;
+        if (Array.isArray(this.areas)) {
+            data["areas"] = [];
+            for (let item of this.areas)
+                data["areas"].push(item.toJSON());
+        }
         return data;
     }
 }
@@ -5077,6 +5513,47 @@ export interface IStorageDto2 {
     name?: string | undefined;
     address?: string | undefined;
     status?: string | undefined;
+    areas?: AreaDto2[] | undefined;
+}
+
+export class AreaDto2 implements IAreaDto2 {
+    id?: number;
+    name?: string;
+
+    constructor(data?: IAreaDto2) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): AreaDto2 {
+        data = typeof data === 'object' ? data : {};
+        let result = new AreaDto2();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+export interface IAreaDto2 {
+    id?: number;
+    name?: string;
 }
 
 export class SignInVm implements ISignInVm {
@@ -5397,6 +5874,166 @@ export class GetListProductOfInventory implements IGetListProductOfInventory {
 
 export interface IGetListProductOfInventory {
     page?: Page | undefined;
+}
+
+export class InventoryListVM implements IInventoryListVM {
+    page?: Page | undefined;
+    inventories?: InventoryDto[] | undefined;
+
+    constructor(data?: IInventoryListVM) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.page = _data["page"] ? Page.fromJS(_data["page"]) : <any>undefined;
+            if (Array.isArray(_data["inventories"])) {
+                this.inventories = [] as any;
+                for (let item of _data["inventories"])
+                    this.inventories!.push(InventoryDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): InventoryListVM {
+        data = typeof data === 'object' ? data : {};
+        let result = new InventoryListVM();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["page"] = this.page ? this.page.toJSON() : <any>undefined;
+        if (Array.isArray(this.inventories)) {
+            data["inventories"] = [];
+            for (let item of this.inventories)
+                data["inventories"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IInventoryListVM {
+    page?: Page | undefined;
+    inventories?: InventoryDto[] | undefined;
+}
+
+export class InventoryDto implements IInventoryDto {
+    productName?: string;
+    availableQuantity?: number;
+    expiration?: Date | undefined;
+    totalPrice?: number;
+    totalSalePrice?: number;
+    safeStock?: number;
+    status?: string;
+
+    constructor(data?: IInventoryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.productName = _data["productName"];
+            this.availableQuantity = _data["availableQuantity"];
+            this.expiration = _data["expiration"] ? new Date(_data["expiration"].toString()) : <any>undefined;
+            this.totalPrice = _data["totalPrice"];
+            this.totalSalePrice = _data["totalSalePrice"];
+            this.safeStock = _data["safeStock"];
+            this.status = _data["status"];
+        }
+    }
+
+    static fromJS(data: any): InventoryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new InventoryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["productName"] = this.productName;
+        data["availableQuantity"] = this.availableQuantity;
+        data["expiration"] = this.expiration ? this.expiration.toISOString() : <any>undefined;
+        data["totalPrice"] = this.totalPrice;
+        data["totalSalePrice"] = this.totalSalePrice;
+        data["safeStock"] = this.safeStock;
+        data["status"] = this.status;
+        return data;
+    }
+}
+
+export interface IInventoryDto {
+    productName?: string;
+    availableQuantity?: number;
+    expiration?: Date | undefined;
+    totalPrice?: number;
+    totalSalePrice?: number;
+    safeStock?: number;
+    status?: string;
+}
+
+export class GetInventoriesByStorageQuery implements IGetInventoriesByStorageQuery {
+    storageId?: number;
+    page?: Page;
+    filters?: FilterData[] | undefined;
+
+    constructor(data?: IGetInventoriesByStorageQuery) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.storageId = _data["storageId"];
+            this.page = _data["page"] ? Page.fromJS(_data["page"]) : <any>undefined;
+            if (Array.isArray(_data["filters"])) {
+                this.filters = [] as any;
+                for (let item of _data["filters"])
+                    this.filters!.push(FilterData.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): GetInventoriesByStorageQuery {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetInventoriesByStorageQuery();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["storageId"] = this.storageId;
+        data["page"] = this.page ? this.page.toJSON() : <any>undefined;
+        if (Array.isArray(this.filters)) {
+            data["filters"] = [];
+            for (let item of this.filters)
+                data["filters"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IGetInventoriesByStorageQuery {
+    storageId?: number;
+    page?: Page;
+    filters?: FilterData[] | undefined;
 }
 
 export class CreateInventoryOutboundCommand implements ICreateInventoryOutboundCommand {
@@ -5962,6 +6599,7 @@ export interface IOrderProductDto {
 export class SaleOrderCommand implements ISaleOrderCommand {
     totalPrice?: number;
     customerId?: number;
+    dateExport?: Date;
     products?: SaleOrderProduct[];
 
     constructor(data?: ISaleOrderCommand) {
@@ -5977,6 +6615,7 @@ export class SaleOrderCommand implements ISaleOrderCommand {
         if (_data) {
             this.totalPrice = _data["totalPrice"];
             this.customerId = _data["customerId"];
+            this.dateExport = _data["dateExport"] ? new Date(_data["dateExport"].toString()) : <any>undefined;
             if (Array.isArray(_data["products"])) {
                 this.products = [] as any;
                 for (let item of _data["products"])
@@ -5996,6 +6635,7 @@ export class SaleOrderCommand implements ISaleOrderCommand {
         data = typeof data === 'object' ? data : {};
         data["totalPrice"] = this.totalPrice;
         data["customerId"] = this.customerId;
+        data["dateExport"] = this.dateExport ? this.dateExport.toISOString() : <any>undefined;
         if (Array.isArray(this.products)) {
             data["products"] = [];
             for (let item of this.products)
@@ -6008,6 +6648,7 @@ export class SaleOrderCommand implements ISaleOrderCommand {
 export interface ISaleOrderCommand {
     totalPrice?: number;
     customerId?: number;
+    dateExport?: Date;
     products?: SaleOrderProduct[];
 }
 
@@ -6059,8 +6700,213 @@ export interface ISaleOrderProduct {
     expectedPickupDate?: Date | undefined;
 }
 
+export class SaleAndImportOrderVM implements ISaleAndImportOrderVM {
+    saleOrders?: OrderDto2[] | undefined;
+    importOrder?: OrderDto2[] | undefined;
+
+    constructor(data?: ISaleAndImportOrderVM) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["saleOrders"])) {
+                this.saleOrders = [] as any;
+                for (let item of _data["saleOrders"])
+                    this.saleOrders!.push(OrderDto2.fromJS(item));
+            }
+            if (Array.isArray(_data["importOrder"])) {
+                this.importOrder = [] as any;
+                for (let item of _data["importOrder"])
+                    this.importOrder!.push(OrderDto2.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): SaleAndImportOrderVM {
+        data = typeof data === 'object' ? data : {};
+        let result = new SaleAndImportOrderVM();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.saleOrders)) {
+            data["saleOrders"] = [];
+            for (let item of this.saleOrders)
+                data["saleOrders"].push(item.toJSON());
+        }
+        if (Array.isArray(this.importOrder)) {
+            data["importOrder"] = [];
+            for (let item of this.importOrder)
+                data["importOrder"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface ISaleAndImportOrderVM {
+    saleOrders?: OrderDto2[] | undefined;
+    importOrder?: OrderDto2[] | undefined;
+}
+
+export class OrderDto2 implements IOrderDto2 {
+    id?: string | undefined;
+    type?: string | undefined;
+    status?: string | undefined;
+    date?: Date;
+    totalPrice?: number;
+
+    constructor(data?: IOrderDto2) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.type = _data["type"];
+            this.status = _data["status"];
+            this.date = _data["date"] ? new Date(_data["date"].toString()) : <any>undefined;
+            this.totalPrice = _data["totalPrice"];
+        }
+    }
+
+    static fromJS(data: any): OrderDto2 {
+        data = typeof data === 'object' ? data : {};
+        let result = new OrderDto2();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["type"] = this.type;
+        data["status"] = this.status;
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["totalPrice"] = this.totalPrice;
+        return data;
+    }
+}
+
+export interface IOrderDto2 {
+    id?: string | undefined;
+    type?: string | undefined;
+    status?: string | undefined;
+    date?: Date;
+    totalPrice?: number;
+}
+
+export class GetImportOrderListQuery implements IGetImportOrderListQuery {
+    page?: Page;
+    filters?: FilterData[] | undefined;
+
+    constructor(data?: IGetImportOrderListQuery) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.page = _data["page"] ? Page.fromJS(_data["page"]) : <any>undefined;
+            if (Array.isArray(_data["filters"])) {
+                this.filters = [] as any;
+                for (let item of _data["filters"])
+                    this.filters!.push(FilterData.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): GetImportOrderListQuery {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetImportOrderListQuery();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["page"] = this.page ? this.page.toJSON() : <any>undefined;
+        if (Array.isArray(this.filters)) {
+            data["filters"] = [];
+            for (let item of this.filters)
+                data["filters"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IGetImportOrderListQuery {
+    page?: Page;
+    filters?: FilterData[] | undefined;
+}
+
+export class GetSaleOrderListQuery implements IGetSaleOrderListQuery {
+    page?: Page;
+    filters?: FilterData[] | undefined;
+
+    constructor(data?: IGetSaleOrderListQuery) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.page = _data["page"] ? Page.fromJS(_data["page"]) : <any>undefined;
+            if (Array.isArray(_data["filters"])) {
+                this.filters = [] as any;
+                for (let item of _data["filters"])
+                    this.filters!.push(FilterData.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): GetSaleOrderListQuery {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetSaleOrderListQuery();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["page"] = this.page ? this.page.toJSON() : <any>undefined;
+        if (Array.isArray(this.filters)) {
+            data["filters"] = [];
+            for (let item of this.filters)
+                data["filters"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IGetSaleOrderListQuery {
+    page?: Page;
+    filters?: FilterData[] | undefined;
+}
+
 export class ProductListVM implements IProductListVM {
     productList?: ProductDto[] | undefined;
+    page?: Page | undefined;
 
     constructor(data?: IProductListVM) {
         if (data) {
@@ -6078,6 +6924,7 @@ export class ProductListVM implements IProductListVM {
                 for (let item of _data["productList"])
                     this.productList!.push(ProductDto.fromJS(item));
             }
+            this.page = _data["page"] ? Page.fromJS(_data["page"]) : <any>undefined;
         }
     }
 
@@ -6095,19 +6942,295 @@ export class ProductListVM implements IProductListVM {
             for (let item of this.productList)
                 data["productList"].push(item.toJSON());
         }
+        data["page"] = this.page ? this.page.toJSON() : <any>undefined;
         return data;
     }
 }
 
 export interface IProductListVM {
     productList?: ProductDto[] | undefined;
+    page?: Page | undefined;
+}
+
+export class GetProductListQuery implements IGetProductListQuery {
+    page?: Page;
+    filters?: FilterData[] | undefined;
+
+    constructor(data?: IGetProductListQuery) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.page = _data["page"] ? Page.fromJS(_data["page"]) : <any>undefined;
+            if (Array.isArray(_data["filters"])) {
+                this.filters = [] as any;
+                for (let item of _data["filters"])
+                    this.filters!.push(FilterData.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): GetProductListQuery {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProductListQuery();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["page"] = this.page ? this.page.toJSON() : <any>undefined;
+        if (Array.isArray(this.filters)) {
+            data["filters"] = [];
+            for (let item of this.filters)
+                data["filters"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IGetProductListQuery {
+    page?: Page;
+    filters?: FilterData[] | undefined;
+}
+
+export class ReportVM implements IReportVM {
+    warehouseStatistics?: WarehousePerformance[];
+    importStatistics?: ImportSummary[];
+    topProducts?: ProductPerformance[];
+    slowMovingProducts?: ProductPerformance[];
+    totalRevenue?: number;
+    totalImportCost?: number;
+    totalOrders?: number;
+
+    constructor(data?: IReportVM) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["warehouseStatistics"])) {
+                this.warehouseStatistics = [] as any;
+                for (let item of _data["warehouseStatistics"])
+                    this.warehouseStatistics!.push(WarehousePerformance.fromJS(item));
+            }
+            if (Array.isArray(_data["importStatistics"])) {
+                this.importStatistics = [] as any;
+                for (let item of _data["importStatistics"])
+                    this.importStatistics!.push(ImportSummary.fromJS(item));
+            }
+            if (Array.isArray(_data["topProducts"])) {
+                this.topProducts = [] as any;
+                for (let item of _data["topProducts"])
+                    this.topProducts!.push(ProductPerformance.fromJS(item));
+            }
+            if (Array.isArray(_data["slowMovingProducts"])) {
+                this.slowMovingProducts = [] as any;
+                for (let item of _data["slowMovingProducts"])
+                    this.slowMovingProducts!.push(ProductPerformance.fromJS(item));
+            }
+            this.totalRevenue = _data["totalRevenue"];
+            this.totalImportCost = _data["totalImportCost"];
+            this.totalOrders = _data["totalOrders"];
+        }
+    }
+
+    static fromJS(data: any): ReportVM {
+        data = typeof data === 'object' ? data : {};
+        let result = new ReportVM();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.warehouseStatistics)) {
+            data["warehouseStatistics"] = [];
+            for (let item of this.warehouseStatistics)
+                data["warehouseStatistics"].push(item.toJSON());
+        }
+        if (Array.isArray(this.importStatistics)) {
+            data["importStatistics"] = [];
+            for (let item of this.importStatistics)
+                data["importStatistics"].push(item.toJSON());
+        }
+        if (Array.isArray(this.topProducts)) {
+            data["topProducts"] = [];
+            for (let item of this.topProducts)
+                data["topProducts"].push(item.toJSON());
+        }
+        if (Array.isArray(this.slowMovingProducts)) {
+            data["slowMovingProducts"] = [];
+            for (let item of this.slowMovingProducts)
+                data["slowMovingProducts"].push(item.toJSON());
+        }
+        data["totalRevenue"] = this.totalRevenue;
+        data["totalImportCost"] = this.totalImportCost;
+        data["totalOrders"] = this.totalOrders;
+        return data;
+    }
+}
+
+export interface IReportVM {
+    warehouseStatistics?: WarehousePerformance[];
+    importStatistics?: ImportSummary[];
+    topProducts?: ProductPerformance[];
+    slowMovingProducts?: ProductPerformance[];
+    totalRevenue?: number;
+    totalImportCost?: number;
+    totalOrders?: number;
+}
+
+export class WarehousePerformance implements IWarehousePerformance {
+    id?: number;
+    warehouseName?: string | undefined;
+    revenue?: number;
+
+    constructor(data?: IWarehousePerformance) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.warehouseName = _data["warehouseName"];
+            this.revenue = _data["revenue"];
+        }
+    }
+
+    static fromJS(data: any): WarehousePerformance {
+        data = typeof data === 'object' ? data : {};
+        let result = new WarehousePerformance();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["warehouseName"] = this.warehouseName;
+        data["revenue"] = this.revenue;
+        return data;
+    }
+}
+
+export interface IWarehousePerformance {
+    id?: number;
+    warehouseName?: string | undefined;
+    revenue?: number;
+}
+
+export class ImportSummary implements IImportSummary {
+    supplierName?: string | undefined;
+    totalImportCost?: number;
+
+    constructor(data?: IImportSummary) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.supplierName = _data["supplierName"];
+            this.totalImportCost = _data["totalImportCost"];
+        }
+    }
+
+    static fromJS(data: any): ImportSummary {
+        data = typeof data === 'object' ? data : {};
+        let result = new ImportSummary();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["supplierName"] = this.supplierName;
+        data["totalImportCost"] = this.totalImportCost;
+        return data;
+    }
+}
+
+export interface IImportSummary {
+    supplierName?: string | undefined;
+    totalImportCost?: number;
+}
+
+export class ProductPerformance implements IProductPerformance {
+    storageId?: number;
+    productName?: string | undefined;
+    totalSold?: number;
+    averageStorageTime?: number;
+
+    constructor(data?: IProductPerformance) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.storageId = _data["storageId"];
+            this.productName = _data["productName"];
+            this.totalSold = _data["totalSold"];
+            this.averageStorageTime = _data["averageStorageTime"];
+        }
+    }
+
+    static fromJS(data: any): ProductPerformance {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductPerformance();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["storageId"] = this.storageId;
+        data["productName"] = this.productName;
+        data["totalSold"] = this.totalSold;
+        data["averageStorageTime"] = this.averageStorageTime;
+        return data;
+    }
+}
+
+export interface IProductPerformance {
+    storageId?: number;
+    productName?: string | undefined;
+    totalSold?: number;
+    averageStorageTime?: number;
 }
 
 export class AdminStatsVM implements IAdminStatsVM {
     totalInventoryValue?: number;
     onlineEmployeeCount?: number;
     orderCompletionRate?: number;
-    highDemandItemSummary?: string;
+    highDemandItemName?: string;
+    highDemandItemCount?: number;
+    prediction?: Prediction | undefined;
 
     constructor(data?: IAdminStatsVM) {
         if (data) {
@@ -6123,7 +7246,9 @@ export class AdminStatsVM implements IAdminStatsVM {
             this.totalInventoryValue = _data["totalInventoryValue"];
             this.onlineEmployeeCount = _data["onlineEmployeeCount"];
             this.orderCompletionRate = _data["orderCompletionRate"];
-            this.highDemandItemSummary = _data["highDemandItemSummary"];
+            this.highDemandItemName = _data["highDemandItemName"];
+            this.highDemandItemCount = _data["highDemandItemCount"];
+            this.prediction = _data["prediction"] ? Prediction.fromJS(_data["prediction"]) : <any>undefined;
         }
     }
 
@@ -6139,7 +7264,9 @@ export class AdminStatsVM implements IAdminStatsVM {
         data["totalInventoryValue"] = this.totalInventoryValue;
         data["onlineEmployeeCount"] = this.onlineEmployeeCount;
         data["orderCompletionRate"] = this.orderCompletionRate;
-        data["highDemandItemSummary"] = this.highDemandItemSummary;
+        data["highDemandItemName"] = this.highDemandItemName;
+        data["highDemandItemCount"] = this.highDemandItemCount;
+        data["prediction"] = this.prediction ? this.prediction.toJSON() : <any>undefined;
         return data;
     }
 }
@@ -6148,7 +7275,101 @@ export interface IAdminStatsVM {
     totalInventoryValue?: number;
     onlineEmployeeCount?: number;
     orderCompletionRate?: number;
-    highDemandItemSummary?: string;
+    highDemandItemName?: string;
+    highDemandItemCount?: number;
+    prediction?: Prediction | undefined;
+}
+
+export class Prediction implements IPrediction {
+    aI_predict?: number;
+    accuracy?: number;
+    date?: Date;
+
+    constructor(data?: IPrediction) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.aI_predict = _data["aI_predict"];
+            this.accuracy = _data["accuracy"];
+            this.date = _data["date"] ? new Date(_data["date"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): Prediction {
+        data = typeof data === 'object' ? data : {};
+        let result = new Prediction();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["aI_predict"] = this.aI_predict;
+        data["accuracy"] = this.accuracy;
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IPrediction {
+    aI_predict?: number;
+    accuracy?: number;
+    date?: Date;
+}
+
+export class EmployeeStatsVM implements IEmployeeStatsVM {
+    outboundInventoryCompletePerMonth?: number;
+    productExpirationCount?: number;
+    totalProductImportPerMonth?: number;
+    totalProductExportPerMonth?: number;
+
+    constructor(data?: IEmployeeStatsVM) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.outboundInventoryCompletePerMonth = _data["outboundInventoryCompletePerMonth"];
+            this.productExpirationCount = _data["productExpirationCount"];
+            this.totalProductImportPerMonth = _data["totalProductImportPerMonth"];
+            this.totalProductExportPerMonth = _data["totalProductExportPerMonth"];
+        }
+    }
+
+    static fromJS(data: any): EmployeeStatsVM {
+        data = typeof data === 'object' ? data : {};
+        let result = new EmployeeStatsVM();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["outboundInventoryCompletePerMonth"] = this.outboundInventoryCompletePerMonth;
+        data["productExpirationCount"] = this.productExpirationCount;
+        data["totalProductImportPerMonth"] = this.totalProductImportPerMonth;
+        data["totalProductExportPerMonth"] = this.totalProductExportPerMonth;
+        return data;
+    }
+}
+
+export interface IEmployeeStatsVM {
+    outboundInventoryCompletePerMonth?: number;
+    productExpirationCount?: number;
+    totalProductImportPerMonth?: number;
+    totalProductExportPerMonth?: number;
 }
 
 export class CreateStorageCommand implements ICreateStorageCommand {
@@ -6335,6 +7556,90 @@ export interface IGetStorageOfUserQuery {
     page?: Page | undefined;
 }
 
+export class ListISorageInfoOfUserVM implements IListISorageInfoOfUserVM {
+    storages?: StorageName[] | undefined;
+
+    constructor(data?: IListISorageInfoOfUserVM) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["storages"])) {
+                this.storages = [] as any;
+                for (let item of _data["storages"])
+                    this.storages!.push(StorageName.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ListISorageInfoOfUserVM {
+        data = typeof data === 'object' ? data : {};
+        let result = new ListISorageInfoOfUserVM();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.storages)) {
+            data["storages"] = [];
+            for (let item of this.storages)
+                data["storages"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IListISorageInfoOfUserVM {
+    storages?: StorageName[] | undefined;
+}
+
+export class StorageName implements IStorageName {
+    id?: number;
+    name?: string | undefined;
+
+    constructor(data?: IStorageName) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): StorageName {
+        data = typeof data === 'object' ? data : {};
+        let result = new StorageName();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+export interface IStorageName {
+    id?: number;
+    name?: string | undefined;
+}
+
 export class StorageProductListVM implements IStorageProductListVM {
     products?: ProductDto2[];
     page?: Page;
@@ -6509,6 +7814,126 @@ export interface IGetStorageProductsQuery {
     page?: Page | undefined;
     searchText?: string | undefined;
     filterData?: FilterData[] | undefined;
+}
+
+export class StorageDto3 implements IStorageDto3 {
+    id?: number;
+    name?: string | undefined;
+    location?: string | undefined;
+    status?: string | undefined;
+    areas?: AreaDto2[] | undefined;
+
+    constructor(data?: IStorageDto3) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.location = _data["location"];
+            this.status = _data["status"];
+            if (Array.isArray(_data["areas"])) {
+                this.areas = [] as any;
+                for (let item of _data["areas"])
+                    this.areas!.push(AreaDto2.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): StorageDto3 {
+        data = typeof data === 'object' ? data : {};
+        let result = new StorageDto3();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["location"] = this.location;
+        data["status"] = this.status;
+        if (Array.isArray(this.areas)) {
+            data["areas"] = [];
+            for (let item of this.areas)
+                data["areas"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IStorageDto3 {
+    id?: number;
+    name?: string | undefined;
+    location?: string | undefined;
+    status?: string | undefined;
+    areas?: AreaDto2[] | undefined;
+}
+
+export class UpdateStorageCommand implements IUpdateStorageCommand {
+    storageId?: number;
+    name?: string | undefined;
+    location?: string | undefined;
+    status?: string | undefined;
+    areas?: AreaDto2[] | undefined;
+
+    constructor(data?: IUpdateStorageCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.storageId = _data["storageId"];
+            this.name = _data["name"];
+            this.location = _data["location"];
+            this.status = _data["status"];
+            if (Array.isArray(_data["areas"])) {
+                this.areas = [] as any;
+                for (let item of _data["areas"])
+                    this.areas!.push(AreaDto2.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): UpdateStorageCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateStorageCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["storageId"] = this.storageId;
+        data["name"] = this.name;
+        data["location"] = this.location;
+        data["status"] = this.status;
+        if (Array.isArray(this.areas)) {
+            data["areas"] = [];
+            for (let item of this.areas)
+                data["areas"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IUpdateStorageCommand {
+    storageId?: number;
+    name?: string | undefined;
+    location?: string | undefined;
+    status?: string | undefined;
+    areas?: AreaDto2[] | undefined;
 }
 
 export class CreateUserCommand implements ICreateUserCommand {
@@ -6848,6 +8273,7 @@ export class SuperAdminStatsVM implements ISuperAdminStatsVM {
     totalCompany?: number;
     cpu?: number;
     ram?: number;
+    prediction?: Prediction | undefined;
 
     constructor(data?: ISuperAdminStatsVM) {
         if (data) {
@@ -6864,6 +8290,7 @@ export class SuperAdminStatsVM implements ISuperAdminStatsVM {
             this.totalCompany = _data["totalCompany"];
             this.cpu = _data["cpu"];
             this.ram = _data["ram"];
+            this.prediction = _data["prediction"] ? Prediction.fromJS(_data["prediction"]) : <any>undefined;
         }
     }
 
@@ -6880,6 +8307,7 @@ export class SuperAdminStatsVM implements ISuperAdminStatsVM {
         data["totalCompany"] = this.totalCompany;
         data["cpu"] = this.cpu;
         data["ram"] = this.ram;
+        data["prediction"] = this.prediction ? this.prediction.toJSON() : <any>undefined;
         return data;
     }
 }
@@ -6889,6 +8317,7 @@ export interface ISuperAdminStatsVM {
     totalCompany?: number;
     cpu?: number;
     ram?: number;
+    prediction?: Prediction | undefined;
 }
 
 export class SwaggerException extends Error {

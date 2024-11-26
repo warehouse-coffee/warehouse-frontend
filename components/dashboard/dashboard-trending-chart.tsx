@@ -45,17 +45,23 @@ export function DashboardTrendingChart({ id }: { id: string }) {
   const [timeRange, setTimeRange] = useState<string>('90d')
   const { data: chartData } = useGetTrendingChart()
 
-  const filteredData = chartData?.filter((item) => {
+  const filteredData = chartData?.slice(0, -1).filter((item) => {
     const date = new Date(item.date)
-    const now = new Date()
-    let daysToSubtract = 90
+    const yesterday = new Date()
+    yesterday.setDate(yesterday.getDate() - 1)
+    yesterday.setHours(23, 59, 59, 999)
+
+    let startDate = new Date(yesterday)
     if (timeRange === '30d') {
-      daysToSubtract = 30
+      startDate.setDate(yesterday.getDate() - 29)
     } else if (timeRange === '7d') {
-      daysToSubtract = 7
+      startDate.setDate(yesterday.getDate() - 6)
+    } else {
+      startDate.setDate(yesterday.getDate() - 89)
     }
-    now.setDate(now.getDate() - daysToSubtract)
-    return date >= now
+    startDate.setHours(0, 0, 0, 0)
+
+    return date >= startDate && date <= yesterday
   })
 
   return (
@@ -138,7 +144,7 @@ export function DashboardTrendingChart({ id }: { id: string }) {
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => `${value}%`}
+              tickFormatter={(value) => `${value}`}
             />
             <ChartTooltip
               cursor={false}
@@ -150,7 +156,7 @@ export function DashboardTrendingChart({ id }: { id: string }) {
                       day: 'numeric'
                     })
                   }}
-                  formatter={(value) => `${Number(value).toFixed(2)}%`}
+                  formatter={(value) => `${Number(value).toFixed(2)}`}
                 />
               }
             />
