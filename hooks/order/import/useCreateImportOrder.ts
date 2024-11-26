@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { API_ENDPOINTS, METHODS } from '@/constants'
 import { handleApiError } from '@/lib/utils'
-import { CreateImportOrder } from '@/types/form'
+import { CreateImportOrder } from '@/types'
 
 const createImportOrder = async (data: CreateImportOrder) => {
   const response = await fetch(API_ENDPOINTS.CREATE_IMPORT_ORDER, {

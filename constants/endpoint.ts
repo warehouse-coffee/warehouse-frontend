@@ -26,7 +26,8 @@ export const API_ENDPOINTS = {
   DELETE_IMPORT_ORDER: '/api/dashboard/employee/orders/import/delete',
   GET_REPORT_STORAGE: '/api/dashboard/admin/reports',
   PUT_STORAGE: '/api/dashboard/admin/storages/update',
-  DELETE_STORAGE: '/api/dashboard/admin/storages/delete'
+  DELETE_STORAGE: '/api/dashboard/admin/storages/delete',
+  GET_TOP_ORDERS: '/api/dashboard/employee/orders/top5'
 } as const
 
 export type ApiEndpoint = typeof API_ENDPOINTS[keyof typeof API_ENDPOINTS]

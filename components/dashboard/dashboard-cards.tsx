@@ -7,16 +7,17 @@ import { ROLE_NAMES } from '@/constants'
 import { useGetStats, isSuperAdminStats, isAdminStats, isEmployeeStats } from '@/hooks/stats/useGetStats'
 
 interface DashboardCardsProps {
+  id: string
   userRole: string | null
 }
 
-export function DashboardCards({ userRole }: DashboardCardsProps) {
+export function DashboardCards({ id, userRole }: DashboardCardsProps) {
   const { data: stats } = useGetStats(userRole)
 
   if (userRole === ROLE_NAMES.SUPER_ADMIN && isSuperAdminStats(stats)) {
     return (
       <>
-        <Card>
+        <Card id={`${id}-total-users`} className="hover:bg-accent/50 transition-colors">
           <CardHeader>
             <CardTitle>Total Users</CardTitle>
             <CardDescription>All registered users across system</CardDescription>
@@ -28,7 +29,7 @@ export function DashboardCards({ userRole }: DashboardCardsProps) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card id={`${id}-total-companies`} className="hover:bg-accent/50 transition-colors">
           <CardHeader>
             <CardTitle>Total Companies</CardTitle>
             <CardDescription>All companies registered in system</CardDescription>
@@ -40,7 +41,7 @@ export function DashboardCards({ userRole }: DashboardCardsProps) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card id={`${id}-cpu-usage`} className="hover:bg-accent/50 transition-colors">
           <CardHeader>
             <CardTitle>CPU Usage</CardTitle>
             <CardDescription>Current CPU usage</CardDescription>
@@ -50,7 +51,7 @@ export function DashboardCards({ userRole }: DashboardCardsProps) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card id={`${id}-ram-usage`} className="hover:bg-accent/50 transition-colors">
           <CardHeader>
             <CardTitle>RAM Usage</CardTitle>
             <CardDescription>Current RAM usage</CardDescription>
@@ -64,7 +65,7 @@ export function DashboardCards({ userRole }: DashboardCardsProps) {
   } else if (userRole === ROLE_NAMES.ADMIN && isAdminStats(stats)) {
     return (
       <>
-        <Card>
+        <Card id={`${id}-total-employees`} className="hover:bg-accent/50 transition-colors">
           <CardHeader>
             <CardTitle>Total Employees</CardTitle>
             <CardDescription>All employees registered in system</CardDescription>
@@ -76,7 +77,7 @@ export function DashboardCards({ userRole }: DashboardCardsProps) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card id={`${id}-total-orders`} className="hover:bg-accent/50 transition-colors">
           <CardHeader>
             <CardTitle>Total Orders</CardTitle>
             <CardDescription>All orders registered in system</CardDescription>
@@ -88,7 +89,7 @@ export function DashboardCards({ userRole }: DashboardCardsProps) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card id={`${id}-inventory-value`} className="hover:bg-accent/50 transition-colors">
           <CardHeader>
             <CardTitle>Inventory Value</CardTitle>
             <CardDescription>Current value of inventory</CardDescription>
@@ -100,7 +101,7 @@ export function DashboardCards({ userRole }: DashboardCardsProps) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card id={`${id}-high-demand`} className="hover:bg-accent/50 transition-colors">
           <CardHeader>
             <CardTitle>High Demand Items</CardTitle>
             <CardDescription>Current top-selling items</CardDescription>
@@ -125,7 +126,7 @@ export function DashboardCards({ userRole }: DashboardCardsProps) {
   } else if (userRole === ROLE_NAMES.EMPLOYEE && isEmployeeStats(stats)) {
     return (
       <>
-        <Card>
+        <Card id={`${id}-outbound`} className="hover:bg-accent/50 transition-colors">
           <CardHeader>
             <CardTitle>Outbound Inventory</CardTitle>
             <CardDescription>Completed this month</CardDescription>
@@ -137,7 +138,7 @@ export function DashboardCards({ userRole }: DashboardCardsProps) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card id={`${id}-exported`} className="hover:bg-accent/50 transition-colors">
           <CardHeader>
             <CardTitle>Exported Products</CardTitle>
             <CardDescription>Exported this month</CardDescription>
@@ -149,7 +150,7 @@ export function DashboardCards({ userRole }: DashboardCardsProps) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card id={`${id}-expiring`} className="hover:bg-accent/50 transition-colors">
           <CardHeader>
             <CardTitle>Expiring Products</CardTitle>
             <CardDescription>Count this month</CardDescription>
@@ -161,7 +162,7 @@ export function DashboardCards({ userRole }: DashboardCardsProps) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card id={`${id}-imported`} className="hover:bg-accent/50 transition-colors">
           <CardHeader>
             <CardTitle>Imported Products</CardTitle>
             <CardDescription>Imported this month</CardDescription>
@@ -173,7 +174,6 @@ export function DashboardCards({ userRole }: DashboardCardsProps) {
           </CardContent>
         </Card>
       </>
-
     )
   }
 
