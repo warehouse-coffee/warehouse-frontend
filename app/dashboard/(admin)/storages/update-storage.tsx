@@ -36,18 +36,22 @@ export function UpdateStorage({ storage }: { storage?: StorageDto2 }) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    const updatedStorage = new UpdateStorageCommand()
-    updatedStorage.storageId = storage?.id || 0
-    updatedStorage.name = name
-    updatedStorage.location = address
-    updatedStorage.status = status
-    // updatedStorage.areas = areas
+    const updatedStorage = new UpdateStorageCommand({
+      storageId: storage?.id || 0,
+      name,
+      location: address,
+      status,
+      areas: areas.map(area => new AreaDto2({ name: area.name }))
+    })
     updateStorage.mutate(updatedStorage)
   }
 
   const addArea = () => {
     if (newArea.trim()) {
-      setAreas([...areas, { name: newArea.trim() } as AreaDto2])
+      const area = new AreaDto2()
+      area.name = newArea.trim()
+      area.id = 0
+      setAreas([...areas, area])
       setNewArea('')
     }
   }

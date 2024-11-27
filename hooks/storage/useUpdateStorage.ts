@@ -10,7 +10,7 @@ const updateStorage = async (data: UpdateStorageCommand) => {
     throw new Error('Invalid storage id')
   }
   const response = await fetch(API_ENDPOINTS.UPDATE_STORAGE, {
-    method: METHODS.POST,
+    method: METHODS.PUT,
     headers: {
       'Content-Type': 'application/json'
     },
@@ -32,7 +32,6 @@ export const useUpdateStorage = (onComplete: () => void) => {
     },
     onError: (error) => {
       handleApiError(error)
-      console.log('error',error)
     },
     onSettled: () => {
       onComplete()

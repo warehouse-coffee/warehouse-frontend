@@ -2,30 +2,25 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { cookieStore, tokenUtils } from '@/lib/auth'
 
-import { StorageClient, UpdateStorageCommand } from '../../../../web-api-client'
+import { AreaDto2, StorageClient, UpdateStorageCommand } from '../../../../web-api-client'
 
 export async function PUT(request: NextRequest) {
-  console.log('request',request)
   const token = cookieStore.get('auth_token')
   if (!token || !tokenUtils.isValid(token)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   try {
-    const { searchParams } = new URL(request.url)
-    const id = searchParams.get('id')
-    if (!id) {
-      return NextResponse.json({ error: 'Storage ID is required' }, { status: 400 })
-    }
-    // get body data
     const data = await request.json()
-    console.log('data',data)
-    const command = new UpdateStorageCommand()
-    command.storageId = Number(id)
-    command.name = data.name
-    command.location = data.address
-    command.status = data.status
-    command.areas = data.areas
+    const mappedAreas = data.areas?.map((area: any) => new AreaDto2({ id: 0, name: area.name })) || []
+
+    const command = new UpdateStorageCommand({
+      storageId: Number(data.storageId),
+      name: data.name,
+      location: data.location,
+      status: data.status,
+      areas: mappedAreas
+    })
     const client = new StorageClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token)
     const result = await client.updateStorage(command)
     return NextResponse.json(result)
