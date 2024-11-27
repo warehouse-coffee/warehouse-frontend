@@ -4,7 +4,8 @@ import { cookieStore, tokenUtils } from '@/lib/auth'
 
 import { StorageClient, UpdateStorageCommand } from '../../../../web-api-client'
 
-export async function UPDATE(request: NextRequest) {
+export async function PUT(request: NextRequest) {
+  console.log('request',request)
   const token = cookieStore.get('auth_token')
   if (!token || !tokenUtils.isValid(token)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -16,7 +17,9 @@ export async function UPDATE(request: NextRequest) {
     if (!id) {
       return NextResponse.json({ error: 'Storage ID is required' }, { status: 400 })
     }
+    // get body data
     const data = await request.json()
+    console.log('data',data)
     const command = new UpdateStorageCommand()
     command.storageId = Number(id)
     command.name = data.name

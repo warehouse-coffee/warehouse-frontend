@@ -36,15 +36,12 @@ export function UpdateStorage({ storage }: { storage?: StorageDto2 }) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    const updatedStorage: UpdateStorageCommand = {
-      storageId: typeof storage?.id === 'number' ? storage.id : undefined,
-      name,
-      location: address,
-      status,
-      areas,
-      init: () => {},
-      toJSON: () => ({})
-    }
+    const updatedStorage = new UpdateStorageCommand()
+    updatedStorage.storageId = storage?.id || 0
+    updatedStorage.name = name
+    updatedStorage.location = address
+    updatedStorage.status = status
+    // updatedStorage.areas = areas
     updateStorage.mutate(updatedStorage)
   }
 
