@@ -11,13 +11,13 @@ export async function PUT(request: NextRequest) {
   }
   try {
     const updateUserData = await request.json()
-    const client = new EmployeesClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token)
+    const client = new EmployeesClient(process.env.NEXT_PUBLIC_BACKEND_API_URL, undefined, token)
     const command = new UpdateEmployeeCommand()
-    command.id = updateUserData.employeeId
-    command.userName = updateUserData.firstName
-    command.password = updateUserData.firstName ?? null
-    command.email = updateUserData.email
-    command.phoneNumber = updateUserData.phoneNumber
+    command.id = updateUserData.id
+    command.userName = updateUserData.userName
+    command.password = updateUserData.password
+    command.email = updateUserData.email.trim()
+    command.phoneNumber = updateUserData.phoneNumber.trim()
     command.warehouses = updateUserData.warehouses
     const result = await client.updateEmployee(command)
     return NextResponse.json(result)

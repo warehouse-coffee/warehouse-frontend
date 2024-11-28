@@ -40,10 +40,10 @@ interface Storage {
 // }
 
 export default function EmployeesUpdatePage({ id, onClose, isOpen }: { id: string, onClose: () => void, isOpen: boolean }) {
-  const { data } = useEmployeeDetail(id)
+  const { data : updateEmployee } = useEmployeeDetail(id)
   const [employee, setEmployee] = useState<EmployeeDetailVM | null>(null)
   const [searchTerm, setSearchTerm] = React.useState('')
-  const [currentPage, setCurrentPage] = React.useState(1)
+  const [currentPage, setCurrentPage] = React.useState(0)
   const [selectedStorages, setSelectedStorages] = React.useState<number[]>([])
   // storages
   const { data: userStorageList } = useUserStorageList(currentPage, 5)
@@ -51,13 +51,13 @@ export default function EmployeesUpdatePage({ id, onClose, isOpen }: { id: strin
   const updateEmployeeMutation = useUpdateEmployee(onClose)
   // set page and storage
   React.useEffect(() => {
-    if (data) {
-      setEmployee(data)
-      data.storages?.forEach(element => {
+    if (updateEmployee) {
+      setEmployee(updateEmployee)
+      updateEmployee.storages?.forEach(element => {
         setSelectedStorages((prev) => [...prev, element.id].filter((id): id is number => id !== undefined))
       })
     }
-  }, [data])
+  }, [updateEmployee])
 
   const filteredStorages = storages.filter((storage) =>
     (storage.name ?? '').toLowerCase().includes(searchTerm.toLowerCase())
@@ -65,7 +65,7 @@ export default function EmployeesUpdatePage({ id, onClose, isOpen }: { id: strin
 
   const itemsPerPage = 5
   const totalPages = Math.ceil(filteredStorages.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
+  const startIndex = currentPage * itemsPerPage
   const endIndex = startIndex + itemsPerPage
   const currentStorages = filteredStorages.slice(startIndex, endIndex)
 
@@ -73,6 +73,7 @@ export default function EmployeesUpdatePage({ id, onClose, isOpen }: { id: strin
     e.preventDefault()
     const formData = new FormData(e.target as HTMLFormElement)
     const data = new UpdateEmployeeCommand({
+      id: id,
       userName: formData.get('username') as string || '',
       password: formData.get('password') as string | undefined,
       email: formData.get('email') as string || undefined,
@@ -81,18 +82,7 @@ export default function EmployeesUpdatePage({ id, onClose, isOpen }: { id: strin
     })
     updateEmployeeMutation.mutate(data)
   }
-  const getStatusColor = (status: Storage['status']) => {
-    switch (status) {
-    case 'Active':
-      return 'text-green-500'
-    case 'Inactive':
-      return 'text-red-500'
-    case 'UnderMaintenance':
-      return 'text-orange-500'
-    default:
-      return 'text-gray-500'
-    }
-  }
+
   const commonTabContentStyle = 'space-y-6 bg-white p-6 rounded-lg shadow-sm dark:bg-primary/10 dark:text-primary min-h-[400px]'
   return (
     <>
@@ -126,7 +116,6 @@ export default function EmployeesUpdatePage({ id, onClose, isOpen }: { id: strin
                       id="password"
                       name="password"
                       type="password"
-                      required
                       placeholder="Enter password"
                       className="w-full"
                     />
