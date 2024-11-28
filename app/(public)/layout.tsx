@@ -1,3 +1,4 @@
+import { Metadata } from 'next'
 import * as React from 'react'
 
 import HomeNavbar from '@/components/home/home-navbar'
@@ -12,6 +13,12 @@ interface HomeLayoutProps {
  * HomeLayout component
  * Renders the main layout for public pages including the navbar and children content
 */
+
+export const metadata: Metadata = {
+  icons: {
+    icon: '/icon.png'
+  }
+}
 
 export default function HomeLayout({ children }: HomeLayoutProps) {
   const navItems = [
