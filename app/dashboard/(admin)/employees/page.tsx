@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useState } from 'react'
+import { Suspense } from 'react'
 
 import DashboardFetchLoader from '@/components/dashboard/dashboard-fetch-loader'
 import {

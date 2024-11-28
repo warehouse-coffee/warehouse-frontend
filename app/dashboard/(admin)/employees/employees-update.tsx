@@ -2,13 +2,13 @@ import { Search } from 'lucide-react'
 import * as React from 'react'
 import { useState } from 'react'
 
-import { EmployeeDetailVM, StorageDto2 } from '@/app/api/web-api-client'
+import { EmployeeDetailVM, StorageDto2, UpdateEmployeeCommand } from '@/app/api/web-api-client'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useEmployeeDetail } from '@/hooks/employee'
+import { useEmployeeDetail, useUpdateEmployee } from '@/hooks/employee'
 import { useUserStorageList } from '@/hooks/storage'
 
 interface Storage {
@@ -48,6 +48,7 @@ export default function EmployeesUpdatePage({ id, onClose, isOpen }: { id: strin
   // storages
   const { data: userStorageList } = useUserStorageList(currentPage, 5)
   const storages: StorageDto2[] = userStorageList?.storages || []
+  const updateEmployeeMutation = useUpdateEmployee(onClose)
   // set page and storage
   React.useEffect(() => {
     if (data) {
@@ -71,14 +72,14 @@ export default function EmployeesUpdatePage({ id, onClose, isOpen }: { id: strin
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const formData = new FormData(e.target as HTMLFormElement)
-    const data = {
-      userName: formData.get('username'),
-      password: formData.get('password'),
-      email: formData.get('email'),
-      phoneNumber: formData.get('phoneNumber'),
+    const data = new UpdateEmployeeCommand({
+      userName: formData.get('username') as string || '',
+      password: formData.get('password') as string | undefined,
+      email: formData.get('email') as string || undefined,
+      phoneNumber: formData.get('phoneNumber') as string | undefined,
       warehouses: selectedStorages
-    }
-    console.log(data)
+    })
+    updateEmployeeMutation.mutate(data)
   }
   const getStatusColor = (status: Storage['status']) => {
     switch (status) {

@@ -1,15 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { UpdateEmployeeCommand } from '@/app/api/web-api-client'
 import { API_ENDPOINTS, METHODS } from '@/constants'
 import { handleApiError } from '@/lib/utils'
-import { UpdateEmployee } from '@/types'
 
-const updateEmployee = async (data: UpdateEmployee) => {
+const updateEmployee = async (data: UpdateEmployeeCommand) => {
   if (!data?.id) {
     throw new Error('Invalid employee id')
   }
-  const response = await fetch(`${API_ENDPOINTS.UPDATE_EMPLOYEE}?id=${data.id}`, {
+  const response = await fetch(API_ENDPOINTS.UPDATE_EMPLOYEE, {
     method: METHODS.PUT,
     headers: {
       'Content-Type': 'application/json'

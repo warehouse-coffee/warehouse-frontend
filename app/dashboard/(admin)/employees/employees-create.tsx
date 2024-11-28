@@ -53,7 +53,6 @@ export default function EmployeesCreatePage({ onClose }: { onClose: () => void }
       warehouses: selectedStorages
     })
     createEmployeeMutation.mutate(data)
-    console.log(data)
   }
   const getStatusColor = (status: Storage['status']) => {
     switch (status) {
