@@ -26,7 +26,8 @@ import { Suspense, useEffect, useMemo, useState } from 'react'
 import React from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
-import { EmployeeDto, EmployeeListVM, Page } from '@/app/api/web-api-client'
+import { EmployeeDto, Page } from '@/app/api/web-api-client'
+import DashboardTablePagination from '@/components/dashboard/dashboard-table-pagination'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -38,14 +39,6 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious
-} from '@/components/ui/pagination'
 import {
   Table,
   TableBody,
@@ -110,21 +103,12 @@ export default function EmployeesTable() {
   const [sortDirection, setSortDirection] = useState<SortDirection>(null)
   const [filters, setFilters] = useState<{ [key: string]: string }>({})
   //page
-  const [currentPage, setCurrentPage] = useState(0)
-  const [pageInfo, setPageInfo] = useState<Page>(new Page({
-    size: 2,
-    pageNumber: 0,
-    totalElements: 0,
-    totalPages: 0
-  }))
+  const [page, setPage] = useState<Page>(new Page())
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize:  2
+    pageSize:  8
   })
-  const [totalElements, setTotalElements] = useState<number>(0)
-  const [totalPages, setTotalPages] = useState<number>(0)
   // Employee list
-  const [data, setData] = useState<EmployeeListVM>()
   const [employees, setEmployees] = useState<EmployeeDto[]>([])
   const { data: employeeListVM } = useEmployeeList(
     pagination.pageIndex,
@@ -133,14 +117,10 @@ export default function EmployeesTable() {
 
   useEffect(() => {
     if (employeeListVM) {
-      setData(employeeListVM)
       setEmployees(employeeListVM.employees || [])
-      setTotalElements(employeeListVM.page?.totalElements || 0)
       if (employeeListVM.page) {
-        setPageInfo(employeeListVM.page)
+        setPage(employeeListVM.page)
       }
-      setCurrentPage(employeeListVM.page?.pageNumber || 0)
-      setTotalPages(employeeListVM.page?.totalPages || 0)
     }
   }, [employeeListVM])
   const sortEmployees = (field: SortField) => {
@@ -195,7 +175,7 @@ export default function EmployeesTable() {
       fuzzy: fuzzyFilter
     },
     manualPagination: true,
-    pageCount: Math.ceil(totalElements / pagination.pageSize)
+    pageCount: page.totalPages
   })
   return (
     <>
@@ -389,58 +369,12 @@ export default function EmployeesTable() {
           </ErrorBoundary>
         </TableBody>
       </Table>
-      <div className="w-full flex items-center justify-between mt-[1.25rem]">
-        <p className="text-[.85rem] text-muted-foreground">
-           Showing {' '}
-          {table.getRowModel().rows.length === 0 ? 0 : totalElements === 0 ? 0 : pagination.pageIndex * pagination.pageSize + 1} {' '}
-          to {' '}
-          {table.getRowModel().rows.length === 0 ? 0 : Math.min(
-            (pagination.pageIndex + 1) * pagination.pageSize,
-            totalElements
-          )} {' '}
-          of {totalElements} user{totalElements > 1 ? 's' : ''}
-        </p>
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault()
-                  table.previousPage()
-                }}
-                aria-disabled={!table.getCanPreviousPage()}
-                className={!table.getCanPreviousPage() ? 'pointer-events-none opacity-50' : ''}
-              />
-            </PaginationItem>
-            {Array.from({ length: Math.max(1, totalPages) }, (_, i) => (
-              <PaginationItem key={i}>
-                <PaginationLink
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    table.setPageIndex(i)
-                  }}
-                  isActive={i === pagination.pageIndex}
-                >
-                  {i + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            <PaginationItem>
-              <PaginationNext
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault()
-                  table.nextPage()
-                }}
-                aria-disabled={!table.getCanNextPage()}
-                className={!table.getCanNextPage() ? 'pointer-events-none opacity-50' : ''}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      </div>
+      <DashboardTablePagination
+        itemName="storage"
+        table={table}
+        totalElements={page.totalElements ?? 0}
+        totalPages={page.totalPages ?? 0}
+      />
     </>
   )
 }

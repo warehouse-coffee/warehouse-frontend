@@ -24,9 +24,10 @@ export const API_ENDPOINTS = {
   GET_IMPORT_ORDERS: '/api/dashboard/employee/orders/import/list',
   CREATE_IMPORT_ORDER: '/api/dashboard/employee/orders/import/create',
   DELETE_IMPORT_ORDER: '/api/dashboard/employee/orders/import/delete',
+  DELETE_STORAGE: '/api/dashboard/admin/storages/delete',
+  UPDATE_STORAGE: '/api/dashboard/admin/storages/update',
   GET_REPORT_STORAGE: '/api/dashboard/admin/reports',
   PUT_STORAGE: '/api/dashboard/admin/storages/update',
-  DELETE_STORAGE: '/api/dashboard/admin/storages/delete',
   GET_TOP_ORDERS: '/api/dashboard/employee/orders/top5'
 } as const
 

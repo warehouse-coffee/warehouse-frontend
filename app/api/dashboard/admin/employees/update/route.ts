@@ -11,9 +11,15 @@ export async function PUT(request: NextRequest) {
   }
   try {
     const updateUserData = await request.json()
-    const client = new EmployeesClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token)
-    const command = new UpdateEmployeeCommand({ ...updateUserData })
-    const result = await client.updateEmployee(new UpdateEmployeeCommand(command))
+    const client = new EmployeesClient(process.env.NEXT_PUBLIC_BACKEND_API_URL, undefined, token)
+    const command = new UpdateEmployeeCommand()
+    command.id = updateUserData.id
+    command.userName = updateUserData.userName
+    command.password = updateUserData.password
+    command.email = updateUserData.email.trim()
+    command.phoneNumber = updateUserData.phoneNumber.trim()
+    command.warehouses = updateUserData.warehouses
+    const result = await client.updateEmployee(command)
     return NextResponse.json(result)
   } catch (error) {
     if (error instanceof SwaggerException) {
