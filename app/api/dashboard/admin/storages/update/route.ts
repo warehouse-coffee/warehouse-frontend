@@ -9,6 +9,7 @@ export async function PUT(request: NextRequest) {
   if (!token || !tokenUtils.isValid(token)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
   try {
     const data = await request.json()
     const mappedAreas = data.areas?.map((area: any) => new AreaDto2({ id: 0, name: area.name })) || []
