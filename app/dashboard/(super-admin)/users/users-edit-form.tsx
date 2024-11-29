@@ -84,7 +84,7 @@ export default function UsersEditForm({ user, onClose, isOpen }: { user: UpdateU
     if (editForm.password) {
       updateData.password = editForm.password
     }
-    
+
     updateUserMutation.mutate(updateData as UpdateUser)
   }, [editForm, updateUserMutation])
 
