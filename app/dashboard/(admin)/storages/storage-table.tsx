@@ -18,23 +18,30 @@ import {
 import { useUserStorageList } from '@/hooks/storage'
 
 interface StorageTableProps {
-  onEdit: (storage : StorageDto2) => void
-  onDelete: (storage : StorageDto2) => void
+  onEdit: (storage: StorageDto2) => void
+  onDelete: (storage: StorageDto2) => void
+  onRefresh?: (callback: () => void) => void
 }
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value)
   addMeta({ itemRank })
   return itemRank.passed
 }
-export function StorageTable({ onEdit, onDelete }: StorageTableProps) {
+export function StorageTable({ onEdit, onDelete, onRefresh }: StorageTableProps) {
   const [data, setData] = useState<StorageDto2[]>([])
   const [page, setPage] = useState<Page>(new Page())
   const columns = useMemo<ColumnDef<StorageDto2>[]>(() => [], [])
   const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
+    pageIndex: 1,
     pageSize: 6
   })
-  const { data: userStorageList } = useUserStorageList(pagination.pageIndex, pagination.pageSize)
+  const { data: userStorageList, refetch } = useUserStorageList(
+    pagination.pageIndex, pagination.pageSize)
+  React.useEffect(() => {
+    if (onRefresh) {
+      onRefresh(() => refetch())
+    }
+  }, [refetch, onRefresh])
   React.useEffect(() => {
     if (userStorageList) {
       setData(userStorageList.storages ?? [])
@@ -46,6 +53,9 @@ export function StorageTable({ onEdit, onDelete }: StorageTableProps) {
   const table = useReactTable({
     data,
     columns,
+    state: {
+      pagination
+    },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),

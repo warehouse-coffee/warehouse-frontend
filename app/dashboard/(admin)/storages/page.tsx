@@ -31,6 +31,7 @@ export default function StoragesPage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const deleteStorage = useDeleteStorage()
+  const refreshStorageList = React.useRef<() => void>()
 
   const handleEdit = (storage : StorageDto2) => {
     const storageToEdit = storage
@@ -83,6 +84,11 @@ export default function StoragesPage() {
     <StorageTable
       onEdit={handleEdit}
       onDelete={handleDelete}
+      onRefresh={() => {
+        if (refreshStorageList.current) {
+          refreshStorageList.current()
+        }
+      }}
     />
     <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
       <DialogContent>
@@ -109,7 +115,12 @@ export default function StoragesPage() {
           </DialogDescription>
         </DialogHeader>
         <Suspense fallback={<DashboardFetchLoader />}>
-          <StoragesCreatePage onClose={() => closeDialog('add')}/>
+          <StoragesCreatePage
+            onClose={() => closeDialog('add')}
+            onSuccess={() => {
+              closeDialog('add')
+              refreshStorageList.current?.()
+            }}/>
         </Suspense>
       </DialogContent>
     </Dialog>
