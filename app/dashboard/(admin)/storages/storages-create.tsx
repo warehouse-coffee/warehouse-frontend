@@ -83,7 +83,6 @@ export default function StoragesCreatePage({ onClose }: { onClose: () => void })
         status: parseInt(status),
         areas: areasDto
       })
-      console.log('Submitting:', formData)
       // Simulating API call
       createUserMutation.mutate(formData)
       await new Promise(resolve => setTimeout(resolve, 1000))
@@ -210,8 +209,8 @@ export default function StoragesCreatePage({ onClose }: { onClose: () => void })
           <Button type="button" variant="outline" onClick={() => {
             setName('')
             setLocation('')
-            setStatus('1')
-            setAreas(['Area A', 'Area B', 'Area C'])
+            setStatus('0')
+            setAreas([])
             setErrors({})
           }}>
             <XCircle className="h-4 w-4 mr-2" /> Cancel

@@ -1,6 +1,7 @@
-import { User, Mail, Phone, Building, Briefcase, MapPin } from 'lucide-react'
+import { User, Mail, Phone, Building, Briefcase, MapPin, XIcon } from 'lucide-react'
 import React, { useState, useMemo, useCallback } from 'react'
 
+import { Dialog, DialogTrigger, DialogContent, DialogClose, DialogContainer, DialogImage } from '@/components/core/dialog'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { DialogFooter } from '@/components/ui/dialog'
@@ -45,18 +46,69 @@ const InfoItem = React.memo(({ icon, label, value }: { icon: React.ReactNode, la
 })
 InfoItem.displayName = 'InfoItem'
 
-const UserHeader = React.memo(({ userDetail }: { userDetail: UserDetail }) => (
-  <div className="flex items-center gap-4">
-    <Avatar className="h-16 w-16">
-      <AvatarImage src={userDetail?.avatarImage || ''} alt={userDetail?.name || ''} />
-      <AvatarFallback>{userDetail?.name?.slice(0, 2).toUpperCase() || ''}</AvatarFallback>
-    </Avatar>
-    <div className="flex flex-col gap-1">
-      <h2 className="text-xl font-semibold">{userDetail?.name}</h2>
-      <p className="text-sm text-muted-foreground">User ID: {userDetail?.id}</p>
+const UserHeader = React.memo(({ userDetail }: { userDetail: UserDetail }) => {
+  const hasAvatar = Boolean(
+    userDetail?.avatarImage &&
+    /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(userDetail.avatarImage as string)
+  )
+
+  return (
+    <div className="flex items-center gap-4">
+      <Dialog
+        transition={{
+          duration: 0.3,
+          ease: 'easeInOut'
+        }}
+      >
+        {hasAvatar ? (
+          <>
+            <DialogTrigger>
+              <Avatar className="h-16 w-16 cursor-pointer hover:opacity-80 transition-opacity">
+                <AvatarImage
+                  src={userDetail?.avatarImage as string}
+                  alt={userDetail?.name || ''}
+                />
+                <AvatarFallback>{userDetail?.name?.slice(0, 2).toUpperCase() || ''}</AvatarFallback>
+              </Avatar>
+            </DialogTrigger>
+
+            <DialogContainer>
+              <DialogContent className='relative'>
+                <DialogImage
+                  src={userDetail?.avatarImage as string}
+                  alt={userDetail?.name || ''}
+                  className='h-auto w-full max-w-[90vw] rounded-[.4rem] object-cover lg:h-[90vh]'
+                />
+              </DialogContent>
+              <DialogClose
+                className='fixed right-6 top-6 h-fit w-fit rounded-full bg-white/80 backdrop-blur-sm p-1.5
+                          hover:bg-white/90 transition-colors'
+                variants={{
+                  initial: { opacity: 0 },
+                  animate: {
+                    opacity: 1,
+                    transition: { delay: 0.3, duration: 0.1 }
+                  },
+                  exit: { opacity: 0, transition: { duration: 0 } }
+                }}
+              >
+                <XIcon className='h-5 w-5 text-zinc-600' />
+              </DialogClose>
+            </DialogContainer>
+          </>
+        ) : (
+          <Avatar className="h-16 w-16">
+            <AvatarFallback>{userDetail?.name?.slice(0, 2).toUpperCase() || ''}</AvatarFallback>
+          </Avatar>
+        )}
+      </Dialog>
+      <div className="flex flex-col gap-1">
+        <h2 className="text-xl font-semibold">{userDetail?.name}</h2>
+        <p className="text-sm text-muted-foreground">User ID: {userDetail?.id}</p>
+      </div>
     </div>
-  </div>
-))
+  )
+})
 UserHeader.displayName = 'UserHeader'
 const TabButtons = React.memo(({ items, activeIndex, setActiveIndex }: {
   items: { title: string }[],

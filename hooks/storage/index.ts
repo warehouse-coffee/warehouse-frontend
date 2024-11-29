@@ -1,3 +1,5 @@
 export * from './useCreateStorage'
 export * from './useStorageOfUserDetail'
 export * from './useStorageOfUser'
+export * from './useUpdateStorage'
+export * from './useDeleteStorage'

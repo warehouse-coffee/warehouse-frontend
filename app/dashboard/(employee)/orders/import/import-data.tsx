@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dialog'
 import { Loader } from '@/components/ui/loader'
 import { TableCell, TableRow } from '@/components/ui/table'
-import { useDeleteImportOrder } from '@/hooks/order'
+import { useDeleteOrder } from '@/hooks/order'
 import { useDialog } from '@/hooks/useDialog'
 import { formatDate, formatCurrency } from '@/lib/utils'
 import { ImportOrder } from '@/types'
@@ -34,7 +34,7 @@ export default function ImportData({ data, table }: ImportDataProps) {
     delete: false
   })
 
-  const deleteImportOrderMutation = useDeleteImportOrder(() => {
+  const deleteImportOrderMutation = useDeleteOrder('import', () => {
     closeDialog('delete')
   })
 

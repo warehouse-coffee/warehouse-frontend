@@ -24,10 +24,7 @@ export default function EmployeesCreatePage({ onClose }: { onClose: () => void }
   const [searchTerm, setSearchTerm] = React.useState('')
   const [currentPage, setCurrentPage] = React.useState(0)
   const [selectedStorages, setSelectedStorages] = React.useState<number[]>([])
-  const [pagination, setPagination] = React.useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 5
-  })
+
   // set data to storages
   const { data } = useUserStorageList(currentPage, 5)
   // set page and storage
@@ -53,7 +50,6 @@ export default function EmployeesCreatePage({ onClose }: { onClose: () => void }
       warehouses: selectedStorages
     })
     createEmployeeMutation.mutate(data)
-    console.log(data)
   }
   const getStatusColor = (status: Storage['status']) => {
     switch (status) {
