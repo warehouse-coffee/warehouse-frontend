@@ -15,6 +15,8 @@ const updateUser = async (data: UpdateUser) => {
       } else if (key === 'avatarImage') {
         if (value instanceof File) {
           formData.append(key, value, value.name)
+        } else if (typeof value === 'string') {
+          formData.append(key, value)
         }
       } else if (key === 'password') {
         formData.append(key, value?.toString() || '')
@@ -35,10 +37,12 @@ const updateUser = async (data: UpdateUser) => {
   try {
     result = typeof responseText === 'string' ? JSON.parse(responseText) : responseText
   } catch (error) {
+    console.error('Error parsing response:', error)
     throw new Error('Failed to parse response')
   }
 
   if (!response.ok) {
+    console.error('Update failed:', result)
     throw new Error(result.message || 'Failed to update user')
   }
 
@@ -52,36 +56,33 @@ export const useUpdateUser = (onComplete: () => void) => {
     mutationFn: updateUser,
     onSuccess: (response) => {
       const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response
+      console.log('Update success response:', parsedResponse)
 
-      // queryClient.getQueriesData({ queryKey: ['users'] }).forEach(([queryKey, oldData]: [any, any]) => {
-      //   if (!oldData) return
+      queryClient.getQueriesData({ queryKey: ['users'] }).forEach(([queryKey, oldData]: [any, any]) => {
+        if (!oldData) return
 
-      //   queryClient.setQueryData(queryKey, {
-      //     ...oldData,
-      //     users: oldData.users.map((user: any) =>
-      //       user.id === parsedResponse.data.id ? { ...user, ...parsedResponse.data } : user
-      //     )
-      //   })
-      // })
+        queryClient.setQueryData(queryKey, {
+          ...oldData,
+          users: oldData.users.map((user: any) =>
+            user.id === parsedResponse.data.id ? parsedResponse.data : user
+          )
+        })
+      })
 
-      queryClient.setQueryData(['userDetail', parsedResponse.data.id], (oldData: any) => {
-        if (!oldData) return oldData
-        return { ...oldData, ...parsedResponse.data }
+      queryClient.setQueryData(['userDetail', parsedResponse.data.id], parsedResponse.data)
+
+      queryClient.invalidateQueries({
+        queryKey: ['users']
       })
 
       queryClient.invalidateQueries({
-        queryKey: ['users'],
-        refetchType: 'all'
-      })
-
-      queryClient.invalidateQueries({
-        queryKey: ['userDetail', parsedResponse.data.id],
-        refetchType: 'all'
+        queryKey: ['userDetail', parsedResponse.data.id]
       })
 
       toast.success(parsedResponse.message || 'User updated successfully')
     },
     onError: (error) => {
+      console.error('Update error:', error)
       handleApiError(error)
     },
     onSettled: () => {

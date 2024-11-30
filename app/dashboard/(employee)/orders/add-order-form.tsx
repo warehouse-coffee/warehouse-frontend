@@ -10,19 +10,20 @@ import * as z from 'zod'
 
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
-import { DateTimePicker24h } from '@/components/ui/date-time-picker'
+import { DateTimePicker24h, DateTimeRangePicker24h } from '@/components/ui/date-time-picker'
 import { DialogFooter } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader } from '@/components/ui/loader'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { importOrderSchema, saleOrderSchema } from '@/configs/zod-schema'
 import { useGetCategoryList } from '@/hooks/category'
 import { useGetCustomerList } from '@/hooks/customer'
 import { useCreateImportOrder, useCreateSaleOrder } from '@/hooks/order'
 import { useGetProductOrder } from '@/hooks/product'
+import { useGetStorageList } from '@/hooks/storage'
 import { cn } from '@/lib/utils'
 
 type ImportOrderFormValues = z.infer<typeof importOrderSchema>
@@ -36,7 +37,15 @@ interface AddOrderFormProps {
 const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
   const [dateRanges, setDateRanges] = useState<{ [key: string]: DateRange | undefined }>({})
   const { data: categories } = useGetCategoryList()
+  const { data: storages } = useGetStorageList()
   const createImportOrderMutation = useCreateImportOrder(onClose)
+
+  const [selectedStorages, setSelectedStorages] = useState<{ [key: string]: number }>({})
+
+  const getAreasForStorage = (storageId: number) => {
+    const storage = storages?.find((storage: { id: number; }) => storage.id === storageId)
+    return storage?.areas || []
+  }
 
   const form = useForm<ImportOrderFormValues>({
     resolver: zodResolver(importOrderSchema),
@@ -235,58 +244,21 @@ const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
 
                   <div className="space-y-2 col-span-2">
                     <Label>Expiration Date Range</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            'w-full justify-start text-left font-normal',
-                            !getDateRange(field.id, index) && 'text-muted-foreground'
-                          )}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {(() => {
-                            const dateRange = getDateRange(field.id, index)
-                            return dateRange?.from ? (
-                              dateRange.to ? (
-                                <>
-                                  {format(dateRange.from, 'LLL dd, y')} -{' '}
-                                  {format(dateRange.to, 'LLL dd, y')}
-                                </>
-                              ) : (
-                                format(dateRange.from, 'LLL dd, y')
-                              )
-                            ) : (
-                              <span>Pick a date range</span>
-                            )
-                          })()}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          initialFocus
-                          mode="range"
-                          defaultMonth={getDateRange(field.id, index)?.from || new Date()}
-                          selected={getDateRange(field.id, index)}
-                          onSelect={(value) => {
-                            setDateRanges(prev => ({
-                              ...prev,
-                              [field.id]: value
-                            }))
-
-                            if (value?.from && value?.to) {
-                              form.setValue(`products.${index}.expiration`, {
-                                from: value.from,
-                                to: value.to
-                              })
-                            }
-                          }}
-                          numberOfMonths={2}
-                          className="rounded-md border"
-                          disabled={(date) => date < new Date()}
-                        />
-                      </PopoverContent>
-                    </Popover>
+                    <DateTimeRangePicker24h
+                      dateRange={getDateRange(field.id, index)}
+                      onChange={(range) => {
+                        setDateRanges(prev => ({
+                          ...prev,
+                          [field.id]: range
+                        }))
+                        if (range?.from && range?.to) {
+                          form.setValue(`products.${index}.expiration`, {
+                            from: range.from,
+                            to: range.to
+                          })
+                        }
+                      }}
+                    />
                     {form.formState.errors.products?.[index]?.expiration && (
                       <p className="text-sm text-red-500">
                         {form.formState.errors.products[index]?.expiration?.message}
@@ -312,15 +284,17 @@ const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                       <SelectContent>
-                        {!categories?.length ? (
-                          <SelectItem value="">No categories found</SelectItem>
-                        ) : (
-                          categories?.map((category: { id: number; name: string; companyId: string }) => (
-                            <SelectItem key={category.id} value={category.id.toString()}>
-                              {category.name}
-                            </SelectItem>
-                          ))
-                        )}
+                        <SelectGroup>
+                          {!categories?.length ? (
+                            <SelectItem disabled aria-disabled value="None">No categories found</SelectItem>
+                          ) : (
+                            categories?.map((category: { id: number; name: string }) => (
+                              <SelectItem key={category.id} value={category.id.toString()}>
+                                {category.name}
+                              </SelectItem>
+                            ))
+                          )}
+                        </SelectGroup>
                       </SelectContent>
                     </Select>
                     {form.formState.errors.products?.[index]?.categoryId && (
@@ -334,13 +308,23 @@ const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
                     <Label>Area</Label>
                     <Select
                       onValueChange={(value) => form.setValue(`products.${index}.areaId`, Number(value))}
+                      disabled={!selectedStorages[field.id]}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select area" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="1">Area 1</SelectItem>
-                        <SelectItem value="2">Area 2</SelectItem>
+                        <SelectGroup>
+                          {!selectedStorages[field.id] ? (
+                            <SelectItem disabled aria-disabled value="None">Please select a storage first</SelectItem>
+                          ) : (
+                            getAreasForStorage(selectedStorages[field.id]).map((area: { id: number; name: string }) => (
+                              <SelectItem key={area.id} value={area.id.toString()}>
+                                {area.name}
+                              </SelectItem>
+                            ))
+                          )}
+                        </SelectGroup>
                       </SelectContent>
                     </Select>
                     {form.formState.errors.products?.[index]?.areaId && (
@@ -353,14 +337,31 @@ const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
                   <div className="col-span-2 space-y-2">
                     <Label>Storage</Label>
                     <Select
-                      onValueChange={(value) => form.setValue(`products.${index}.storageId`, Number(value))}
+                      onValueChange={(value) => {
+                        const storageId = Number(value)
+                        form.setValue(`products.${index}.storageId`, storageId)
+                        form.setValue(`products.${index}.areaId`, 0)
+                        setSelectedStorages(prev => ({
+                          ...prev,
+                          [field.id]: storageId
+                        }))
+                      }}
                     >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select storage" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="1">Storage 1</SelectItem>
-                        <SelectItem value="2">Storage 2</SelectItem>
+                        <SelectGroup>
+                          {!storages?.length ? (
+                            <SelectItem disabled aria-disabled value="None">No storages found</SelectItem>
+                          ) : (
+                            storages?.map((storage: { id: number; name: string; }) => (
+                              <SelectItem key={storage.id} value={storage.id.toString()}>
+                                {storage.name}
+                              </SelectItem>
+                            ))
+                          )}
+                        </SelectGroup>
                       </SelectContent>
                     </Select>
                     {form.formState.errors.products?.[index]?.storageId && (
@@ -457,15 +458,17 @@ const SaleOrderForm = ({ onClose }: { onClose: () => void }) => {
               <SelectValue placeholder="Select customer" />
             </SelectTrigger>
             <SelectContent>
-              {!customers?.length ? (
-                <SelectItem value="">No customers found</SelectItem>
-              ) : (
-                customers?.map((customer: { id: number; name: string }) => (
-                  <SelectItem key={customer.id} value={customer.id.toString()}>
-                    {customer.name}
-                  </SelectItem>
-                ))
-              )}
+              <SelectGroup>
+                {!customers?.length ? (
+                  <SelectItem disabled aria-disabled value="None">No customers found</SelectItem>
+                ) : (
+                  customers?.map((customer: { id: number; name: string }) => (
+                    <SelectItem key={customer.id} value={customer.id.toString()}>
+                      {customer.name}
+                    </SelectItem>
+                  ))
+                )}
+              </SelectGroup>
             </SelectContent>
           </Select>
           {form.formState.errors.customerId && (
@@ -545,15 +548,17 @@ const SaleOrderForm = ({ onClose }: { onClose: () => void }) => {
                         <SelectValue placeholder="Select product" />
                       </SelectTrigger>
                       <SelectContent>
-                        {!products?.length ? (
-                          <SelectItem value="">No products found</SelectItem>
-                        ) : (
-                          products?.map((product: { name: string }) => (
-                            <SelectItem key={product.name} value={product.name}>
-                              {product.name}
-                            </SelectItem>
-                          ))
-                        )}
+                        <SelectGroup>
+                          {!products?.length ? (
+                            <SelectItem disabled aria-disabled value="None">No products found</SelectItem>
+                          ) : (
+                            products?.map((product: { name: string }) => (
+                              <SelectItem key={product.name} value={product.name}>
+                                {product.name}
+                              </SelectItem>
+                            ))
+                          )}
+                        </SelectGroup>
                       </SelectContent>
                     </Select>
                     {form.formState.errors.products?.[index]?.productName && (

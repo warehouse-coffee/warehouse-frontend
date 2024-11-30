@@ -138,8 +138,6 @@ export default function UsersData({
     )
   }
 
-  console.log(data[0].avatarImage)
-
   return (
     <>
       {table.getRowModel().rows.map((row: Row<User>) => (

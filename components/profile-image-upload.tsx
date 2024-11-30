@@ -25,11 +25,20 @@ interface ImageUploadProps {
   onProcessFile?: (file: File | null) => void
 }
 
-const ImageUpload = ({ defaultImage, onProcessFile }: ImageUploadProps) => {
+const ProfileImageUpload = ({ defaultImage, onProcessFile }: ImageUploadProps) => {
+  const getFullImageUrl = (image: File | string | null) => {
+    if (!image) return null
+    if (image instanceof File) return image
+    if (typeof image === 'string') return image
+    return null
+  }
+
+  const processedImage = getFullImageUrl(defaultImage as File | string | null)
+
   return (
     <div className="w-full max-w-[9rem]">
       <FilePond
-        files={defaultImage ? [defaultImage] : []}
+        files={processedImage ? [processedImage] : []}
         allowMultiple={false}
         maxFiles={1}
         name="avatarImage"
@@ -41,10 +50,16 @@ const ImageUpload = ({ defaultImage, onProcessFile }: ImageUploadProps) => {
         imageResizeTargetWidth={200}
         imageResizeTargetHeight={200}
         stylePanelLayout="compact circle"
-        styleLoadIndicatorPosition="center bottom"
+        styleLoadIndicatorPosition="right bottom"
         styleProgressIndicatorPosition="right bottom"
-        styleButtonRemoveItemPosition="left bottom"
+        styleButtonRemoveItemPosition="right bottom"
         styleButtonProcessItemPosition="right bottom"
+        server={{
+          process: async (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
+            progress(true, 0, 100)
+            load(file)
+          }
+        }}
         onupdatefiles={(fileItems: FilePondFile[]) => {
           const file = fileItems[0]?.file || null
           if (onProcessFile) {
@@ -56,4 +71,4 @@ const ImageUpload = ({ defaultImage, onProcessFile }: ImageUploadProps) => {
   )
 }
 
-export default ImageUpload
+export default ProfileImageUpload

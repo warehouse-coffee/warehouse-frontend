@@ -1,7 +1,7 @@
 import { Eye, EyeOff } from 'lucide-react'
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 
-import ImageUpload from '@/components/image-load'
+import ProfileImageUpload from '@/components/profile-image-upload'
 import { Button } from '@/components/ui/button'
 import { DialogFooter } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -121,7 +121,7 @@ export default function UsersEditForm({ user, onClose, isOpen }: { user: UpdateU
       <div className="flex gap-8">
         <div className="flex flex-col items-center gap-5 w-[12rem]">
           <Label>Avatar Image</Label>
-          <ImageUpload
+          <ProfileImageUpload
             defaultImage={editForm.avatarImage as File | null}
             onProcessFile={handleProcessFile}
           />

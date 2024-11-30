@@ -18,9 +18,9 @@ export const API_ENDPOINTS = {
   CREATE_EMPLOYEE: '/api/dashboard/admin/employees/create',
   UPDATE_EMPLOYEE: '/api/dashboard/admin/employees/update',
   DELETE_EMPLOYEE: '/api/dashboard/admin/employees/delete',
-  GET_STORAGE_OF_USER: '/api/dashboard/admin/storages/listOfUser',
+  GET_STORAGE_OF_USER: '/api/dashboard/admin/storages/list-of-user',
   CREATE_STORAGE: '/api/dashboard/admin/storages/create',
-  GET_STORAGE_OF_USER_DETAIL: '/api/dashboard/employee/listOfUser',
+  GET_STORAGE_OF_USER_DETAIL: '/api/dashboard/employee/list-of-user',
   GET_IMPORT_ORDERS: '/api/dashboard/employee/orders/import/list',
   CREATE_IMPORT_ORDER: '/api/dashboard/employee/orders/import/create',
   DELETE_ORDER: '/api/dashboard/employee/orders/delete',
@@ -32,7 +32,8 @@ export const API_ENDPOINTS = {
   GET_SALE_ORDERS: '/api/dashboard/employee/orders/sale/list',
   CREATE_SALE_ORDER: '/api/dashboard/employee/orders/sale/create',
   GET_CUSTOMER_LIST: '/api/dashboard/customer/list',
-  GET_CATEGORY_LIST: '/api/dashboard/category/list'
+  GET_CATEGORY_LIST: '/api/dashboard/category/list',
+  GET_STORAGE_LIST: '/api/dashboard/storage/list'
 } as const
 
 export type ApiEndpoint = typeof API_ENDPOINTS[keyof typeof API_ENDPOINTS]

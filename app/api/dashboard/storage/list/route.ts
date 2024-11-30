@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { cookieStore, tokenUtils } from '@/lib/auth'
 
-import { CategoriesClient } from '../../../web-api-client'
+import { StorageClient } from '../../../web-api-client'
 
 export async function GET(request: NextRequest) {
   const token = cookieStore.get('auth_token')
@@ -12,17 +12,15 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const client = new CategoriesClient(
+    const client = new StorageClient(
       process.env.NEXT_PUBLIC_BACKEND_API_URL!,
       undefined,
       token
     )
 
-    const result = await client.getCategoryList()
-
+    const result = await client.getStorageList()
     return NextResponse.json(result)
   } catch (error) {
-    console.error('Category list error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Eye, EyeOff, TriangleAlert } from 'lucide-react'
+import { Eye, EyeOff, TriangleAlert, ArrowLeft } from 'lucide-react'
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -82,7 +83,7 @@ export default function LoginForm() {
           />
           {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
         </LabelInputContainer>
-        <LabelInputContainer className="mb-4">
+        <LabelInputContainer className='mb-3'>
           <Label htmlFor="password">Password</Label>
           <div className="relative">
             <Input
@@ -103,6 +104,9 @@ export default function LoginForm() {
           </div>
           {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
         </LabelInputContainer>
+        <Link href='/forgot-password' className='text-muted-foreground text-sm mb-4 flex justify-end transition-all duration-250 hover:text-white'>
+          Forgot password?
+        </Link>
         <button
           className={cn(
             'bg-gradient-to-br mt-6 relative flex items-center gap-4 justify-center group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 dark:bg-zinc-800 w-full text-[.95rem] text-white rounded-md h-11 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]',
@@ -121,6 +125,15 @@ export default function LoginForm() {
           )}
           <BottomGradient />
         </button>
+        <div className='flex items-center justify-center mt-5'>
+          <Link
+            href='/'
+            className='text-muted-foreground text-sm flex items-center gap-2 transition-all group hover:text-white'
+          >
+            <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+            <span>Back to home</span>
+          </Link>
+        </div>
       </form>
       <BorderBeam size={120} duration={12} delay={9} />
     </div>
