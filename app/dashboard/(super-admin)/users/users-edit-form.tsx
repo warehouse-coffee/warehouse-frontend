@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader } from '@/components/ui/loader'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useCompanyList } from '@/hooks/company'
+import { useGetCompanyList } from '@/hooks/company'
 import { useUpdateUser } from '@/hooks/user'
 import { cn, formatLabel, formatRoleLabel, getAvailableRoles } from '@/lib/utils'
 import { UpdateUser, RoleName, CompanyInfo } from '@/types'
@@ -16,7 +16,7 @@ import { UpdateUser, RoleName, CompanyInfo } from '@/types'
 type EditFormType = UpdateUser & { password: string, avatarImage: File | string | null }
 
 export default function UsersEditForm({ user, onClose, isOpen }: { user: UpdateUser, onClose: () => void, isOpen: boolean }) {
-  const { data: companyData } = useCompanyList()
+  const { data: companyData } = useGetCompanyList()
 
   const companyList = companyData?.companyList || []
 

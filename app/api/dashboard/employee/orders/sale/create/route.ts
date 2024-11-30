@@ -28,8 +28,6 @@ export async function POST(req: NextRequest) {
       )
       const result = await client.saleOrder(createSaleOrderCommand)
 
-      console.log(result)
-
       if (result.statusCode === 400) {
         return NextResponse.json(
           { error: result.message },

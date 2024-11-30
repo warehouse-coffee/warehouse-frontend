@@ -10,6 +10,7 @@ import * as z from 'zod'
 
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
+import { DateTimePicker24h } from '@/components/ui/date-time-picker'
 import { DialogFooter } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -18,8 +19,10 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { importOrderSchema, saleOrderSchema } from '@/configs/zod-schema'
+import { useGetCategoryList } from '@/hooks/category'
 import { useGetCustomerList } from '@/hooks/customer'
-import { useCreateSaleOrder } from '@/hooks/order'
+import { useCreateImportOrder, useCreateSaleOrder } from '@/hooks/order'
+import { useGetProductOrder } from '@/hooks/product'
 import { cn } from '@/lib/utils'
 
 type ImportOrderFormValues = z.infer<typeof importOrderSchema>
@@ -32,6 +35,8 @@ interface AddOrderFormProps {
 
 const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
   const [dateRanges, setDateRanges] = useState<{ [key: string]: DateRange | undefined }>({})
+  const { data: categories } = useGetCategoryList()
+  const createImportOrderMutation = useCreateImportOrder(onClose)
 
   const form = useForm<ImportOrderFormValues>({
     resolver: zodResolver(importOrderSchema),
@@ -65,13 +70,24 @@ const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
   const onSubmit = (data: ImportOrderFormValues) => {
     const totalPrice = data.products.reduce((sum, product) => sum + (product.price * product.quantity), 0)
 
-    const finalData = {
-      ...data,
+    const formattedData = {
       totalPrice,
-      type: 'import'
+      customerName: data.customerName,
+      customerPhoneNumber: data.customerPhoneNumber,
+      products: data.products.map((product) => ({
+        name: product.name,
+        unit: product.unit,
+        quantity: product.quantity,
+        price: product.price,
+        note: product.note,
+        expiration: new Date(product.expiration.to).toISOString(),
+        categoryId: product.categoryId,
+        areaId: product.areaId,
+        storageId: product.storageId
+      }))
     }
 
-    console.log(finalData)
+    createImportOrderMutation.mutate(formattedData)
     onClose()
   }
 
@@ -296,8 +312,15 @@ const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="1">Category 1</SelectItem>
-                        <SelectItem value="2">Category 2</SelectItem>
+                        {!categories?.length ? (
+                          <SelectItem value="">No categories found</SelectItem>
+                        ) : (
+                          categories?.map((category: { id: number; name: string; companyId: string }) => (
+                            <SelectItem key={category.id} value={category.id.toString()}>
+                              {category.name}
+                            </SelectItem>
+                          ))
+                        )}
                       </SelectContent>
                     </Select>
                     {form.formState.errors.products?.[index]?.categoryId && (
@@ -371,6 +394,7 @@ const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
 const SaleOrderForm = ({ onClose }: { onClose: () => void }) => {
   const [dateRanges, setDateRanges] = useState<{ [key: string]: DateRange | undefined }>({})
   const { data: customers } = useGetCustomerList()
+  const { data: products } = useGetProductOrder()
   const createSaleOrderMutation = useCreateSaleOrder(onClose)
 
   const form = useForm<SaleOrderFormValues>({
@@ -433,11 +457,15 @@ const SaleOrderForm = ({ onClose }: { onClose: () => void }) => {
               <SelectValue placeholder="Select customer" />
             </SelectTrigger>
             <SelectContent>
-              {customers?.map((customer: { id: number; name: string }) => (
-                <SelectItem key={customer.id} value={customer.id.toString()}>
-                  {customer.name}
-                </SelectItem>
-              ))}
+              {!customers?.length ? (
+                <SelectItem value="">No customers found</SelectItem>
+              ) : (
+                customers?.map((customer: { id: number; name: string }) => (
+                  <SelectItem key={customer.id} value={customer.id.toString()}>
+                    {customer.name}
+                  </SelectItem>
+                ))
+              )}
             </SelectContent>
           </Select>
           {form.formState.errors.customerId && (
@@ -447,33 +475,10 @@ const SaleOrderForm = ({ onClose }: { onClose: () => void }) => {
 
         <div className="space-y-2">
           <Label>Date Exported</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  'w-full justify-start text-left font-normal',
-                  !dateExported && 'text-muted-foreground'
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {dateExported ? (
-                  format(dateExported, 'PPP')
-                ) : (
-                  <span>Pick a date</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={dateExported}
-                onSelect={(date) => date && form.setValue('dateExported', date)}
-                disabled={(date) => date < new Date()}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
+          <DateTimePicker24h
+            date={dateExported}
+            onChange={(date) => form.setValue('dateExported', date)}
+          />
           {form.formState.errors.dateExported && (
             <p className="text-sm text-red-500">{form.formState.errors.dateExported.message}</p>
           )}
@@ -533,10 +538,24 @@ const SaleOrderForm = ({ onClose }: { onClose: () => void }) => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Name</Label>
-                    <Input
-                      {...form.register(`products.${index}.productName`)}
-                      placeholder="Enter product name"
-                    />
+                    <Select
+                      onValueChange={(value) => form.setValue(`products.${index}.productName`, value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select product" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {!products?.length ? (
+                          <SelectItem value="">No products found</SelectItem>
+                        ) : (
+                          products?.map((product: { name: string }) => (
+                            <SelectItem key={product.name} value={product.name}>
+                              {product.name}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
                     {form.formState.errors.products?.[index]?.productName && (
                       <p className="text-sm text-red-500">
                         {form.formState.errors.products?.[index]?.productName?.message}

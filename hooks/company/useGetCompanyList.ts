@@ -20,12 +20,12 @@ const fetchCompanies = async () => {
   return data
 }
 
-export const useCompanyList = () => {
+export const useGetCompanyList = () => {
   return useSuspenseQuery({
     queryKey: ['companies'],
     queryFn: fetchCompanies,
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 60 * 24,
+    // staleTime: 1000 * 60 * 5,
+    // gcTime: 1000 * 60 * 60 * 24,
     refetchOnWindowFocus: false
   })
 }

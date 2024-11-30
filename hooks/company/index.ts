@@ -1,1 +1,1 @@
-export * from './useCompanyList'
+export * from './useGetCompanyList'

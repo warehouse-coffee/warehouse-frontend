@@ -16,9 +16,20 @@ export type CreateEmployeeInput = {
 }
 
 export type CreateImportOrderInput = {
-  orderNumber: string;
-  orderDate: Date;
-  supplierId: string;
+  customerName: string
+  customerPhoneNumber: string
+  products: {
+    name: string,
+    unit: string,
+    quantity: number,
+    price: number,
+    note?: string,
+    expiration: string,
+    categoryId: number,
+    areaId: number,
+    storageId: number
+  }[]
+  totalPrice: number
 }
 
 export type CreateSaleOrderInput = {

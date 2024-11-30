@@ -2,13 +2,13 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 
 import { API_ENDPOINTS } from '@/constants'
 
-const fetchCustomerList = async () => {
-  const response = await fetch(`${API_ENDPOINTS.GET_CUSTOMER_LIST}`, {
+const fetchCategoryList = async () => {
+  const response = await fetch(API_ENDPOINTS.GET_CATEGORY_LIST, {
     credentials: 'include'
   })
 
   if (!response.ok) {
-    throw new Error('Failed to fetch customer list')
+    throw new Error('Failed to fetch category list')
   }
 
   const data = await response.json()
@@ -16,15 +16,16 @@ const fetchCustomerList = async () => {
   if (!data || data.error) {
     throw new Error(data?.error || 'No data received')
   }
-  return data.customers
+
+  return data.categories
 }
 
-export const useGetCustomerList = () => {
+export const useGetCategoryList = () => {
   return useSuspenseQuery({
-    queryKey: ['customers'],
-    queryFn: fetchCustomerList,
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 60 * 24,
+    queryKey: ['categories'],
+    queryFn: fetchCategoryList,
+    // staleTime: 1000 * 60 * 5,
+    // gcTime: 1000 * 60 * 60 * 24,
     refetchOnWindowFocus: false
   })
 }

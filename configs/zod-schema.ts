@@ -44,6 +44,6 @@ export const saleOrderSchema = z.object({
     expectedPickupDate: z.object({
       from: z.date(),
       to: z.date()
-    })  
+    })
   })).min(1, 'At least one product is required')
 })
