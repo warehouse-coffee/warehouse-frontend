@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useState } from 'react'
+import { Suspense, useState, useCallback } from 'react'
 import React from 'react'
 
 import { StorageDto2 } from '@/app/api/web-api-client'
@@ -31,6 +31,7 @@ export default function StoragesPage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const deleteStorage = useDeleteStorage()
+  const [refreshFn, setRefreshFn] = useState<(() => void) | null>(null)
 
   const handleEdit = (storage : StorageDto2) => {
     const storageToEdit = storage
@@ -54,6 +55,10 @@ export default function StoragesPage() {
       setDeletingStorage(null)
     }
   }
+
+  const setRefreshFunction = useCallback((fn: () => void) => {
+    setRefreshFn(() => fn)
+  }, [])
 
   return (
     <> <Breadcrumb>
@@ -83,6 +88,7 @@ export default function StoragesPage() {
     <StorageTable
       onEdit={handleEdit}
       onDelete={handleDelete}
+      onRefresh={setRefreshFunction}
     />
     <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
       <DialogContent>
@@ -92,6 +98,13 @@ export default function StoragesPage() {
         {editingStorage && (
           <UpdateStorage
             storage={editingStorage}
+            onSuccess={() => {
+              if (refreshFn) {
+                refreshFn()
+              }
+              setIsEditDialogOpen(false)
+              setEditingStorage(null)
+            }}
           />
         )}
       </DialogContent>
@@ -109,7 +122,12 @@ export default function StoragesPage() {
           </DialogDescription>
         </DialogHeader>
         <Suspense fallback={<DashboardFetchLoader />}>
-          <StoragesCreatePage onClose={() => closeDialog('add')}/>
+          <StoragesCreatePage
+            onClose={() => closeDialog('add')}
+            onSuccess={() => {
+              closeDialog('add')
+              refreshFn?.()
+            }}/>
         </Suspense>
       </DialogContent>
     </Dialog>

@@ -16,14 +16,16 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { useUpdateStorage } from '@/hooks/storage'
-export function UpdateStorage({ storage }: { storage?: StorageDto2 }) {
+export function UpdateStorage({ storage, onSuccess }: { storage?: StorageDto2, onSuccess?: () => void }) {
   const [name, setName] = useState('')
   const [address, setAddress] = useState('')
   const [status, setStatus] = useState('Active')
   const [areas, setAreas] = useState<AreaDto2[]>([])
   const [newArea, setNewArea] = useState('')
   const updateStorage = useUpdateStorage(() => {
-
+    if (onSuccess) {
+      onSuccess()
+    }
   })
   useEffect(() => {
     if (storage) {
