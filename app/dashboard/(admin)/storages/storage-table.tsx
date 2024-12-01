@@ -1,7 +1,7 @@
 import { rankItem } from '@tanstack/match-sorter-utils'
 import { ColumnDef, FilterFn, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, PaginationState, useReactTable } from '@tanstack/react-table'
 import { ChevronDown, ChevronUp, Pencil, Trash2 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import React from 'react'
 
 import { StorageDto2, Page } from '@/app/api/web-api-client'
@@ -37,11 +37,13 @@ export function StorageTable({ onEdit, onDelete, onRefresh }: StorageTableProps)
   })
   const { data: userStorageList, refetch } = useUserStorageList(
     pagination.pageIndex, pagination.pageSize)
-  React.useEffect(() => {
+
+  useEffect(() => {
     if (onRefresh) {
-      onRefresh(() => refetch())
+      onRefresh(refetch)
     }
-  }, [refetch, onRefresh])
+  }, [])
+
   React.useEffect(() => {
     if (userStorageList) {
       setData(userStorageList.storages ?? [])

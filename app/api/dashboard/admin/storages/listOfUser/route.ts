@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     const pageNumber = parseInt(searchParams.get('pageNumber') || '')
     const size = parseInt(searchParams.get('size') || '')
     const page = new Page({
-      pageNumber: pageNumber-1,
+      pageNumber: pageNumber,
       size: size
     })
     const query = new GetStorageOfUserQuery({ page: page })
