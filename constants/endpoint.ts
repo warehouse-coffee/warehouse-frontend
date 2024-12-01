@@ -33,7 +33,11 @@ export const API_ENDPOINTS = {
   CREATE_SALE_ORDER: '/api/dashboard/employee/orders/sale/create',
   GET_CUSTOMER_LIST: '/api/dashboard/customer/list',
   GET_CATEGORY_LIST: '/api/dashboard/category/list',
-  GET_STORAGE_LIST: '/api/dashboard/storage/list'
+  GET_STORAGE_LIST: '/api/dashboard/storage/list',
+  CREATE_COMPANY: '/api/dashboard/superadmin/companies/create',
+  UPDATE_COMPANY: '/api/dashboard/superadmin/companies/update',
+  DELETE_COMPANY: '/api/dashboard/superadmin/companies/delete',
+  GET_COMPANY_DETAIL: '/api/dashboard/superadmin/companies/detail'
 } as const
 
 export type ApiEndpoint = typeof API_ENDPOINTS[keyof typeof API_ENDPOINTS]

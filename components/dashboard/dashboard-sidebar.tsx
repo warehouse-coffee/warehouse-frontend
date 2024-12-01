@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { Home, Settings, Users, Coffee, Boxes, Logs, Warehouse, Truck, File, ChevronRight } from 'lucide-react'
+import { Home, Settings, Users, Coffee, Boxes, Logs, Warehouse, Truck, File, ChevronRight, Building } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { useState } from 'react'
@@ -34,6 +34,7 @@ const sidebarItems: DashboardSidebarItems[] = [
   { name: 'Reports', href: '/dashboard/reports', icon: File, requiredRoles: ['Admin', 'Employee'] },
   { name: 'Company Settings', href: '/dashboard/company-settings', icon: Settings, requiredRoles: ['Admin'] },
   { name: 'Users', href: '/dashboard/users', icon: Users, requiredRoles: ['Super-Admin'] },
+  { name: 'Companies', href: '/dashboard/companies', icon: Building, requiredRoles: ['Super-Admin'] },
   { name: 'Logs', href: '/dashboard/logs', icon: Logs, requiredRoles: ['Super-Admin'] },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings, requiredRoles: ['Super-Admin'] }
 ]
