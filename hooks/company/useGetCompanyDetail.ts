@@ -4,7 +4,7 @@ import { API_ENDPOINTS } from '@/constants'
 import { handleApiError } from '@/lib/utils'
 
 const getCompanyDetail = async (companyId: string) => {
-  const response = await fetch(`${API_ENDPOINTS.GET_COMPANY_DETAIL}`, {
+  const response = await fetch(`${API_ENDPOINTS.GET_COMPANY_DETAIL}?id=${companyId}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'

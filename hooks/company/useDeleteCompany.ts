@@ -1,12 +1,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { API_ENDPOINTS } from '@/constants'
+
 export const useDeleteCompany = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await fetch(`/api/dashboard/superadmin/companies/${id}/delete`, {
+      const response = await fetch(`${API_ENDPOINTS.DELETE_COMPANY}?id=${id}`, {
         method: 'DELETE',
         credentials: 'include'
       })

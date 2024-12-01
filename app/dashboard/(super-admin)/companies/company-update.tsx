@@ -24,7 +24,8 @@ import { useUpdateCompany } from '@/hooks/company/useUpdateCompany'
 const formSchema = z.object({
   companyId: z.string().min(1, 'Company ID is required'),
   companyName: z.string().min(1, 'Company name is required'),
-  phoneContact: z.string().min(1, 'Phone number is required')
+  phoneContact: z.string().min(1, 'Phone number is required'),
+  emailContact: z.string().min(1, 'Email is required')
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -42,9 +43,10 @@ export function CompanyUpdate({ companyId, onSuccess }: CompanyUpdateProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      companyId: company?.data?.companyId || '',
-      companyName: company?.data?.companyName || '',
-      phoneContact: company?.data?.phoneContact || ''
+      companyId: company.companyId || '',
+      companyName: company.companyName || '',
+      phoneContact: company.phoneContact || '',
+      emailContact: company.emailContact || ''
     }
   })
 
@@ -55,7 +57,8 @@ export function CompanyUpdate({ companyId, onSuccess }: CompanyUpdateProps) {
       const command = new UpdateCompanyCommand({
         companyId: data.companyId,
         companyName: data.companyName,
-        phone: data.phoneContact
+        phone: data.phoneContact,
+        email: data.emailContact
       })
       await updateCompanyMutation.mutateAsync(command)
       onSuccess()
@@ -64,7 +67,7 @@ export function CompanyUpdate({ companyId, onSuccess }: CompanyUpdateProps) {
     } finally {
       setIsSubmitting(false)
     }
-  }, [updateCompanyMutation, isSubmitting, onSuccess])
+  }, [updateCompanyMutation, isSubmitting, onSuccess, company])
 
   if (isLoading) {
     return <DashboardFetchLoader />
@@ -112,6 +115,20 @@ export function CompanyUpdate({ companyId, onSuccess }: CompanyUpdateProps) {
               <FormLabel>Phone Number <span className="text-red-500">*</span></FormLabel>
               <FormControl>
                 <Input placeholder="Enter phone number" required {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="emailContact"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email <span className="text-red-500">*</span></FormLabel>
+              <FormControl>
+                <Input placeholder="Enter email address" type="email" required {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

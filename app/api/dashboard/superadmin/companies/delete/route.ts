@@ -4,8 +4,7 @@ import { CompaniesClient } from '@/app/api/web-api-client'
 import { cookieStore } from '@/lib/auth'
 
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  request: NextRequest
 ) {
   try {
     // Get authentication token
@@ -17,14 +16,16 @@ export async function DELETE(
 
     // Khởi tạo CompaniesClient với token
     const client = new CompaniesClient(
-      process.env.NEXT_PUBLIC_API_URL,
+      process.env.NEXT_PUBLIC_BACKEND_API_URL,
       undefined,
       token,
       undefined
     )
 
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id') || ''
     // Gọi API để xóa company
-    await client.deleteCompany(params.id)
+    await client.deleteCompany(id)
 
     // Trả về kết quả thành công
     return NextResponse.json({ message: 'Company deleted successfully' }, { status: 200 })

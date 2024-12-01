@@ -4,8 +4,7 @@ import { CompaniesClient } from '@/app/api/web-api-client'
 import { cookieStore } from '@/lib/auth'
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  request: NextRequest
 ) {
   try {
     // Get authentication token
@@ -14,18 +13,20 @@ export async function GET(
     if (!token) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id') || ''
 
     // Khởi tạo CompaniesClient với token
     const client = new CompaniesClient(
-      process.env.NEXT_PUBLIC_API_URL,
+      process.env.NEXT_PUBLIC_BACKEND_API_URL,
       undefined,
       token,
       undefined
     )
 
-    const company = await client.getCompanyDetail(params.id)
+    const company = await client.getCompanyDetail(id)
 
-    return NextResponse.json(company, { status: 200 })
+    return NextResponse.json(company.data, { status: 200 })
   } catch (error) {
     return new NextResponse(
       JSON.stringify({
