@@ -15,6 +15,7 @@ export default function EmployeesCreatePage({ onClose }: { onClose: () => void }
   const [searchTerm, setSearchTerm] = React.useState('')
   const [currentPage, setCurrentPage] = React.useState(1)
   const [selectedStorages, setSelectedStorages] = React.useState<number[]>([])
+
   // set data to storages
   const { data } = useUserStorageList(currentPage, 5)
   // set page and storage

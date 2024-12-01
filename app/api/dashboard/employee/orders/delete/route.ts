@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { cookieStore, tokenUtils } from '@/lib/auth'
 
-import { OrdersClient } from '../../../../../web-api-client'
+import { OrdersClient } from '../../../../web-api-client'
 
 export async function DELETE(request: NextRequest) {
   const token = cookieStore.get('auth_token')

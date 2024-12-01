@@ -43,7 +43,8 @@ import {
 import { useImportOrderList } from '@/hooks/order/import/useGetImportOrderList'
 import { useDialog } from '@/hooks/useDialog'
 
-// import AddOrderForm from './add-order-form'
+import AddOrderForm from '../add-order-form'
+
 import ImportDataLoading from './import-data-loading'
 
 const ImportData = dynamic(() => import('./import-data'), {
@@ -135,14 +136,14 @@ export default function ImportTable() {
                 <span>Add Order</span>
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-[30rem]">
+            <DialogContent className="max-w-[40rem]">
               <DialogHeader>
                 <DialogTitle>Add Import Order</DialogTitle>
                 <DialogDescription>
                   Fill in the required details to create a new import order.
                 </DialogDescription>
               </DialogHeader>
-              {/* <AddOrderForm onClose={() => closeDialog('add')} /> */}
+              <AddOrderForm onClose={() => closeDialog('add')} type='import' />
             </DialogContent>
           </Dialog>
         </div>

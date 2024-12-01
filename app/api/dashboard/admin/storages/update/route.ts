@@ -13,7 +13,6 @@ export async function PUT(request: NextRequest) {
   try {
     const data = await request.json()
     const mappedAreas = data.areas?.map((area: any) => new AreaDto2({ id: 0, name: area.name })) || []
-
     const command = new UpdateStorageCommand({
       storageId: Number(data.storageId),
       name: data.name,

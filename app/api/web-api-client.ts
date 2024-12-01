@@ -44,19 +44,13 @@ export class Client {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
-            return response.text().then((_responseText) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-                result200 = resultData200 !== undefined ? resultData200 : <any>null;
-    
-            return result200;
-            });
+            return response.text();
         } else if (status !== 200 && status !== 204) {
             return response.text().then((_responseText) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+                throw new Error("An unexpected server error occurred.");
             });
         }
-        return Promise.resolve<string>(null as any);
+        return Promise.resolve("");
     }
 }
 
@@ -831,6 +825,42 @@ export class CustomersClient {
             });
         }
         return Promise.resolve<ResponseDto>(null as any);
+    }
+
+    getCustomerOfCompany(): Promise<CustomersVM> {
+        let url_ = this.baseUrl + "/api/Customers/company";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetCustomerOfCompany(_response);
+        });
+    }
+
+    protected processGetCustomerOfCompany(response: Response): Promise<CustomersVM> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = CustomersVM.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<CustomersVM>(null as any);
     }
 }
 
@@ -1865,6 +1895,42 @@ export class ProductsClient {
             });
         }
         return Promise.resolve<ProductListVM>(null as any);
+    }
+    
+    getProductsOrder(): Promise<ProductsOrderVM> {
+        let url_ = this.baseUrl + "/api/Products/product-order";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetProductsOrder(_response);
+        });
+    }
+
+    protected processGetProductsOrder(response: Response): Promise<ProductsOrderVM> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProductsOrderVM.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<ProductsOrderVM>(null as any);
     }
 }
 
@@ -5054,6 +5120,90 @@ export interface ICreateCustomerCommand {
     address?: string | undefined;
 }
 
+export class CustomersVM implements ICustomersVM {
+    customers?: CustomerDto[];
+
+    constructor(data?: ICustomersVM) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["customers"])) {
+                this.customers = [] as any;
+                for (let item of _data["customers"])
+                    this.customers!.push(CustomerDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): CustomersVM {
+        data = typeof data === 'object' ? data : {};
+        let result = new CustomersVM();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.customers)) {
+            data["customers"] = [];
+            for (let item of this.customers)
+                data["customers"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface ICustomersVM {
+    customers?: CustomerDto[];
+}
+
+export class CustomerDto implements ICustomerDto {
+    id?: number;
+    name?: string | undefined;
+
+    constructor(data?: ICustomerDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): CustomerDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CustomerDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+export interface ICustomerDto {
+    id?: number;
+    name?: string | undefined;
+}
+
 export class CreateEmployeeCommand implements ICreateEmployeeCommand {
     userName?: string | undefined;
     password?: string | undefined;
@@ -7006,6 +7156,86 @@ export interface IGetProductListQuery {
     filters?: FilterData[] | undefined;
 }
 
+export class ProductsOrderVM implements IProductsOrderVM {
+    products?: ProductDto2[] | undefined;
+
+    constructor(data?: IProductsOrderVM) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["products"])) {
+                this.products = [] as any;
+                for (let item of _data["products"])
+                    this.products!.push(ProductDto2.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ProductsOrderVM {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductsOrderVM();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.products)) {
+            data["products"] = [];
+            for (let item of this.products)
+                data["products"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IProductsOrderVM {
+    products?: ProductDto2[] | undefined;
+}
+
+export class ProductDto2 implements IProductDto2 {
+    name?: string | undefined;
+
+    constructor(data?: IProductDto2) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): ProductDto2 {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductDto2();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+export interface IProductDto2 {
+    name?: string | undefined;
+}
+
 export class ReportVM implements IReportVM {
     warehouseStatistics?: WarehousePerformance[];
     importStatistics?: ImportSummary[];
@@ -7647,7 +7877,7 @@ export interface IStorageName {
 }
 
 export class StorageProductListVM implements IStorageProductListVM {
-    products?: ProductDto2[];
+    products?: ProductDto3[];
     page?: Page;
 
     constructor(data?: IStorageProductListVM) {
@@ -7664,7 +7894,7 @@ export class StorageProductListVM implements IStorageProductListVM {
             if (Array.isArray(_data["products"])) {
                 this.products = [] as any;
                 for (let item of _data["products"])
-                    this.products!.push(ProductDto2.fromJS(item));
+                    this.products!.push(ProductDto3.fromJS(item));
             }
             this.page = _data["page"] ? Page.fromJS(_data["page"]) : <any>undefined;
         }
@@ -7690,11 +7920,11 @@ export class StorageProductListVM implements IStorageProductListVM {
 }
 
 export interface IStorageProductListVM {
-    products?: ProductDto2[];
+    products?: ProductDto3[];
     page?: Page;
 }
 
-export class ProductDto2 implements IProductDto2 {
+export class ProductDto3 implements IProductDto3 {
     name?: string;
     units?: string;
     amount?: number;
@@ -7706,7 +7936,7 @@ export class ProductDto2 implements IProductDto2 {
     safeStock?: number;
     totalPrice?: number;
 
-    constructor(data?: IProductDto2) {
+    constructor(data?: IProductDto3) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -7730,9 +7960,9 @@ export class ProductDto2 implements IProductDto2 {
         }
     }
 
-    static fromJS(data: any): ProductDto2 {
+    static fromJS(data: any): ProductDto3 {
         data = typeof data === 'object' ? data : {};
-        let result = new ProductDto2();
+        let result = new ProductDto3();
         result.init(data);
         return result;
     }
@@ -7753,7 +7983,7 @@ export class ProductDto2 implements IProductDto2 {
     }
 }
 
-export interface IProductDto2 {
+export interface IProductDto3 {
     name?: string;
     units?: string;
     amount?: number;

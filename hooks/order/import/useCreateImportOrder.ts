@@ -6,12 +6,14 @@ import { handleApiError } from '@/lib/utils'
 import { CreateImportOrder } from '@/types'
 
 const createImportOrder = async (data: CreateImportOrder) => {
+  const formattedData = { ...data }
+
   const response = await fetch(API_ENDPOINTS.CREATE_IMPORT_ORDER, {
     method: METHODS.POST,
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(data)
+    body: JSON.stringify(formattedData)
   })
 
   const result = await response.json()

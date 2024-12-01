@@ -39,6 +39,7 @@ export async function PUT(request: NextRequest) {
     if (!response.ok) {
       try {
         const result = text ? JSON.parse(text) : {}
+        console.log(result)
         return NextResponse.json(
           { error: result.message || 'Failed to update user' },
           { status: response.status }
