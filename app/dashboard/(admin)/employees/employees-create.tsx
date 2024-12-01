@@ -9,19 +9,11 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useCreateEmployee } from '@/hooks/employee'
 import { useUserStorageList } from '@/hooks/storage'
-import { CreateEmployeeInput } from '@/types'
-const initialFormState: CreateEmployeeInput = {
-  userName: '',
-  password: '',
-  email: '',
-  phoneNumber: '',
-  warehouses: []
-}
 import { Storage } from '@/types/storage'
 
 export default function EmployeesCreatePage({ onClose }: { onClose: () => void }) {
   const [searchTerm, setSearchTerm] = React.useState('')
-  const [currentPage, setCurrentPage] = React.useState(0)
+  const [currentPage, setCurrentPage] = React.useState(1)
   const [selectedStorages, setSelectedStorages] = React.useState<number[]>([])
 
   // set data to storages
@@ -33,7 +25,7 @@ export default function EmployeesCreatePage({ onClose }: { onClose: () => void }
   )
   const itemsPerPage = 5
   const totalPages = Math.ceil(filteredStorages.length / itemsPerPage)
-  const startIndex = currentPage * itemsPerPage
+  const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
   const currentStorages = filteredStorages.slice(startIndex, endIndex)
   const createEmployeeMutation = useCreateEmployee(onClose)
