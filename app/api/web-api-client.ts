@@ -44,13 +44,19 @@ export class Client {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
-            return response.text();
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return result200;
+            });
         } else if (status !== 200 && status !== 204) {
             return response.text().then((_responseText) => {
-                throw new Error("An unexpected server error occurred.");
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
-        return Promise.resolve("");
+        return Promise.resolve<string>(null as any);
     }
 }
 
@@ -3457,6 +3463,7 @@ export interface ICompanyListVM {
 }
 
 export class CompanyDto implements ICompanyDto {
+    id?: number;
     companyId?: string | undefined;
     companyName?: string | undefined;
     phoneContact?: string | undefined;
@@ -3472,6 +3479,7 @@ export class CompanyDto implements ICompanyDto {
 
     init(_data?: any) {
         if (_data) {
+            this.id = _data["id"];
             this.companyId = _data["companyId"];
             this.companyName = _data["companyName"];
             this.phoneContact = _data["phoneContact"];
@@ -3487,6 +3495,7 @@ export class CompanyDto implements ICompanyDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
         data["companyId"] = this.companyId;
         data["companyName"] = this.companyName;
         data["phoneContact"] = this.phoneContact;
@@ -3495,6 +3504,7 @@ export class CompanyDto implements ICompanyDto {
 }
 
 export interface ICompanyDto {
+    id?: number;
     companyId?: string | undefined;
     companyName?: string | undefined;
     phoneContact?: string | undefined;
