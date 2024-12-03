@@ -66,4 +66,45 @@ export class ApiClientService {
       throw new Error('Logout failed')
     }
   }
+
+  static async validateResetToken(token: string) {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/auth/validate-reset-token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ token })
+      })
+
+      if (!response.ok) {
+        throw new Error('Invalid or expired token')
+      }
+
+      const data = await response.json()
+      return data
+    } catch (error) {
+      throw new Error('Failed to validate reset token')
+    }
+  }
+
+  static async resetPassword(token: string, newPassword: string) {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/auth/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ token, newPassword })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to reset password')
+      }
+
+      return true
+    } catch (error) {
+      throw new Error('Failed to reset password')
+    }
+  }
 }

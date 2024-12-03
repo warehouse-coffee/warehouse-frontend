@@ -35,7 +35,7 @@ export const useCreateImportOrder = (onComplete: () => void) => {
   return useMutation({
     mutationFn: createImportOrder,
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['importOrders'], refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: ['importOrders'] })
       toast.success(data.message || 'Import order created successfully')
     },
     onError: (error: Error) => {

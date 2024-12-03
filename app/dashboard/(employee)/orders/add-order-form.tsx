@@ -97,7 +97,6 @@ const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
     }
 
     createImportOrderMutation.mutate(formattedData)
-    onClose()
   }
 
   const getDateRange = (fieldId: string, index: number) => {
@@ -382,10 +381,20 @@ const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
           Cancel
         </Button>
         <Button
-          className="bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary"
+          className={cn(
+            'bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary',
+            createImportOrderMutation.isPending && 'flex items-center gap-3 cursor-wait pointer-events-none'
+          )}
           type="submit"
         >
-          Add Import Order
+          {createImportOrderMutation.isPending ? (
+            <>
+              Creating...
+              <Loader color="#62c5ff" size="1.25rem" />
+            </>
+          ) : (
+            'Add Import Order'
+          )}
         </Button>
       </DialogFooter>
     </form>
