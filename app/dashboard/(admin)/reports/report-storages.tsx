@@ -105,7 +105,7 @@ export default function ReportStorages() {
             <div className="grid grid-cols-3 gap-4">
               {renderSummaryItem('Total Revenue', data?.totalRevenue ?? 0)}
               {renderSummaryItem('Total Import Cost', data?.totalImportCost ?? 0)}
-              {renderSummaryItem('Total Orders', data?.totalOrders ?? 0, false)}
+              {renderSummaryItem('Total Orders Completed', data?.totalOrders ?? 0, false)}
             </div>
             <div className="flex gap-4">
               <div>
@@ -174,7 +174,7 @@ export default function ReportStorages() {
           <WarehouseStatistics {...warehouseStatistics} />
         </TabsContent>
         <TabsContent value="import">
-          <ImportStatistics {...importStatistics} />
+          <ImportStatistics data={importStatistics} />
         </TabsContent>
         <TabsContent value="products">
           <ProductComparison topProducts={topProducts} slowMovingProducts={slowMovingProducts} />

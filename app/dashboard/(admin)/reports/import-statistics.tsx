@@ -7,8 +7,10 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip'
-
-export function ImportStatistics(data: ImportSummary[]) {
+interface ImportSummaryProps {
+  data: ImportSummary[]
+}
+export function ImportStatistics({ data }: ImportSummaryProps) {
   const formatCurrency = (value: string) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(parseFloat(value))
   }

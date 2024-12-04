@@ -70,8 +70,8 @@ export const DashboardTour = ({ userId, userRole }: DashboardTourProps) => {
           {
             element: '#dashboard-cards-total-orders',
             popover: {
-              title: 'Total Orders',
-              description: 'All orders registered in system.',
+              title: 'Order Completion',
+              description: 'Rate orders have been completed.',
               side: 'bottom',
               align: 'start'
             }
@@ -89,7 +89,7 @@ export const DashboardTour = ({ userId, userRole }: DashboardTourProps) => {
             element: '#dashboard-cards-high-demand',
             popover: {
               title: 'High Demand Items',
-              description: 'Current top-selling items.',
+              description: 'Current top-ordered items.',
               side: 'bottom',
               align: 'start'
             }
