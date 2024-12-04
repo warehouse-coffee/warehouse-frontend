@@ -111,7 +111,7 @@ const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 max-h-[80vh] px-1">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="customerName">Customer Name</Label>
+          <Label htmlFor="customerName">Customer Name <span className="text-red-500">*</span></Label>
           <Input
             id="customerName"
             {...form.register('customerName')}
@@ -123,7 +123,7 @@ const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="customerPhoneNumber">Phone Number</Label>
+          <Label htmlFor="customerPhoneNumber">Phone Number <span className="text-red-500">*</span></Label>
           <Input
             id="customerPhoneNumber"
             {...form.register('customerPhoneNumber')}
@@ -192,7 +192,7 @@ const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Name</Label>
+                    <Label>Name <span className="text-red-500">*</span></Label>
                     <Input
                       {...form.register(`products.${index}.name`)}
                       placeholder="Enter product name"
@@ -205,7 +205,7 @@ const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Unit</Label>
+                    <Label>Unit <span className="text-red-500">*</span></Label>
                     <Input
                       {...form.register(`products.${index}.unit`)}
                       placeholder="Enter unit"
@@ -218,7 +218,7 @@ const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Quantity</Label>
+                    <Label>Quantity <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       {...form.register(`products.${index}.quantity`, { valueAsNumber: true })}
@@ -232,7 +232,7 @@ const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Price</Label>
+                    <Label>Price <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       {...form.register(`products.${index}.price`, { valueAsNumber: true })}
@@ -246,7 +246,7 @@ const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
                   </div>
 
                   <div className="space-y-2 col-span-2">
-                    <Label>Expiration Date Range</Label>
+                    <Label>Expiration Date Range <span className="text-red-500">*</span></Label>
                     <DateTimeRangePicker24h
                       dateRange={getDateRange(field.id, index)}
                       onChange={(range) => {
@@ -270,7 +270,7 @@ const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
                   </div>
 
                   <div className="space-y-2 col-span-2">
-                    <Label>Note</Label>
+                    <Label>Note (optional)</Label>
                     <Textarea
                       {...form.register(`products.${index}.note`)}
                       placeholder="Enter note"
@@ -279,7 +279,7 @@ const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Category</Label>
+                    <Label>Category <span className="text-red-500">*</span></Label>
                     <Select
                       onValueChange={(value) => form.setValue(`products.${index}.categoryId`, Number(value))}
                     >
@@ -308,7 +308,7 @@ const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Area</Label>
+                    <Label>Area <span className="text-red-500">*</span></Label>
                     <Select
                       onValueChange={(value) => form.setValue(`products.${index}.areaId`, Number(value))}
                       disabled={!selectedStorages[field.id]}
@@ -338,7 +338,7 @@ const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
                   </div>
 
                   <div className="col-span-2 space-y-2">
-                    <Label>Storage</Label>
+                    <Label>Storage <span className="text-red-500">*</span></Label>
                     <Select
                       onValueChange={(value) => {
                         const storageId = Number(value)
@@ -467,7 +467,7 @@ const SaleOrderForm = ({ onClose }: { onClose: () => void }) => {
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 max-h-[80vh] px-1">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label>Customer</Label>
+          <Label>Customer <span className="text-red-500">*</span></Label>
           <Select
             onValueChange={(value) => form.setValue('customerId', Number(value))}
           >
@@ -494,7 +494,7 @@ const SaleOrderForm = ({ onClose }: { onClose: () => void }) => {
         </div>
 
         <div className="space-y-2">
-          <Label>Date Exported</Label>
+          <Label>Date Exported <span className="text-red-500">*</span></Label>
           <DateTimePicker24h
             date={dateExported}
             onChange={(date) => form.setValue('dateExported', date)}
@@ -557,7 +557,7 @@ const SaleOrderForm = ({ onClose }: { onClose: () => void }) => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Name</Label>
+                    <Label>Name <span className="text-red-500">*</span></Label>
                     <Select
                       onValueChange={(value) => form.setValue(`products.${index}.productName`, value)}
                     >
@@ -586,7 +586,7 @@ const SaleOrderForm = ({ onClose }: { onClose: () => void }) => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Quantity</Label>
+                    <Label>Quantity <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       {...form.register(`products.${index}.quantity`, { valueAsNumber: true })}
@@ -601,7 +601,7 @@ const SaleOrderForm = ({ onClose }: { onClose: () => void }) => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Price</Label>
+                    <Label>Price <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       {...form.register(`products.${index}.price`, { valueAsNumber: true })}
@@ -616,7 +616,7 @@ const SaleOrderForm = ({ onClose }: { onClose: () => void }) => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Expected Pickup Date Range</Label>
+                    <Label>Expected Pickup Date Range <span className="text-red-500">*</span></Label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button

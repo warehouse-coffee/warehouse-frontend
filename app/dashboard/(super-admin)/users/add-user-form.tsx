@@ -60,7 +60,7 @@ export default function AddUserForm({ onClose }: { onClose: () => void }) {
         {Object.entries(createForm).map(([key, value]) => (
           <div key={key} className="w-full flex items-center gap-4">
             <Label htmlFor={key} className="w-[35%]">
-              {formatLabel(key)}
+              {formatLabel(key)} <span className="text-red-500">*</span>
             </Label>
             <div className="w-full">
               {key === 'roleName' ? (

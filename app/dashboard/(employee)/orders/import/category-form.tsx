@@ -95,7 +95,7 @@ export default function CategoryForm({ onClose }: { onClose: () => void }) {
 
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Category Name</Label>
+                  <Label htmlFor="name">Category Name <span className="text-red-500">*</span></Label>
                   <Input
                     id="name"
                     placeholder="Enter category name"
