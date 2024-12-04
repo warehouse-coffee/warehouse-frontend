@@ -5,7 +5,7 @@ import { ArrowLeft } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -13,8 +13,8 @@ import { z } from 'zod'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader } from '@/components/ui/loader'
-import { forgotPasswordSchema } from '@/configs/zod-schema'
-import { checkEmailExists } from '@/lib/actions'
+import { resetPasswordSchema } from '@/configs/zod-schema'
+import { resetPassword } from '@/lib/actions'
 import { cn } from '@/lib/utils'
 
 const BorderBeam = dynamic(() => import('@/components/magicui/border-beam'), { ssr: false })
@@ -42,55 +42,75 @@ const BottomGradient = () => {
   )
 }
 
-export default function ForgotPasswordForm() {
-  const [error, setError] = useState<string>('')
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+interface ResetPasswordFormProps {
+  resetToken: string
+  email?: string
+  tempPass?: string
+  error?: string
+}
+
+export default function ResetPasswordForm({ resetToken, email, tempPass, error: initialError }: ResetPasswordFormProps) {
+  const [error, setError] = useState(initialError || '')
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
   const {
     register,
     handleSubmit,
     formState: { errors }
-  } = useForm<z.infer<typeof forgotPasswordSchema>>({
-    resolver: zodResolver(forgotPasswordSchema),
+  } = useForm<z.infer<typeof resetPasswordSchema>>({
+    resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
-      email: ''
+      password: '',
+      confirmPassword: ''
     }
   })
 
-  async function onSubmit(values: z.infer<typeof forgotPasswordSchema>) {
+  useEffect(() => {
+    if (error) {
+      toast.error('Invalid or expired token')
+    }
+  }, [error])
+
+  async function onSubmit(values: z.infer<typeof resetPasswordSchema>) {
     try {
       setIsLoading(true)
-      setError('')
+      const result = await resetPassword(resetToken, values.password)
 
-      const emailCheck = await checkEmailExists(values.email)
-
-      if (!emailCheck.success || !emailCheck.exists) {
-        setError('No account found with this email address')
-        return
+      if (result.success) {
+        toast.success('Password reset successfully')
+        router.push('/login')
+      } else {
+        setError(result.error || 'Failed to reset password')
+        toast.error(result.error || 'Failed to reset password')
       }
-
-      toast.success('Check your email', {
-        description: 'We have sent you a password reset link',
-        duration: 5000
-      })
-
-      router.push('/login')
     } catch (error) {
-      setError('An error occurred while sending the reset password email')
+      setError('An error occurred while resetting password')
+      toast.error('An error occurred while resetting password')
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <div className="w-[25rem] max-w-md mx-auto rounded-none md:rounded-2xl p-7 shadow-input bg-transparent backdrop-filter backdrop-blur-lg bg-opacity-30 border border-gray-200 dark:border-gray-800 relative z-10">
+    <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-7 shadow-input bg-transparent backdrop-filter backdrop-blur-lg bg-opacity-30 border border-gray-200 dark:border-gray-800 relative z-10">
       <div className="flex flex-col space-y-2">
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-800 dark:text-neutral-200">
-          Forgot Password
+          Reset Password
         </h1>
         <p className="text-neutral-600 leading-6 text-sm max-w-sm dark:text-neutral-300">
-          Enter your email address and we&apos;ll send you a link to reset your password
+          {email ? (
+            <>
+              Email: <span className="font-medium text-white">{email}</span>
+              {tempPass && (
+                <div className="mt-2">
+                  Temporary Password: <span className="font-medium text-white">{tempPass}</span>
+                </div>
+              )}
+            </>
+          ) : (
+            'Enter your new password'
+          )}
         </p>
       </div>
 
@@ -104,16 +124,30 @@ export default function ForgotPasswordForm() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-4">
         <LabelInputContainer>
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="password">New Password</Label>
           <Input
-            id="email"
-            type="email"
-            placeholder="name@example.com"
-            {...register('email')}
+            id="password"
+            type="password"
+            placeholder="••••••••"
+            {...register('password')}
             disabled={isLoading}
           />
-          {errors.email && (
-            <p className="text-red-500 text-sm">{errors.email.message}</p>
+          {errors.password && (
+            <p className="text-red-500 text-sm">{errors.password.message}</p>
+          )}
+        </LabelInputContainer>
+
+        <LabelInputContainer>
+          <Label htmlFor="confirmPassword">Confirm Password</Label>
+          <Input
+            id="confirmPassword"
+            type="password"
+            placeholder="••••••••"
+            {...register('confirmPassword')}
+            disabled={isLoading}
+          />
+          {errors.confirmPassword && (
+            <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>
           )}
         </LabelInputContainer>
 
@@ -131,7 +165,7 @@ export default function ForgotPasswordForm() {
               <Loader size='1.35rem' />
             </>
           ) : (
-            'Send Reset Link'
+            'Reset Password'
           )}
           <BottomGradient />
         </button>

@@ -23,6 +23,7 @@ import { Loader } from '@/components/ui/loader'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { useDeleteEmployee } from '@/hooks/employee'
 import { useDialog } from '@/hooks/useDialog'
+import { cn } from '@/lib/utils'
 import { Employee } from '@/types'
 
 const EmployeeActions = React.memo(
@@ -181,6 +182,7 @@ export default function EmployeesData({ table }: { table: any }) {
             <Button
               type="button"
               onClick={() => closeDialog('delete')}
+              className={cn('bg-accent')}
               variant="outline"
             >
               Cancel

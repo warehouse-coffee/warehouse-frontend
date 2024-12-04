@@ -33,6 +33,8 @@ export const API_ENDPOINTS = {
   CREATE_SALE_ORDER: '/api/dashboard/employee/orders/sale/create',
   GET_CUSTOMER_LIST: '/api/dashboard/customer/list',
   GET_CATEGORY_LIST: '/api/dashboard/category/list',
+  CREATE_CATEGORY: '/api/dashboard/category/create',
+  DELETE_CATEGORY: '/api/dashboard/category/delete',
   GET_STORAGE_LIST: '/api/dashboard/storage/list',
   CREATE_COMPANY: '/api/dashboard/superadmin/companies/create',
   UPDATE_COMPANY: '/api/dashboard/superadmin/companies/update',

@@ -7,7 +7,7 @@ import {
   useReactTable,
   PaginationState
 } from '@tanstack/react-table'
-import { ArrowUpAZ, ArrowDownAZ, ArrowUpDown, CirclePlus } from 'lucide-react'
+import { ArrowUpAZ, ArrowDownAZ, ArrowUpDown, CirclePlus, FolderKanban } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import React, { useState, useEffect } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
@@ -45,6 +45,7 @@ import { useDialog } from '@/hooks/useDialog'
 
 import AddOrderForm from '../add-order-form'
 
+import CategoryForm from './category-form'
 import ImportDataLoading from './import-data-loading'
 
 const ImportData = dynamic(() => import('./import-data'), {
@@ -55,7 +56,8 @@ const ImportData = dynamic(() => import('./import-data'), {
 export default function ImportTable() {
   const { reset } = useQueryErrorResetBoundary()
   const { closeDialog, dialogsOpen, setDialogsOpen } = useDialog({
-    add: false
+    add: false,
+    manageCategory: false
   })
 
   const [pagination, setPagination] = useState<PaginationState>({
@@ -128,7 +130,24 @@ export default function ImportTable() {
             />
           </div>
         </div>
-        <div>
+        <div className="flex items-center gap-4">
+          <Dialog open={dialogsOpen.manageCategory} onOpenChange={(open) => setDialogsOpen(prev => ({ ...prev, manageCategory: open }))}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="bg-gray-600/10 text-white dark:bg-gray-600/30 dark:text-white">
+                <FolderKanban className="mr-2 h-4 w-4" />
+                <span>Manage Category</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-[36rem]">
+              <DialogHeader>
+                <DialogTitle>Categories Management</DialogTitle>
+                <DialogDescription>
+                  Manage your categories here.
+                </DialogDescription>
+              </DialogHeader>
+              <CategoryForm onClose={() => closeDialog('manageCategory')} />
+            </DialogContent>
+          </Dialog>
           <Dialog open={dialogsOpen.add} onOpenChange={(open) => setDialogsOpen(prev => ({ ...prev, add: open }))}>
             <DialogTrigger asChild>
               <Button variant="outline" className="bg-black text-white hover:bg-black hover:text-white dark:bg-primary/10 dark:text-primary">

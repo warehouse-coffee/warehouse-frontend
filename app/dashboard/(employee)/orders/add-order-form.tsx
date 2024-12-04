@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { addDays, format } from 'date-fns'
 import { CalendarIcon, Plus, Trash2 } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { DateRange } from 'react-day-picker'
 import { useFieldArray, useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -75,6 +75,10 @@ const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
     name: 'products',
     control: form.control
   })
+
+  const handleResetForm = useCallback(() => {
+    form.reset()
+  }, [])
 
   const onSubmit = (data: ImportOrderFormValues) => {
     const totalPrice = data.products.reduce((sum, product) => sum + (product.price * product.quantity), 0)
@@ -377,8 +381,8 @@ const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
       </div>
 
       <DialogFooter className="bg-background">
-        <Button type="button" variant="outline" onClick={onClose}>
-          Cancel
+        <Button className={cn('bg-accent')} type="button" variant="outline" onClick={handleResetForm}>
+          Reset
         </Button>
         <Button
           className={cn(
@@ -430,6 +434,10 @@ const SaleOrderForm = ({ onClose }: { onClose: () => void }) => {
     name: 'products',
     control: form.control
   })
+
+  const handleResetForm = useCallback(() => {
+    form.reset()
+  }, [])
 
   const onSubmit = (data: SaleOrderFormValues) => {
     const totalPrice = data.products.reduce((sum, product) => sum + (product.price * product.quantity), 0)
@@ -677,8 +685,8 @@ const SaleOrderForm = ({ onClose }: { onClose: () => void }) => {
       </div>
 
       <DialogFooter className="bg-background">
-        <Button type="button" variant="outline" onClick={onClose}>
-          Cancel
+        <Button className={cn('bg-accent')} type="button" variant="outline" onClick={handleResetForm}>
+          Reset
         </Button>
         <Button
           className={cn(

@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/table'
 import { useDialog } from '@/hooks/useDialog'
 import { useDeleteUser } from '@/hooks/user'
-import { formatRoleLabel } from '@/lib/utils'
+import { cn, formatRoleLabel } from '@/lib/utils'
 import { UpdateUser, User, UserDetail } from '@/types'
 
 const UsersDetailDialog = dynamic(() => import('./users-detail'), {
@@ -217,7 +217,7 @@ export default function UsersData({
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button type="button" onClick={() => closeDialog('delete')} variant="outline">Cancel</Button>
+            <Button className={cn('bg-accent')} type="button" variant="outline" onClick={() => closeDialog('delete')}>Cancel</Button>
             <Button
               type="submit"
               className={`bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary ${deleteUserMutation.isPending ? 'flex items-center gap-3 cursor-not-allowed pointer-events-none' : ''}`}
