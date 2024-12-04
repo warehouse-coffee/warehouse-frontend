@@ -171,7 +171,7 @@ export default function ReportStorages() {
           <TabsTrigger value="products">Product Comparison</TabsTrigger>
         </TabsList>
         <TabsContent value="warehouse">
-          <WarehouseStatistics {...warehouseStatistics} />
+          <WarehouseStatistics data={warehouseStatistics} />
         </TabsContent>
         <TabsContent value="import">
           <ImportStatistics data={importStatistics} />
