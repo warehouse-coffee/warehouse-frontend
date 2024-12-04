@@ -27,7 +27,7 @@ export default function InventoryData({ data, table }: InventoryDataProps) {
 
   return rows.map((row: any) => (
     <TableRow key={row.id}>
-      <TableCell>{row.getValue('productName')}</TableCell>
+      <TableCell className="text-center">{row.getValue('productName')}</TableCell>
       <TableCell className="text-center">{row.getValue('availableQuantity')}</TableCell>
       <TableCell className="text-center">
         {format(new Date(row.getValue('expiration')), 'dd/MM/yyyy')}

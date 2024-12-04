@@ -79,7 +79,7 @@ export default function UsersTable() {
   })
 
   const [totalElements, setTotalElements] = useState<number>(0)
-  const [globalSearch, setGlobalSearch] = useState('')
+  const [globalSearch, setGlobalSearch] = useState<string>('')
   const debouncedGlobalSearch = useDebounce(globalSearch, 500)
   const [isSearching, setIsSearching] = useState<boolean>(false)
 
@@ -147,10 +147,10 @@ export default function UsersTable() {
   }, [userData])
 
   useEffect(() => {
-    if (debouncedGlobalSearch && data.length === 0) {
+    if (debouncedGlobalSearch && userData?.users.length === 0) {
       setIsSearching(true)
     }
-  }, [debouncedGlobalSearch, data.length])
+  }, [debouncedGlobalSearch, userData?.users.length])
 
   const table = useReactTable({
     data,

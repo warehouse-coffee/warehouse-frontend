@@ -1,11 +1,18 @@
 'use client'
 
+import { rankItem } from '@tanstack/match-sorter-utils'
 import { useQueryErrorResetBoundary } from '@tanstack/react-query'
 import {
   getCoreRowModel,
   getPaginationRowModel,
   useReactTable,
-  PaginationState
+  PaginationState,
+  FilterFn,
+  getFilteredRowModel,
+  getSortedRowModel,
+  SortingState,
+  SortingFn,
+  flexRender
 } from '@tanstack/react-table'
 import { ArrowUpDown, ArrowUpAZ, ArrowDownAZ } from 'lucide-react'
 import dynamic from 'next/dynamic'
@@ -24,6 +31,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
+import { Loader } from '@/components/ui/loader'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
 import {
   Table,
@@ -34,7 +42,8 @@ import {
   TableCell
 } from '@/components/ui/table'
 import { useInventoriesByStorage } from '@/hooks/inventory/useGetInventoryListByStorage'
-import { useStorageOfUserDetail } from '@/hooks/storage/useStorageOfUserDetail'
+import { useStorageOfUserDetail } from '@/hooks/storage'
+import { useDebounce } from '@/hooks/useDebounce'
 
 import InventoryDataLoading from './inventory-data-loading'
 
@@ -51,6 +60,10 @@ export default function InventoryTable() {
     pageSize: 5
   })
 
+  const [globalSearch, setGlobalSearch] = useState<string>('')
+  const debouncedGlobalSearch = useDebounce(globalSearch, 500)
+  const [isSearching, setIsSearching] = useState<boolean>(false)
+
   const [totalElements, setTotalElements] = useState<number>(0)
   const [totalPages, setTotalPages] = useState<number>(0)
   const [selectedStorageId, setSelectedStorageId] = useState<number>(0)
@@ -65,6 +78,18 @@ export default function InventoryTable() {
     pagination.pageSize
   )
 
+  const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+
+    // Rank the item
+    const itemRank = rankItem(row.getValue(columnId), value)
+
+    // Store the itemRank info
+    addMeta({ itemRank })
+
+    // Return if the item should be filtered in/out
+    return itemRank.passed
+  }
+
   useEffect(() => {
     if (storageList.length > 0 && !selectedStorageId) {
       setSelectedStorageId(storageList[0].id || 0)
@@ -76,50 +101,232 @@ export default function InventoryTable() {
       setData(inventoryData.inventories)
       setTotalElements(inventoryData.page?.totalElements ?? 0)
       setTotalPages(inventoryData.page?.totalPages ?? 0)
+      setIsSearching(false)
     }
   }, [inventoryData])
+
+  const [sorting, setSorting] = useState<SortingState>([])
+
+  // Custom sorting function cho status
+  const sortStatusFn: SortingFn<any> = (rowA, rowB, columnId) => {
+    const statusA = rowA.getValue(columnId) as string
+    const statusB = rowB.getValue(columnId) as string
+    const statusOrder = ['In Stock', 'Low Stock', 'Out of Stock']
+    return statusOrder.indexOf(statusA) - statusOrder.indexOf(statusB)
+  }
 
   const table = useReactTable({
     data,
     columns: [
       {
         accessorKey: 'productName',
-        header: 'Product Name'
+        header: ({ column }) => (
+          <div
+            className="flex items-center justify-center gap-2 cursor-pointer select-none"
+            onClick={column.getToggleSortingHandler()}
+            title={
+              column.getCanSort()
+                ? column.getNextSortingOrder() === 'asc'
+                  ? 'Sort ascending'
+                  : column.getNextSortingOrder() === 'desc'
+                    ? 'Sort descending'
+                    : 'Clear sort'
+                : undefined
+            }
+          >
+            Product Name
+            {{
+              asc: <ArrowUpAZ className="h-4 w-4" />,
+              desc: <ArrowDownAZ className="h-4 w-4" />
+            }[column.getIsSorted() as string] ?? <ArrowUpDown className="h-4 w-4" />}
+          </div>
+        ),
+        filterFn: fuzzyFilter
       },
       {
         accessorKey: 'availableQuantity',
-        header: 'Available Quantity'
+        header: ({ column }) => (
+          <div
+            className="flex items-center justify-center gap-2 cursor-pointer select-none"
+            onClick={column.getToggleSortingHandler()}
+            title={
+              column.getCanSort()
+                ? column.getNextSortingOrder() === 'asc'
+                  ? 'Sort ascending'
+                  : column.getNextSortingOrder() === 'desc'
+                    ? 'Sort descending'
+                    : 'Clear sort'
+                : undefined
+            }
+          >
+            Available Quantity
+            {{
+              asc: <ArrowUpAZ className="h-4 w-4" />,
+              desc: <ArrowDownAZ className="h-4 w-4" />
+            }[column.getIsSorted() as string] ?? <ArrowUpDown className="h-4 w-4" />}
+          </div>
+        )
       },
       {
         accessorKey: 'expiration',
-        header: 'Expiration'
+        header: ({ column }) => (
+          <div
+            className="flex items-center justify-center gap-2 cursor-pointer select-none"
+            onClick={column.getToggleSortingHandler()}
+            title={
+              column.getCanSort()
+                ? column.getNextSortingOrder() === 'asc'
+                  ? 'Sort ascending'
+                  : column.getNextSortingOrder() === 'desc'
+                    ? 'Sort descending'
+                    : 'Clear sort'
+                : undefined
+            }
+          >
+            Expiration
+            {{
+              asc: <ArrowUpAZ className="h-4 w-4" />,
+              desc: <ArrowDownAZ className="h-4 w-4" />
+            }[column.getIsSorted() as string] ?? <ArrowUpDown className="h-4 w-4" />}
+          </div>
+        ),
+        sortingFn: 'datetime'
       },
       {
         accessorKey: 'totalPrice',
-        header: 'Total Price'
+        header: ({ column }) => (
+          <div
+            className="flex items-center justify-center gap-2 cursor-pointer select-none"
+            onClick={column.getToggleSortingHandler()}
+            title={
+              column.getCanSort()
+                ? column.getNextSortingOrder() === 'asc'
+                  ? 'Sort ascending'
+                  : column.getNextSortingOrder() === 'desc'
+                    ? 'Sort descending'
+                    : 'Clear sort'
+                : undefined
+            }
+          >
+            Total Price
+            {{
+              asc: <ArrowUpAZ className="h-4 w-4" />,
+              desc: <ArrowDownAZ className="h-4 w-4" />
+            }[column.getIsSorted() as string] ?? <ArrowUpDown className="h-4 w-4" />}
+          </div>
+        )
       },
       {
         accessorKey: 'totalSalePrice',
-        header: 'Total Sale Price'
+        header: ({ column }) => (
+          <div
+            className="flex items-center justify-center gap-2 cursor-pointer select-none"
+            onClick={column.getToggleSortingHandler()}
+            title={
+              column.getCanSort()
+                ? column.getNextSortingOrder() === 'asc'
+                  ? 'Sort ascending'
+                  : column.getNextSortingOrder() === 'desc'
+                    ? 'Sort descending'
+                    : 'Clear sort'
+                : undefined
+            }
+          >
+            Total Sale Price
+            {{
+              asc: <ArrowUpAZ className="h-4 w-4" />,
+              desc: <ArrowDownAZ className="h-4 w-4" />
+            }[column.getIsSorted() as string] ?? <ArrowUpDown className="h-4 w-4" />}
+          </div>
+        )
       },
       {
         accessorKey: 'safeStock',
-        header: 'Safe Stock'
+        header: ({ column }) => (
+          <div
+            className="flex items-center justify-center gap-2 cursor-pointer select-none"
+            onClick={column.getToggleSortingHandler()}
+            title={
+              column.getCanSort()
+                ? column.getNextSortingOrder() === 'asc'
+                  ? 'Sort ascending'
+                  : column.getNextSortingOrder() === 'desc'
+                    ? 'Sort descending'
+                    : 'Clear sort'
+                : undefined
+            }
+          >
+            Safe Stock
+            {{
+              asc: <ArrowUpAZ className="h-4 w-4" />,
+              desc: <ArrowDownAZ className="h-4 w-4" />
+            }[column.getIsSorted() as string] ?? <ArrowUpDown className="h-4 w-4" />}
+          </div>
+        )
       },
       {
         accessorKey: 'status',
-        header: 'Status'
+        header: ({ column }) => (
+          <div
+            className="flex items-center justify-center gap-2 cursor-pointer select-none"
+            onClick={column.getToggleSortingHandler()}
+            title={
+              column.getCanSort()
+                ? column.getNextSortingOrder() === 'asc'
+                  ? 'Sort ascending'
+                  : column.getNextSortingOrder() === 'desc'
+                    ? 'Sort descending'
+                    : 'Clear sort'
+                : undefined
+            }
+          >
+            Status
+            {{
+              asc: <ArrowUpAZ className="h-4 w-4" />,
+              desc: <ArrowDownAZ className="h-4 w-4" />
+            }[column.getIsSorted() as string] ?? <ArrowUpDown className="h-4 w-4" />}
+          </div>
+        ),
+        sortingFn: sortStatusFn
       }
     ],
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     state: {
-      pagination
+      pagination,
+      columnFilters: debouncedGlobalSearch ? [
+        {
+          id: 'productName',
+          value: debouncedGlobalSearch
+        }
+      ] : [],
+      sorting
+    },
+    filterFns: {
+      fuzzy: fuzzyFilter
     },
     onPaginationChange: setPagination,
+    onSortingChange: setSorting,
     manualPagination: true,
-    pageCount: totalPages
+    pageCount: totalPages,
+    sortingFns: {
+      sortStatusFn
+    }
   })
+
+  useEffect(() => {
+    if (debouncedGlobalSearch) {
+      setIsSearching(true)
+      const timer = setTimeout(() => {
+        setIsSearching(false)
+      }, 500)
+      return () => clearTimeout(timer)
+    } else {
+      setIsSearching(false)
+    }
+  }, [debouncedGlobalSearch])
 
   return (
     <section className="w-full mt-[1.5rem]">
@@ -150,185 +357,32 @@ export default function InventoryTable() {
             <Input
               placeholder="Search products in inventory..."
               className="min-w-[20rem]"
-              value=""
-              onChange={() => {}}
+              value={globalSearch}
+              onChange={(e) => setGlobalSearch(e.target.value)}
             />
+            {isSearching && (
+              <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                <Loader color="#fff" size="1.15rem" />
+              </div>
+            )}
           </div>
         </div>
       </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>
-                <div className="flex items-center gap-2">
-                  Product Name
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <ArrowUpDown className="h-4 w-4 cursor-pointer" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="min-w-[10rem]">
-                      <DropdownMenuLabel>Sort by</DropdownMenuLabel>
-                      <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727] mb-2" />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                          <ArrowUpAZ className="mr-2 h-4 w-4" />
-                          <span>Ascending</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <ArrowDownAZ className="mr-2 h-4 w-4" />
-                          <span>Descending</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="flex items-center justify-center gap-2">
-                  Available Quantity
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <ArrowUpDown className="h-4 w-4 cursor-pointer" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="min-w-[10rem]">
-                      <DropdownMenuLabel>Sort by</DropdownMenuLabel>
-                      <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727] mb-2" />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                          <ArrowUpAZ className="mr-2 h-4 w-4" />
-                          <span>Ascending</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <ArrowDownAZ className="mr-2 h-4 w-4" />
-                          <span>Descending</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="flex items-center justify-center gap-2">
-                  Expiration
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <ArrowUpDown className="h-4 w-4 cursor-pointer" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="min-w-[10rem]">
-                      <DropdownMenuLabel>Sort by</DropdownMenuLabel>
-                      <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727] mb-2" />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                          <ArrowUpAZ className="mr-2 h-4 w-4" />
-                          <span>Ascending</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <ArrowDownAZ className="mr-2 h-4 w-4" />
-                          <span>Descending</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="flex items-center justify-center gap-2">
-                  Total Price
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <ArrowUpDown className="h-4 w-4 cursor-pointer" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="min-w-[10rem]">
-                      <DropdownMenuLabel>Sort by</DropdownMenuLabel>
-                      <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727] mb-2" />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                          <ArrowUpAZ className="mr-2 h-4 w-4" />
-                          <span>Ascending</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <ArrowDownAZ className="mr-2 h-4 w-4" />
-                          <span>Descending</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="flex items-center justify-center gap-2">
-                  Total Sale Price
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <ArrowUpDown className="h-4 w-4 cursor-pointer" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="min-w-[10rem]">
-                      <DropdownMenuLabel>Sort by</DropdownMenuLabel>
-                      <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727] mb-2" />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                          <ArrowUpAZ className="mr-2 h-4 w-4" />
-                          <span>Ascending</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <ArrowDownAZ className="mr-2 h-4 w-4" />
-                          <span>Descending</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="flex items-center justify-center gap-2">
-                  Safe Stock
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <ArrowUpDown className="h-4 w-4 cursor-pointer" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="min-w-[10rem]">
-                      <DropdownMenuLabel>Sort by</DropdownMenuLabel>
-                      <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727] mb-2" />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                          <ArrowUpAZ className="mr-2 h-4 w-4" />
-                          <span>Ascending</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <ArrowDownAZ className="mr-2 h-4 w-4" />
-                          <span>Descending</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="flex items-center justify-center gap-2">
-                  Status
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <ArrowUpDown className="h-4 w-4 cursor-pointer" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="min-w-[10rem]">
-                      <DropdownMenuLabel>Sort by</DropdownMenuLabel>
-                      <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727] mb-2" />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                          <ArrowUpAZ className="mr-2 h-4 w-4" />
-                          <span>Ascending</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <ArrowDownAZ className="mr-2 h-4 w-4" />
-                          <span>Descending</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </TableHead>
-            </TableRow>
+            {table.getHeaderGroups().map(headerGroup => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map(header => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder ? null : flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
           </TableHeader>
           <TableBody>
             <ErrorBoundary

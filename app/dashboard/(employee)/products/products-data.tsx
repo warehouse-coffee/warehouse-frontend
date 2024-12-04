@@ -26,7 +26,7 @@ export default function ProductsData({ data, table }: ProductsDataProps) {
 
   return rows.map((row: any) => (
     <TableRow key={row.id}>
-      <TableCell>{row.getValue('name')}</TableCell>
+      <TableCell className="text-center">{row.getValue('name')}</TableCell>
       <TableCell className="text-center">{row.getValue('units')}</TableCell>
       <TableCell className="text-center">{row.getValue('quantity')}</TableCell>
       <TableCell className="text-center">
