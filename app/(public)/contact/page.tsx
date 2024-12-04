@@ -1,7 +1,7 @@
 'use client'
-import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Coffee, Github, Linkedin, Mail, MapPin, Phone, Twitter, CheckCircle } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -43,17 +43,17 @@ export default function Contact() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    const formData = new FormData(e.target as HTMLFormElement)
-    const name = formData.get('name') as string
-    const email = formData.get('email') as string
-    const message = formData.get('message') as string
+    // const formData = new FormData(e.target as HTMLFormElement)
+    // const name = formData.get('name') as string
+    // const email = formData.get('email') as string
+    // const message = formData.get('message') as string
 
     // Here you would typically send the form data to your backend
-    console.log({ name, email, message })
+    // console.log({ name, email, message })
 
-    setIsSubmitted(true)
+    setIsSubmitted(true);
     // Reset the form
-    ;(e.target as HTMLFormElement).reset()
+    (e.target as HTMLFormElement).reset()
   }
 
   const handleCloseModal = () => {
@@ -66,7 +66,7 @@ export default function Contact() {
     }
   }, [isSubmitted])
 
-  return (    
+  return (
     <div className="bg-background">
       <AnimatePresence>
         {isSubmitted && (
@@ -94,7 +94,7 @@ export default function Contact() {
           </motion.div>
         )}
       </AnimatePresence>
-      
+
       <section className="relative h-[55vh] flex items-center justify-center">
         <div className="relative z-10 text-center">
           <h1 className="text-5xl font-bold text-white mb-4">Contact Us</h1>
@@ -129,7 +129,7 @@ export default function Contact() {
                     {member.twitter && (
                       <a href={`https://twitter.com/${member.twitter}`} className="text-primary hover:text-primary/80">
                         <Twitter className="h-5 w-5" />
-                        <span className="sr-only">{member.name}'s Twitter</span>
+                        <span className="sr-only">{member.name}&apos;s Twitter</span>
                       </a>
                     )}
                     {member.linkedin && (
@@ -138,13 +138,13 @@ export default function Contact() {
                         className="text-primary hover:text-primary/80"
                       >
                         <Linkedin className="h-5 w-5" />
-                        <span className="sr-only">{member.name}'s LinkedIn</span>
+                        <span className="sr-only">{member.name}&apos;s LinkedIn</span>
                       </a>
                     )}
                     {member.github && (
                       <a href={`https://github.com/${member.github}`} className="text-primary hover:text-primary/80">
                         <Github className="h-5 w-5" />
-                        <span className="sr-only">{member.name}'s GitHub</span>
+                        <span className="sr-only">{member.name}&apos;s GitHub</span>
                       </a>
                     )}
                   </div>
@@ -203,4 +203,3 @@ export default function Contact() {
     </div>
   )
 }
-

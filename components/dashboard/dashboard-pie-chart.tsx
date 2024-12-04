@@ -29,11 +29,11 @@ type DashboardPieChartProps = {
 
 const chartConfig = {
   prediction: {
-    label: 'Prediction',
+    label: 'Confidence',
     color: 'hsl(var(--chart-1))'
   },
   real_time: {
-    label: 'Real-time',
+    label: 'Uncertainty',
     color: 'hsl(var(--chart-2))'
   }
 } satisfies ChartConfig
@@ -105,6 +105,14 @@ export function DashboardPieChart({ id, userRole }: DashboardPieChartProps) {
     day: 'numeric'
   })
 
+  let tommorowDate = new Date(predictionData.date)
+  tommorowDate.setDate(tommorowDate.getDate() + 1)
+  const formattedtommorowDate = tommorowDate.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
+
   return (
     <Card className="flex flex-col" id={id}>
       <CardHeader className="items-center pb-0">
@@ -151,7 +159,7 @@ export function DashboardPieChart({ id, userRole }: DashboardPieChartProps) {
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground"
                         >
-                          Prediction
+                          Confidence
                         </tspan>
                       </text>
                     )
@@ -164,11 +172,11 @@ export function DashboardPieChart({ id, userRole }: DashboardPieChartProps) {
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2 font-medium leading-none">
-          Prediction Confidence: {(predictionData.aI_predict).toFixed(2)}
+          Prediction: {(predictionData.aI_predict).toFixed(2)}
           {getTrendIcon(predictionData.aI_predict)}
         </div>
         <div className="leading-none text-muted-foreground">
-          Coffee price forecast
+          Forecast for {formattedtommorowDate}
         </div>
       </CardFooter>
     </Card>

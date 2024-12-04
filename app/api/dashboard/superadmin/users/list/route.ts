@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
     })
 
     const response = await client.getAllUsers(query)
+    // console.log(response)
     return NextResponse.json(response)
   } catch (error) {
     if (error instanceof Error) {

@@ -144,7 +144,10 @@ export default function UsersData({
         <TableRow key={row.original.id}>
           <TableCell className="flex items-center gap-3">
             <Avatar className="w-8 h-8">
-              <AvatarImage src={row.original.avatarImage} alt={row.original.userName} />
+              <AvatarImage
+                src={row.original.avatarImage as string}
+                alt={row.original.userName}
+              />
               <AvatarFallback>
                 {row.original.userName?.slice(0, 2).toUpperCase()}
               </AvatarFallback>
@@ -188,7 +191,7 @@ export default function UsersData({
       </Dialog>
 
       <Dialog open={dialogsOpen.edit} onOpenChange={(open) => setDialogsOpen(prev => ({ ...prev, edit: open }))}>
-        <DialogContent className="max-w-[30rem]">
+        <DialogContent className="max-w-[55rem]">
           <DialogHeader>
             <DialogTitle>Edit User</DialogTitle>
             <DialogDescription>

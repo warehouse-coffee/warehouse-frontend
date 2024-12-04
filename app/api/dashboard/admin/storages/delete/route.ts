@@ -14,13 +14,13 @@ export async function DELETE(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
     if (!id) {
-      return NextResponse.json({ error: 'Employee ID is required' }, { status: 400 })
+      return NextResponse.json({ error: 'Storage ID is required' }, { status: 400 })
     }
     const client = new StorageClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token)
     const result = await client.deleteStorage(Number(id))
     return NextResponse.json(result)
   } catch (error: any) {
-    const errorMessage = error.message || 'Failed to delete employee'
+    const errorMessage = error.message || 'Failed to delete storage'
     return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
 }

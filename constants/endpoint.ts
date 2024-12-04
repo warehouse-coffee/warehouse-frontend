@@ -18,16 +18,26 @@ export const API_ENDPOINTS = {
   CREATE_EMPLOYEE: '/api/dashboard/admin/employees/create',
   UPDATE_EMPLOYEE: '/api/dashboard/admin/employees/update',
   DELETE_EMPLOYEE: '/api/dashboard/admin/employees/delete',
-  GET_STORAGE_OF_USER: '/api/dashboard/admin/storages/listOfUser',
+  GET_STORAGE_OF_USER: '/api/dashboard/admin/storages/list-of-user',
   CREATE_STORAGE: '/api/dashboard/admin/storages/create',
-  GET_STORAGE_OF_USER_DETAIL: '/api/dashboard/employee/listOfUser',
+  GET_STORAGE_OF_USER_DETAIL: '/api/dashboard/employee/list-of-user',
   GET_IMPORT_ORDERS: '/api/dashboard/employee/orders/import/list',
   CREATE_IMPORT_ORDER: '/api/dashboard/employee/orders/import/create',
-  DELETE_IMPORT_ORDER: '/api/dashboard/employee/orders/import/delete',
-  GET_REPORT_STORAGE: '/api/dashboard/admin/reports',
-  PUT_STORAGE: '/api/dashboard/admin/storages/update',
+  DELETE_ORDER: '/api/dashboard/employee/orders/delete',
   DELETE_STORAGE: '/api/dashboard/admin/storages/delete',
-  GET_TOP_ORDERS: '/api/dashboard/employee/orders/top5'
+  UPDATE_STORAGE: '/api/dashboard/admin/storages/update',
+  GET_REPORT_STORAGE: '/api/dashboard/admin/reports',
+  GET_PRODUCT_ORDER: '/api/dashboard/product/product-order',
+  GET_TOP_ORDERS: '/api/dashboard/employee/orders/top5',
+  GET_SALE_ORDERS: '/api/dashboard/employee/orders/sale/list',
+  CREATE_SALE_ORDER: '/api/dashboard/employee/orders/sale/create',
+  GET_CUSTOMER_LIST: '/api/dashboard/customer/list',
+  GET_CATEGORY_LIST: '/api/dashboard/category/list',
+  GET_STORAGE_LIST: '/api/dashboard/storage/list',
+  CREATE_COMPANY: '/api/dashboard/superadmin/companies/create',
+  UPDATE_COMPANY: '/api/dashboard/superadmin/companies/update',
+  DELETE_COMPANY: '/api/dashboard/superadmin/companies/delete',
+  GET_COMPANY_DETAIL: '/api/dashboard/superadmin/companies/detail'
 } as const
 
 export type ApiEndpoint = typeof API_ENDPOINTS[keyof typeof API_ENDPOINTS]

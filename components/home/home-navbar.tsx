@@ -11,7 +11,9 @@ export default function HomeNavbar({ navItems }: { navItems: Navbar[] }) {
   const pathname = usePathname()
 
   return (
-    <nav className={`w-full fixed z-[1000] flex items-center justify-between ${pathname !== '/' ? 'border-b border-solid border-[#2c2c2c] bg-opacity-25 backdrop-filter backdrop-blur-[.6rem] top-0 h-20' : 'h-16 top-[.5rem]'}`}>
+    <nav
+      className={`w-full fixed z-[1000] flex items-center justify-between ${pathname !== '/' ? 'border-b border-solid border-[#2c2c2c] bg-opacity-25 backdrop-filter backdrop-blur-[.6rem] top-0 h-20' : 'h-16 top-[.5rem]'}`}
+    >
       <div className="w-1/3 h-full flex items-center ml-[2rem]">
         <HyperText className='text-[1.75rem] uppercase font-bold font-sans' text='cofee td.' />
       </div>

@@ -8,7 +8,6 @@ import dynamic from 'next/dynamic'
 import { useCallback } from 'react'
 import React from 'react'
 
-import { EmployeeDto } from '@/app/api/web-api-client'
 import DashboardFetchLoader from '@/components/dashboard/dashboard-fetch-loader'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -80,12 +79,6 @@ export default function EmployeesData({ table }: { table: any }) {
   const handleEditEmployee = useCallback(
     (employee: Employee) => {
       openDialog('edit', employee)
-    },
-    [openDialog]
-  )
-  const handleViewEmployee = useCallback(
-    (employee: Employee) => {
-      openDialog('detail', employee)
     },
     [openDialog]
   )

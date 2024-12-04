@@ -6,18 +6,22 @@ import { API_ENDPOINTS, METHODS } from '@/constants'
 import { handleApiError } from '@/lib/utils'
 
 const updateStorage = async (data: UpdateStorageCommand) => {
-  const response = await fetch(API_ENDPOINTS.PUT_STORAGE, {
-    method: METHODS.POST,
+  if (!data?.storageId) {
+    throw new Error('Invalid storage id')
+  }
+  const response = await fetch(API_ENDPOINTS.UPDATE_STORAGE, {
+    method: METHODS.PUT,
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(data)
   })
   if (!response.ok) {
-    throw new Error('Failed to create storage')
+    throw new Error('Failed to update storage')
   }
   return response.json()
 }
+
 export const useUpdateStorage = (onComplete: () => void) => {
   const queryClient = useQueryClient()
   return useMutation({

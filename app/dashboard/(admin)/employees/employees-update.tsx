@@ -2,13 +2,13 @@ import { Search } from 'lucide-react'
 import * as React from 'react'
 import { useState } from 'react'
 
-import { EmployeeDetailVM, StorageDto2 } from '@/app/api/web-api-client'
+import { EmployeeDetailVM, StorageDto2, UpdateEmployeeCommand } from '@/app/api/web-api-client'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useEmployeeDetail } from '@/hooks/employee'
+import { useEmployeeDetail, useUpdateEmployee } from '@/hooks/employee'
 import { useUserStorageList } from '@/hooks/storage'
 
 interface Storage {
@@ -40,23 +40,24 @@ interface Storage {
 // }
 
 export default function EmployeesUpdatePage({ id, onClose, isOpen }: { id: string, onClose: () => void, isOpen: boolean }) {
-  const { data } = useEmployeeDetail(id)
+  const { data : updateEmployee } = useEmployeeDetail(id)
   const [employee, setEmployee] = useState<EmployeeDetailVM | null>(null)
   const [searchTerm, setSearchTerm] = React.useState('')
-  const [currentPage, setCurrentPage] = React.useState(1)
+  const [currentPage, setCurrentPage] = React.useState(0)
   const [selectedStorages, setSelectedStorages] = React.useState<number[]>([])
   // storages
   const { data: userStorageList } = useUserStorageList(currentPage, 5)
   const storages: StorageDto2[] = userStorageList?.storages || []
+  const updateEmployeeMutation = useUpdateEmployee(onClose)
   // set page and storage
   React.useEffect(() => {
-    if (data) {
-      setEmployee(data)
-      data.storages?.forEach(element => {
+    if (updateEmployee) {
+      setEmployee(updateEmployee)
+      updateEmployee.storages?.forEach(element => {
         setSelectedStorages((prev) => [...prev, element.id].filter((id): id is number => id !== undefined))
       })
     }
-  }, [data])
+  }, [updateEmployee])
 
   const filteredStorages = storages.filter((storage) =>
     (storage.name ?? '').toLowerCase().includes(searchTerm.toLowerCase())
@@ -64,34 +65,24 @@ export default function EmployeesUpdatePage({ id, onClose, isOpen }: { id: strin
 
   const itemsPerPage = 5
   const totalPages = Math.ceil(filteredStorages.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
+  const startIndex = currentPage * itemsPerPage
   const endIndex = startIndex + itemsPerPage
   const currentStorages = filteredStorages.slice(startIndex, endIndex)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const formData = new FormData(e.target as HTMLFormElement)
-    const data = {
-      userName: formData.get('username'),
-      password: formData.get('password'),
-      email: formData.get('email'),
-      phoneNumber: formData.get('phoneNumber'),
+    const data = new UpdateEmployeeCommand({
+      id: id,
+      userName: formData.get('username') as string || '',
+      password: formData.get('password') as string | undefined,
+      email: formData.get('email') as string || undefined,
+      phoneNumber: formData.get('phoneNumber') as string | undefined,
       warehouses: selectedStorages
-    }
-    console.log(data)
+    })
+    updateEmployeeMutation.mutate(data)
   }
-  const getStatusColor = (status: Storage['status']) => {
-    switch (status) {
-    case 'Active':
-      return 'text-green-500'
-    case 'Inactive':
-      return 'text-red-500'
-    case 'UnderMaintenance':
-      return 'text-orange-500'
-    default:
-      return 'text-gray-500'
-    }
-  }
+
   const commonTabContentStyle = 'space-y-6 bg-white p-6 rounded-lg shadow-sm dark:bg-primary/10 dark:text-primary min-h-[400px]'
   return (
     <>
@@ -125,7 +116,6 @@ export default function EmployeesUpdatePage({ id, onClose, isOpen }: { id: strin
                       id="password"
                       name="password"
                       type="password"
-                      required
                       placeholder="Enter password"
                       className="w-full"
                     />

@@ -1,8 +1,7 @@
 'use client'
-import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-
 import { Coffee, Heart, Lightbulb, Mail, MapPin, Phone, Send, Star, Twitter, CheckCircle } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -15,17 +14,17 @@ export default function AboutUs() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    const formData = new FormData(e.target as HTMLFormElement)
-    const name = formData.get('name') as string
-    const email = formData.get('email') as string
-    const message = formData.get('message') as string
+    // const formData = new FormData(e.target as HTMLFormElement)
+    // const name = formData.get('name') as string
+    // const email = formData.get('email') as string
+    // const message = formData.get('message') as string
 
     // Here you would typically send the form data to your backend
-    console.log({ name, email, message })
+    // console.log({ name, email, message })
 
-    setIsSubmitted(true)
-      // Reset the form
-      ; (e.target as HTMLFormElement).reset()
+    setIsSubmitted(true);
+    // Reset the form
+    (e.target as HTMLFormElement).reset()
   }
 
   const handleCloseModal = () => {

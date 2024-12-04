@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader } from '@/components/ui/loader'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useCompanyList } from '@/hooks/company'
+import { useGetCompanyList } from '@/hooks/company'
 import { useCreateUser } from '@/hooks/user'
 import { cn, formatLabel, formatRoleLabel, getAvailableRoles } from '@/lib/utils'
 import { CompanyInfo, CreateUserInput, RoleName } from '@/types'
@@ -28,7 +28,7 @@ export default function AddUserForm({ onClose }: { onClose: () => void }) {
 
   const createUserMutation = useCreateUser(onClose)
 
-  const { data: companyData } = useCompanyList()
+  const { data: companyData } = useGetCompanyList()
 
   const companyList = companyData?.companyList || []
 

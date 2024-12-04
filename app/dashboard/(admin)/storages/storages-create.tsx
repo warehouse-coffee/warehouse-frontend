@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Plus, Save, XCircle, MapPin, Tag, Info, Check, GripVertical } from 'lucide-react'
 import React, { useState, useRef } from 'react'
+import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -22,8 +23,12 @@ import {
 } from '@/components/ui/tooltip'
 import { useCreateStorage } from '@/hooks/storage'
 
+interface StoragesCreatePageProps {
+  onClose: () => void;
+  onSuccess?: () => void;
+}
 import { CreateStorageCommand, AreaDto } from '../../../../app/api/web-api-client'
-export default function StoragesCreatePage({ onClose }: { onClose: () => void }) {
+export default function StoragesCreatePage({ onClose, onSuccess }: StoragesCreatePageProps) {
   const [name, setName] = useState('')
   const [location, setLocation] = useState('')
   const [status, setStatus] = useState('0')
@@ -83,13 +88,17 @@ export default function StoragesCreatePage({ onClose }: { onClose: () => void })
         status: parseInt(status),
         areas: areasDto
       })
-      console.log('Submitting:', formData)
       // Simulating API call
-      createUserMutation.mutate(formData)
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      setIsSubmitting(false)
-      setShowSuccessModal(true)
-      setTimeout(() => setShowSuccessModal(false), 3000)
+      try {
+        createUserMutation.mutate(formData)
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        setIsSubmitting(false)
+        setShowSuccessModal(true)
+        setTimeout(() => setShowSuccessModal(false), 3000)
+        onSuccess?.()
+      } catch (error) {
+        toast.error('Failed to create storage')
+      }
       // toast.success('Storage created successfully')
     }
   }
@@ -210,8 +219,8 @@ export default function StoragesCreatePage({ onClose }: { onClose: () => void })
           <Button type="button" variant="outline" onClick={() => {
             setName('')
             setLocation('')
-            setStatus('1')
-            setAreas(['Area A', 'Area B', 'Area C'])
+            setStatus('0')
+            setAreas([])
             setErrors({})
           }}>
             <XCircle className="h-4 w-4 mr-2" /> Cancel

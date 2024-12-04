@@ -20,8 +20,8 @@ export const useDeleteStorage = (onComplete?: () => void) => {
   return useMutation({
     mutationFn: deleteStorage,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] })
-      toast.success('User deleted successfully')
+      queryClient.invalidateQueries({ queryKey: ['userStorageList'] })
+      toast.success('Storage deleted successfully')
     },
     onError: (error: Error) => {
       handleApiError(error)
