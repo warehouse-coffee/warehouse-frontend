@@ -27,6 +27,7 @@ export const API_ENDPOINTS = {
   DELETE_STORAGE: '/api/dashboard/admin/storages/delete',
   UPDATE_STORAGE: '/api/dashboard/admin/storages/update',
   GET_REPORT_STORAGE: '/api/dashboard/admin/reports',
+  GET_PRODUCT_LIST: '/api/dashboard/product/list',
   GET_PRODUCT_ORDER: '/api/dashboard/product/product-order',
   GET_TOP_ORDERS: '/api/dashboard/employee/orders/top5',
   GET_SALE_ORDERS: '/api/dashboard/employee/orders/sale/list',
