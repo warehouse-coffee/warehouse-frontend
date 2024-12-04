@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 
 import { cookieStore, tokenUtils } from '@/lib/auth'
 
-import LoginMain from './login-main'
+import LoginForm from './login-form'
 
 export const metadata: Metadata = {
   title: 'Login',
@@ -19,5 +19,5 @@ export default function LoginPage() {
     redirect('/dashboard')
   }
 
-  return <LoginMain />
+  return <LoginForm />
 }

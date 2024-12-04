@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { useDeleteStorage } from '@/hooks/storage/useDeleteStorage'
 import { useDialog } from '@/hooks/useDialog'
+import { cn } from '@/lib/utils'
 
 import { StorageTable } from './storage-table'
 import StoragesCreatePage from './storages-create'
@@ -140,7 +141,7 @@ export default function StoragesPage() {
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+          <Button className={cn('bg-accent')} variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
               Cancel
           </Button>
           <Button variant="destructive" onClick={confirmDelete}>

@@ -9,6 +9,24 @@ export const loginSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters long')
 })
 
+export const forgotPasswordSchema = z.object({
+  email: z.string().email('Please enter a valid email address')
+})
+
+export const resetPasswordSchema = z.object({
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least 1 uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least 1 lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least 1 number')
+    .regex(/[^A-Za-z0-9]/, 'Password must contain at least 1 special character'),
+  confirmPassword: z.string()
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'Passwords do not match',
+  path: ['confirmPassword']
+})
+
 export const settingsFormSchema = z.object({
   aiServiceKey: z.string().min(1, 'AI Service Key is required'),
   emailServiceKey: z.string().min(1, 'Email Service Key is required'),
