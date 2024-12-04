@@ -132,7 +132,7 @@ export default function LoginForm() {
         <div className='flex items-center justify-center mt-5'>
           <Link href="/" className={cn('flex items-center gap-2 text-muted-foreground text-sm transition-all duration-250 group hover:text-white', isSubmitting && 'cursor-not-allowed pointer-events-none')}>
             <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-            <span>Back to home</span>
+            <span>Back to Home</span>
           </Link>
         </div>
       </form>

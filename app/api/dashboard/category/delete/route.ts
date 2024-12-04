@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { cookieStore, tokenUtils } from '@/lib/auth'
+
 import { CategoriesClient } from '../../../web-api-client'
 
 export async function DELETE(request: NextRequest) {

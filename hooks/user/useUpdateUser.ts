@@ -54,29 +54,11 @@ export const useUpdateUser = (onComplete: () => void) => {
 
   return useMutation({
     mutationFn: updateUser,
-    onSuccess: (response) => {
-      const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response
-      console.log('Update success response:', parsedResponse)
-
-      queryClient.getQueriesData({ queryKey: ['users'] }).forEach(([queryKey, oldData]: [any, any]) => {
-        if (!oldData) return
-
-        queryClient.setQueryData(queryKey, {
-          ...oldData,
-          users: oldData.users.map((user: any) =>
-            user.id === parsedResponse.data.id ? parsedResponse.data : user
-          )
-        })
-      })
-
-      queryClient.setQueryData(['userDetail', parsedResponse.data.id], parsedResponse.data)
+    onSuccess: (data) => {
+      const parsedResponse = typeof data === 'string' ? JSON.parse(data) : data
 
       queryClient.invalidateQueries({
         queryKey: ['users']
-      })
-
-      queryClient.invalidateQueries({
-        queryKey: ['userDetail', parsedResponse.data.id]
       })
 
       toast.success(parsedResponse.message || 'User updated successfully')
