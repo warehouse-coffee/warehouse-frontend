@@ -4,22 +4,21 @@ import { format } from 'date-fns'
 
 import { Badge } from '@/components/ui/badge'
 import { TableCell, TableRow } from '@/components/ui/table'
-import { formatCurrency } from '@/lib/utils'
-import { Inventory } from '@/types'
+import { Product } from '@/types'
 
-interface InventoryDataProps {
-  data: Inventory[]
+interface ProductsDataProps {
+  data: Product[]
   table: any
 }
 
-export default function InventoryData({ data, table }: InventoryDataProps) {
+export default function ProductsData({ data, table }: ProductsDataProps) {
   const rows = table.getRowModel().rows
 
   if (rows.length === 0) {
     return (
       <TableRow>
         <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
-          No inventory data found.
+          No products data found.
         </TableCell>
       </TableRow>
     )
@@ -27,28 +26,32 @@ export default function InventoryData({ data, table }: InventoryDataProps) {
 
   return rows.map((row: any) => (
     <TableRow key={row.id}>
-      <TableCell>{row.getValue('productName')}</TableCell>
-      <TableCell className="text-center">{row.getValue('availableQuantity')}</TableCell>
-      <TableCell className="text-center">
-        {format(new Date(row.getValue('expiration')), 'dd/MM/yyyy')}
-      </TableCell>
-      <TableCell className="text-center">{formatCurrency(row.getValue('totalPrice'))}</TableCell>
-      <TableCell className="text-center">{formatCurrency(row.getValue('totalSalePrice'))}</TableCell>
-      <TableCell className="text-center">{row.getValue('safeStock')}</TableCell>
+      <TableCell>{row.getValue('name')}</TableCell>
+      <TableCell className="text-center">{row.getValue('units')}</TableCell>
+      <TableCell className="text-center">{row.getValue('quantity')}</TableCell>
       <TableCell className="text-center">
         {row.getValue('status') === 'In Stock' ? (
           <Badge variant="outline" className="dark:bg-primary/10 dark:text-primary">
-            {row.getValue('status')}
+            In Stock
           </Badge>
         ) : row.getValue('status') === 'Low Stock' ? (
           <Badge variant="outline" className="dark:bg-yellow-100/10 dark:text-yellow-400">
-            {row.getValue('status')}
+            Low Stock
           </Badge>
         ) : (
           <Badge variant="destructive" className="dark:bg-destructive/30 dark:text-red-500">
-            {row.getValue('status')}
+            Out of Stock
           </Badge>
         )}
+      </TableCell>
+      <TableCell className="text-center">
+        {format(new Date(row.getValue('expiration')), 'dd/MM/yyyy')}
+      </TableCell>
+      <TableCell className="text-center">
+        {format(new Date(row.getValue('importDate')), 'dd/MM/yyyy')}
+      </TableCell>
+      <TableCell className="text-center">
+        {row.getValue('exportDate') ? format(new Date(row.getValue('exportDate')), 'dd/MM/yyyy') : '-'}
       </TableCell>
     </TableRow>
   ))

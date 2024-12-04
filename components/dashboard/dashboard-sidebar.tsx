@@ -31,7 +31,7 @@ const sidebarItems: DashboardSidebarItems[] = [
     ]
   },
   { name: 'Employees', href: '/dashboard/employees', icon: Users, requiredRoles: ['Admin'] },
-  { name: 'Reports', href: '/dashboard/reports', icon: File, requiredRoles: ['Admin', 'Employee'] },
+  { name: 'Reports', href: '/dashboard/reports', icon: File, requiredRoles: ['Admin'] },
   { name: 'Company Settings', href: '/dashboard/company-settings', icon: Settings, requiredRoles: ['Admin'] },
   { name: 'Users', href: '/dashboard/users', icon: Users, requiredRoles: ['Super-Admin'] },
   { name: 'Companies', href: '/dashboard/companies', icon: Building, requiredRoles: ['Super-Admin'] },

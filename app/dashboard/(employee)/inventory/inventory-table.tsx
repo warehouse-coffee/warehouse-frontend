@@ -72,8 +72,8 @@ export default function InventoryTable() {
   }, [storageList, selectedStorageId])
 
   useEffect(() => {
-    if (inventoryData) {
-      setData(inventoryData)
+    if (inventoryData?.inventories) {
+      setData(inventoryData.inventories)
       setTotalElements(inventoryData.page?.totalElements ?? 0)
       setTotalPages(inventoryData.page?.totalPages ?? 0)
     }

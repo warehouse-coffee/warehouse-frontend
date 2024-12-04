@@ -25,9 +25,9 @@ export default function InventoryPage() {
       </Breadcrumb>
       <div className="mt-[.5rem]">
         <div className="flex flex-col gap-[.3rem]">
-          <h1 className="text-[1.5rem] font-bold">Inventory Management</h1>
+          <h1 className="text-[1.5rem] font-bold">Inventory Overview</h1>
           <p className="text-[.85rem] text-muted-foreground">
-            Manage inventory and assign their status effectively here.
+            View and track inventory items and their current status here.
           </p>
         </div>
       </div>
