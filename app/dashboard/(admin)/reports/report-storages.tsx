@@ -103,7 +103,7 @@ export default function ReportStorages() {
         <CardContent>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div className="grid grid-cols-3 gap-4">
-              {renderSummaryItem('Total Revenue', data?.totalRevenue ?? 0)}
+              {renderSummaryItem('Total Sale Cost', data?.totalRevenue ?? 0)}
               {renderSummaryItem('Total Import Cost', data?.totalImportCost ?? 0)}
               {renderSummaryItem('Total Orders Completed', data?.totalOrders ?? 0, false)}
             </div>
