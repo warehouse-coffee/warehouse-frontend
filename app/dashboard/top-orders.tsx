@@ -65,7 +65,7 @@ export function TopOrders({ id }: { id: string }) {
         >
           {[
             <OrderList key="sales" orders={ordersData?.saleOrders} />,
-            <OrderList key="imports" orders={ordersData?.importOrders} />
+            <OrderList key="imports" orders={ordersData?.importOrder} />
           ]}
         </TransitionPanel>
       </CardContent>

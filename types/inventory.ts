@@ -1,4 +1,5 @@
 export type Inventory = {
+  id: number
   productName: string
   availableQuantity: number
   expiration: string

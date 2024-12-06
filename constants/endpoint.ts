@@ -41,7 +41,9 @@ export const API_ENDPOINTS = {
   UPDATE_COMPANY: '/api/dashboard/superadmin/companies/update',
   DELETE_COMPANY: '/api/dashboard/superadmin/companies/delete',
   GET_COMPANY_DETAIL: '/api/dashboard/superadmin/companies/detail',
-  GET_INVENTORY_LIST_BY_STORAGE: '/api/dashboard/employee/inventory/list'
+  GET_INVENTORY_LIST_BY_STORAGE: '/api/dashboard/employee/inventory/list',
+  GET_SAFE_STOCK: '/api/dashboard/employee/inventory/safe-stock/get',
+  UPDATE_SAFE_STOCK: '/api/dashboard/employee/inventory/safe-stock/update'
 } as const
 
 export type ApiEndpoint = typeof API_ENDPOINTS[keyof typeof API_ENDPOINTS]
