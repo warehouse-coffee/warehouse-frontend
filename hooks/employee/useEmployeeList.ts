@@ -31,6 +31,6 @@ export const useEmployeeList = (page: number, pageSize: number) => {
     queryKey: ['employees', page, pageSize],
     queryFn: () => fetchEmployees({ pageIndex: page, pageSize }),
     staleTime: 0,
-    cacheTime: 5 * 60 * 1000,
+    cacheTime: 5 * 60 * 1000
   })
 }
