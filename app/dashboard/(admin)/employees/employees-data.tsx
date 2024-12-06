@@ -20,8 +20,9 @@ import {
   DialogTitle
 } from '@/components/ui/dialog'
 import { Loader } from '@/components/ui/loader'
+import { Switch } from '@/components/ui/switch'
 import { TableCell, TableRow } from '@/components/ui/table'
-import { useDeleteEmployee } from '@/hooks/employee'
+import { useDeleteEmployee, useActiveEmployee } from '@/hooks/employee'
 import { useDialog } from '@/hooks/useDialog'
 import { cn } from '@/lib/utils'
 import { Employee } from '@/types'
@@ -63,7 +64,7 @@ const EmployeeUpdateForm = dynamic(() => import('./employees-update'), {
   ssr: false,
   loading: () => <DashboardFetchLoader />
 })
-export default function EmployeesData({ table }: { table: any }) {
+export default function EmployeesData({ table, onRefresh }: { table: any, onRefresh?: () => void }) {
   const {
     dialogsOpen,
     itemRef: employeeRef,
@@ -77,6 +78,7 @@ export default function EmployeesData({ table }: { table: any }) {
   const deleteEmployeeMutation = useDeleteEmployee(() => {
     closeDialog('delete')
   })
+  const activateEmployeeMutation = useActiveEmployee()
   const handleEditEmployee = useCallback(
     (employee: Employee) => {
       openDialog('edit', employee)
@@ -94,6 +96,17 @@ export default function EmployeesData({ table }: { table: any }) {
       deleteEmployeeMutation.mutate(employeeRef.current.id ?? '')
     }
   }, [deleteEmployeeMutation, employeeRef])
+  const handleToggleActive = async (employee: Employee) => {
+    try {
+      await activateEmployeeMutation.mutateAsync({
+        id: employee.id!,
+        active: !employee.isActived
+      })
+      onRefresh?.()
+    } catch (error) {
+      console.error('Error toggling employee status:', error)
+    }
+  }
   if (table.getRowModel().rows.length === 0) {
     return (
       <TableRow>
@@ -146,15 +159,26 @@ export default function EmployeesData({ table }: { table: any }) {
           <TableCell>{row.original.email}</TableCell>
           <TableCell>{row.original.phoneNumber || 'N/A'}</TableCell>
           <TableCell>
-            <span
-              className={`px-2 py-1 rounded-full text-xs ${
-                row.original.isActived
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-red-100 text-red-700'
-              }`}
-            >
-              {row.original.isActived ? 'Active' : 'Inactive'}
-            </span>
+            <div className="flex items-center gap-2">
+              <Switch
+                checked={row.original.isActived}
+                onCheckedChange={() => handleToggleActive(row.original)}
+                disabled={activateEmployeeMutation.isPending}
+                className={cn(
+                  row.original.isActived ? 'bg-green-500' : 'bg-red-500',
+                  'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2',
+                  activateEmployeeMutation.isPending && 'opacity-50 cursor-not-allowed'
+                )}
+              />
+              <span
+                className={cn(
+                  'text-sm font-medium',
+                  row.original.isActived ? 'text-green-600' : 'text-red-600'
+                )}
+              >
+                {row.original.isActived ? 'Active' : 'Inactive'}
+              </span>
+            </div>
           </TableCell>
           <TableCell>
             <EmployeeActions

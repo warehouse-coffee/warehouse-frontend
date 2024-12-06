@@ -110,7 +110,7 @@ export default function EmployeesTable() {
   })
   // Employee list
   const [employees, setEmployees] = useState<EmployeeDto[]>([])
-  const { data: employeeListVM } = useEmployeeList(
+  const { data: employeeListVM, refetch } = useEmployeeList(
     pagination.pageIndex,
     pagination.pageSize
   )
@@ -351,12 +351,7 @@ export default function EmployeesTable() {
               <TableRow>
                 <TableCell className="w-full flex flex-col items-center justify-center">
                   There was an error! Please try again.
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary"
-                    onClick={() => resetErrorBoundary()}
-                  >
+                  <Button onClick={() => resetErrorBoundary()}>
                     Try again
                   </Button>
                 </TableCell>
@@ -364,7 +359,7 @@ export default function EmployeesTable() {
             )}
           >
             <Suspense fallback={<EmployeesDataLoading />}>
-              <EmployeeDataMain table={table} />
+              <EmployeeDataMain table={table} onRefresh={refetch} />
             </Suspense>
           </ErrorBoundary>
         </TableBody>
