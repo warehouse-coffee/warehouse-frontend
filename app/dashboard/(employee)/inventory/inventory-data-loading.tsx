@@ -5,6 +5,7 @@ export default function InventoryDataLoading() {
   return (
     [...Array(5)].map((_, index) => (
       <TableRow key={index}>
+        <TableCell><Skeleton className="h-4 w-[4rem]" /></TableCell>
         <TableCell><Skeleton className="h-4 w-[12rem]" /></TableCell>
         <TableCell><Skeleton className="h-4 w-[6rem]" /></TableCell>
         <TableCell><Skeleton className="h-4 w-[8rem]" /></TableCell>

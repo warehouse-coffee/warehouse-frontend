@@ -65,3 +65,9 @@ export const saleOrderSchema = z.object({
     })
   })).min(1, 'At least one product is required')
 })
+
+export const safeStockSchema = z.object({
+  safeStock: z.number()
+    .min(0, 'Safe stock must be greater than or equal to 0')
+    .max(1000000, 'Safe stock must be less than 1,000,000')
+})

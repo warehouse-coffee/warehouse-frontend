@@ -21,15 +21,6 @@ import { ErrorBoundary } from 'react-error-boundary'
 
 import DashboardTablePagination from '@/components/dashboard/dashboard-table-pagination'
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Loader } from '@/components/ui/loader'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -41,11 +32,12 @@ import {
   TableRow,
   TableCell
 } from '@/components/ui/table'
-import { useInventoriesByStorage } from '@/hooks/inventory/useGetInventoryListByStorage'
+import { useInventoriesByStorage } from '@/hooks/inventory'
 import { useStorageOfUserDetail } from '@/hooks/storage'
 import { useDebounce } from '@/hooks/useDebounce'
 
 import InventoryDataLoading from './inventory-data-loading'
+import SafeStockForm from './safe-stock-form'
 
 const InventoryDataMain = dynamic(() => import('./inventory-data'), {
   ssr: false,
@@ -118,6 +110,31 @@ export default function InventoryTable() {
   const table = useReactTable({
     data,
     columns: [
+      {
+        accessorKey: 'id',
+        header: ({ column }) => (
+          <div
+            className="flex items-center justify-center gap-2 cursor-pointer select-none"
+            onClick={column.getToggleSortingHandler()}
+            title={
+              column.getCanSort()
+                ? column.getNextSortingOrder() === 'asc'
+                  ? 'Sort ascending'
+                  : column.getNextSortingOrder() === 'desc'
+                    ? 'Sort descending'
+                    : 'Clear sort'
+                : undefined
+            }
+          >
+            ID
+            {{
+              asc: <ArrowUpAZ className="h-4 w-4" />,
+              desc: <ArrowDownAZ className="h-4 w-4" />
+            }[column.getIsSorted() as string] ?? <ArrowUpDown className="h-4 w-4" />}
+          </div>
+        ),
+        filterFn: fuzzyFilter
+      },
       {
         accessorKey: 'productName',
         header: ({ column }) => (

@@ -16,6 +16,7 @@ export async function POST(request: NextRequest) {
     const pageNumber = parseInt(searchParams.get('pageNumber') || '1')
     const size = parseInt(searchParams.get('size') || '5')
     const storageId = parseInt(searchParams.get('storageId') || '0')
+
     const client = new InventoriesClient(
       process.env.NEXT_PUBLIC_BACKEND_API_URL!,
       undefined,
