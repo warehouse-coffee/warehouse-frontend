@@ -6,15 +6,15 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
+import { UpdateSafeStockCommand } from '@/app/api/web-api-client'
 import { Button } from '@/components/ui/button'
 import { DialogFooter } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader } from '@/components/ui/loader'
+import { safeStockSchema } from '@/configs/zod-schema'
 import { useGetSafeStock, useUpdateSafeStock } from '@/hooks/inventory'
 import { cn } from '@/lib/utils'
-import { UpdateSafeStockCommand } from '@/app/api/web-api-client'
-import { safeStockSchema } from '@/configs/zod-schema'
 
 type SafeStockFormValues = z.infer<typeof safeStockSchema>
 
