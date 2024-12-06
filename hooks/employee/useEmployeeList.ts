@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 
 import { EmployeeListVM } from '@/app/api/web-api-client'
 import { API_ENDPOINTS } from '@/constants'
@@ -27,10 +27,8 @@ const fetchEmployees = async ({ pageIndex, pageSize }: FetchEmployeesParams): Pr
 }
 
 export const useEmployeeList = (page: number, pageSize: number) => {
-  return useQuery({
+  return useSuspenseQuery({
     queryKey: ['employees', page, pageSize],
-    queryFn: () => fetchEmployees({ pageIndex: page, pageSize }),
-    staleTime: 0,
-    cacheTime: 5 * 60 * 1000
+    queryFn: () => fetchEmployees({ pageIndex: page, pageSize })
   })
 }
