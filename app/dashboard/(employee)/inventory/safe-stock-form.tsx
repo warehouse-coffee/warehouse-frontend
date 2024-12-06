@@ -92,10 +92,10 @@ export default function SafeStockForm({
       </div>
 
       <DialogFooter className="mt-6">
-        <Button 
-          type="button" 
-          variant="outline" 
-          className={cn('bg-accent')} 
+        <Button
+          type="button"
+          variant="outline"
+          className={cn('bg-accent')}
           onClick={handleResetForm}
         >
           Reset

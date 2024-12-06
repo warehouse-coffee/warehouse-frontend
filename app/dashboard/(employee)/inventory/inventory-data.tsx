@@ -1,6 +1,7 @@
 'use client'
 
 import { format } from 'date-fns'
+import { Pencil } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -16,7 +17,6 @@ import { TableCell, TableRow } from '@/components/ui/table'
 import { useDialog } from '@/hooks/useDialog'
 import { formatCurrency } from '@/lib/utils'
 import { Inventory } from '@/types'
-import { Pencil } from 'lucide-react'
 
 import SafeStockForm from './safe-stock-form'
 
