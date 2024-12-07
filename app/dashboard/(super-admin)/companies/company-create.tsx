@@ -130,13 +130,8 @@ export function CompanyCreate({ onClose }: CompanyCreateProps) {
         />
 
         <DialogFooter className="mt-6">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onClose}
-            disabled={isSubmitting || createCompanyMutation.isPending}
-          >
-            Cancel
+          <Button type="button" variant="outline" className={cn('bg-accent')} onClick={() => form.reset()}>
+            Reset
           </Button>
           <Button
             type="submit"
