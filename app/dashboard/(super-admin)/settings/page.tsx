@@ -1,5 +1,3 @@
-import type { Metadata } from 'next'
-
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -10,12 +8,6 @@ import {
 } from '@/components/ui/breadcrumb'
 
 import SettingsForm from './settings-form'
-
-export const metadata: Metadata = {
-  icons: {
-    icon: '/icon.png'
-  }
-}
 
 export default function SettingsPage() {
   return (
