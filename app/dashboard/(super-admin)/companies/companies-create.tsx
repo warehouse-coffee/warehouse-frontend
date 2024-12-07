@@ -20,7 +20,7 @@ interface CompanyCreateProps {
   onClose: () => void
 }
 
-export function CompanyCreate({ onClose }: CompanyCreateProps) {
+export default function CompaniesCreate({ onClose }: CompanyCreateProps) {
   const createCompanyMutation = useCreateCompany(onClose)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
 

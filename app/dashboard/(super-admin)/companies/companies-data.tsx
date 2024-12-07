@@ -19,7 +19,7 @@ import { useDialog } from '@/hooks/useDialog'
 import { cn } from '@/lib/utils'
 import { Company } from '@/types'
 
-import { CompanyUpdate } from './company-update'
+import CompaniesUpdate from './companies-update'
 
 interface CompaniesDataProps {
   data: Company[]
@@ -64,7 +64,7 @@ export default function CompaniesData({ data, table }: CompaniesDataProps) {
         return (
           <TableRow key={company.companyId}>
             <TableCell className="py-3">{company.companyId}</TableCell>
-            <TableCell className={cn("py-3", !company.companyName && 'text-muted-foreground')}>
+            <TableCell className={cn('py-3', !company.companyName && 'text-muted-foreground')}>
               {company.companyName ?? 'Not Updated'}
             </TableCell>
             <TableCell className={cn('py-3 text-center', !company.phoneContact && 'text-muted-foreground')}>
@@ -103,7 +103,7 @@ export default function CompaniesData({ data, table }: CompaniesDataProps) {
             </DialogDescription>
           </DialogHeader>
           {selectedCompany?.current && (
-            <CompanyUpdate
+            <CompaniesUpdate
               companyId={selectedCompany.current.companyId}
               onSuccess={() => closeDialog('edit')}
             />
@@ -148,4 +148,4 @@ export default function CompaniesData({ data, table }: CompaniesDataProps) {
       </Dialog>
     </>
   )
-} 
+}

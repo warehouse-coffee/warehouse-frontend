@@ -30,7 +30,7 @@ interface CompanyUpdateProps {
   onSuccess: () => void
 }
 
-export function CompanyUpdate({ companyId, onSuccess }: CompanyUpdateProps) {
+export default function CompaniesUpdate({ companyId, onSuccess }: CompanyUpdateProps) {
   const { data: company, isLoading } = useGetCompanyDetail(companyId)
   const updateCompanyMutation = useUpdateCompany(companyId)
   const [isSubmitting, setIsSubmitting] = React.useState(false)

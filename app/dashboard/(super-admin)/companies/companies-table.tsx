@@ -52,14 +52,14 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
-import { useDeleteCompany, useGetCompanyList } from '@/hooks/company'
+import { useGetCompanyList } from '@/hooks/company'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useDialog } from '@/hooks/useDialog'
 import { cn } from '@/lib/utils'
 import { Company } from '@/types'
 
+import CompaniesCreate from './companies-create'
 import CompaniesDataLoading from './companies-data-loading'
-import { CompanyCreate } from './company-create'
 
 const CompaniesDataMain = dynamic(() => import('./companies-data'), {
   ssr: false,
@@ -256,7 +256,7 @@ export default function CompanyTable() {
                 Fill in the details to create a new company.
               </DialogDescription>
             </DialogHeader>
-            <CompanyCreate onClose={() => closeDialog('add')} />
+            <CompaniesCreate onClose={() => closeDialog('add')} />
           </DialogContent>
         </Dialog>
       </div>
