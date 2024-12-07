@@ -52,8 +52,8 @@ export default function InventoryTable() {
     pageSize: 5
   })
 
-  const [globalSearch, setGlobalSearch] = useState<string>('')
-  const debouncedGlobalSearch = useDebounce(globalSearch, 500)
+  const [searchValue, setSearchValue] = useState<string>('')
+  const debouncedSearchValue = useDebounce(searchValue, 500)
   const [isSearching, setIsSearching] = useState<boolean>(false)
 
   const [totalElements, setTotalElements] = useState<number>(0)
@@ -88,14 +88,29 @@ export default function InventoryTable() {
     }
   }, [storageList, selectedStorageId])
 
+  const handleSearch = (value: string) => {
+    setSearchValue(value)
+    setIsSearching(true)
+  }
+
   useEffect(() => {
     if (inventoryData?.inventories) {
-      setData(inventoryData.inventories)
+      let filteredData = [...inventoryData.inventories]
+
+      // Apply search filter
+      if (debouncedSearchValue) {
+        filteredData = filteredData.filter(item => {
+          const matchesName = item.productName?.toLowerCase().includes(debouncedSearchValue.toLowerCase())
+          return matchesName
+        })
+      }
+
+      setData(filteredData)
       setTotalElements(inventoryData.page?.totalElements ?? 0)
       setTotalPages(inventoryData.page?.totalPages ?? 0)
       setIsSearching(false)
     }
-  }, [inventoryData])
+  }, [inventoryData, debouncedSearchValue])
 
   const [sorting, setSorting] = useState<SortingState>([])
 
@@ -313,13 +328,8 @@ export default function InventoryTable() {
     getSortedRowModel: getSortedRowModel(),
     state: {
       pagination,
-      columnFilters: debouncedGlobalSearch ? [
-        {
-          id: 'productName',
-          value: debouncedGlobalSearch
-        }
-      ] : [],
-      sorting
+      sorting,
+      globalFilter: debouncedSearchValue
     },
     filterFns: {
       fuzzy: fuzzyFilter
@@ -332,18 +342,6 @@ export default function InventoryTable() {
       sortStatusFn
     }
   })
-
-  useEffect(() => {
-    if (debouncedGlobalSearch) {
-      setIsSearching(true)
-      const timer = setTimeout(() => {
-        setIsSearching(false)
-      }, 500)
-      return () => clearTimeout(timer)
-    } else {
-      setIsSearching(false)
-    }
-  }, [debouncedGlobalSearch])
 
   return (
     <section className="w-full mt-[1.5rem]">
@@ -372,10 +370,10 @@ export default function InventoryTable() {
         <div className="flex items-center gap-4">
           <div className="relative">
             <Input
-              placeholder="Search products in inventory..."
+              placeholder="Search inventory..."
               className="min-w-[20rem]"
-              value={globalSearch}
-              onChange={(e) => setGlobalSearch(e.target.value)}
+              value={searchValue}
+              onChange={(e) => handleSearch(e.target.value)}
             />
             {isSearching && (
               <div className="absolute right-4 top-1/2 -translate-y-1/2">
@@ -402,30 +400,51 @@ export default function InventoryTable() {
             ))}
           </TableHeader>
           <TableBody>
-            <ErrorBoundary
-              onReset={reset}
-              fallbackRender={({ resetErrorBoundary }) => (
-                <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <span>There was an error loading the inventory data.</span>
-                      <Button
-                        onClick={() => resetErrorBoundary()}
-                        variant="outline"
-                        className="bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary"
-                      >
-                        Try again
-                      </Button>
+            {isSearching ? (
+              <InventoryDataLoading />
+            ) : table.getRowModel().rows.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="h-24 text-muted-foreground text-center">
+                  {debouncedSearchValue ? (
+                    <div className="flex flex-col items-center gap-1">
+                      <span>
+                        No items found matching &quot;<span className="font-medium">{debouncedSearchValue}</span>&quot;
+                      </span>
+                      <span className="text-sm">
+                        Try adjusting your search to find what you&apos;re looking for.
+                      </span>
                     </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            >
-              <InventoryDataMain
-                data={data}
-                table={table}
-              />
-            </ErrorBoundary>
+                  ) : (
+                    'No inventory items available.'
+                  )}
+                </TableCell>
+              </TableRow>
+            ) : (
+              <ErrorBoundary
+                onReset={reset}
+                fallbackRender={({ resetErrorBoundary }) => (
+                  <TableRow>
+                    <TableCell colSpan={7} className="h-24 text-center">
+                      <div className="flex flex-col items-center gap-2">
+                        <span>There was an error loading the inventory data.</span>
+                        <Button
+                          onClick={() => resetErrorBoundary()}
+                          variant="outline"
+                          className="bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary"
+                        >
+                        Try again
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+              >
+                <InventoryDataMain
+                  data={data}
+                  table={table}
+                />
+              </ErrorBoundary>
+            )}
           </TableBody>
         </Table>
       </div>

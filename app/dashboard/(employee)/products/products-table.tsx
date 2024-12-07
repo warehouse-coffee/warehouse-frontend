@@ -49,8 +49,8 @@ export default function ProductsTable() {
     pageSize: 5
   })
 
-  const [globalSearch, setGlobalSearch] = useState<string>('')
-  const debouncedGlobalSearch = useDebounce(globalSearch, 500)
+  const [searchValue, setSearchValue] = useState<string>('')
+  const debouncedSearchValue = useDebounce(searchValue, 500)
   const [isSearching, setIsSearching] = useState<boolean>(false)
 
   const [totalElements, setTotalElements] = useState<number>(0)
@@ -73,14 +73,29 @@ export default function ProductsTable() {
     return itemRank.passed
   }
 
+  const handleSearch = (value: string) => {
+    setSearchValue(value)
+    setIsSearching(true)
+  }
+
   useEffect(() => {
     if (productsData?.productList) {
-      setData(productsData.productList || [])
-      setTotalElements(productsData.page?.totalElements || 0)
-      setTotalPages(productsData.page?.totalPages || 0)
+      let filteredData = [...productsData.productList]
+
+      // Apply search filter
+      if (debouncedSearchValue) {
+        filteredData = filteredData.filter(item => {
+          const matchesName = item.name?.toLowerCase().includes(debouncedSearchValue.toLowerCase())
+          return matchesName
+        })
+      }
+
+      setData(filteredData)
+      setTotalElements(productsData.page?.totalElements ?? 0)
+      setTotalPages(productsData.page?.totalPages ?? 0)
       setIsSearching(false)
     }
-  }, [productsData])
+  }, [productsData, debouncedSearchValue])
 
   const [sorting, setSorting] = useState<SortingState>([])
 
@@ -275,10 +290,10 @@ export default function ProductsTable() {
     getSortedRowModel: getSortedRowModel(),
     state: {
       pagination,
-      columnFilters: debouncedGlobalSearch ? [
+      columnFilters: debouncedSearchValue ? [
         {
           id: 'name',
-          value: debouncedGlobalSearch
+          value: debouncedSearchValue
         }
       ] : [],
       sorting
@@ -295,18 +310,6 @@ export default function ProductsTable() {
     }
   })
 
-  useEffect(() => {
-    if (debouncedGlobalSearch) {
-      setIsSearching(true)
-      const timer = setTimeout(() => {
-        setIsSearching(false)
-      }, 500)
-      return () => clearTimeout(timer)
-    } else {
-      setIsSearching(false)
-    }
-  }, [debouncedGlobalSearch])
-
   return (
     <section className="w-full mt-[1.5rem]">
       <div className="flex items-center justify-between w-full mb-[.85rem]">
@@ -315,8 +318,8 @@ export default function ProductsTable() {
             <Input
               placeholder="Search products..."
               className="min-w-[20rem]"
-              value={globalSearch}
-              onChange={(e) => setGlobalSearch(e.target.value)}
+              value={searchValue}
+              onChange={(e) => handleSearch(e.target.value)}
             />
             {isSearching && (
               <div className="absolute right-4 top-1/2 -translate-y-1/2">
@@ -343,30 +346,51 @@ export default function ProductsTable() {
             ))}
           </TableHeader>
           <TableBody>
-            <ErrorBoundary
-              onReset={reset}
-              fallbackRender={({ resetErrorBoundary }) => (
-                <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <span>There was an error loading the products data.</span>
-                      <Button
-                        onClick={() => resetErrorBoundary()}
-                        variant="outline"
-                        className="bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary"
-                      >
-                        Try again
-                      </Button>
+            {isSearching ? (
+              <ProductsDataLoading />
+            ) : table.getRowModel().rows.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="h-24 text-muted-foreground text-center">
+                  {debouncedSearchValue ? (
+                    <div className="flex flex-col items-center gap-1">
+                      <span>
+                        No items found matching &quot;<span className="font-medium">{debouncedSearchValue}</span>&quot;
+                      </span>
+                      <span className="text-sm">
+                        Try adjusting your search to find what you&apos;re looking for.
+                      </span>
                     </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            >
-              <ProductsDataMain
-                data={data}
-                table={table}
-              />
-            </ErrorBoundary>
+                  ) : (
+                    'No products available.'
+                  )}
+                </TableCell>
+              </TableRow>
+            ) : (
+              <ErrorBoundary
+                onReset={reset}
+                fallbackRender={({ resetErrorBoundary }) => (
+                  <TableRow>
+                    <TableCell colSpan={7} className="h-24 text-center">
+                      <div className="flex flex-col items-center gap-2">
+                        <span>There was an error loading the products data.</span>
+                        <Button
+                          onClick={() => resetErrorBoundary()}
+                          variant="outline"
+                          className="bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary"
+                        >
+                          Try again
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+              >
+                <ProductsDataMain
+                  data={data}
+                  table={table}
+                />
+              </ErrorBoundary>
+            )}
           </TableBody>
         </Table>
       </div>

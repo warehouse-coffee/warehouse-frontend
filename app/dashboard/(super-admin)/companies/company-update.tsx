@@ -1,13 +1,14 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import { UpdateCompanyCommand } from '@/app/api/web-api-client'
 import DashboardFetchLoader from '@/components/dashboard/dashboard-fetch-loader'
 import { Button } from '@/components/ui/button'
+import { DialogFooter } from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -17,8 +18,9 @@ import {
   FormMessage
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { useGetCompanyDetail } from '@/hooks/company/useGetCompanyDetail'
-import { useUpdateCompany } from '@/hooks/company/useUpdateCompany'
+import { Loader } from '@/components/ui/loader'
+import { useGetCompanyDetail, useUpdateCompany } from '@/hooks/company'
+import { cn } from '@/lib/utils'
 
 // Validation schema
 const formSchema = z.object({
@@ -43,12 +45,23 @@ export function CompanyUpdate({ companyId, onSuccess }: CompanyUpdateProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      companyId: company.companyId || '',
-      companyName: company.companyName || '',
-      phoneContact: company.phoneContact || '',
-      emailContact: company.emailContact || ''
+      companyId: '',
+      companyName: '',
+      phoneContact: '',
+      emailContact: ''
     }
   })
+
+  useEffect(() => {
+    if (company) {
+      form.reset({
+        companyId: company.companyId || '',
+        companyName: company.companyName || '',
+        phoneContact: company.phoneContact || '',
+        emailContact: company.emailContact || ''
+      })
+    }
+  }, [company, form])
 
   const onSubmit = React.useCallback(async (data: FormValues) => {
     if (isSubmitting || updateCompanyMutation.isPending) return
@@ -67,7 +80,7 @@ export function CompanyUpdate({ companyId, onSuccess }: CompanyUpdateProps) {
     } finally {
       setIsSubmitting(false)
     }
-  }, [updateCompanyMutation, isSubmitting, onSuccess, company])
+  }, [updateCompanyMutation, isSubmitting, onSuccess])
 
   if (isLoading) {
     return <DashboardFetchLoader />
@@ -135,14 +148,27 @@ export function CompanyUpdate({ companyId, onSuccess }: CompanyUpdateProps) {
           )}
         />
 
-        <div className="flex justify-end gap-4">
+        <DialogFooter className="mt-6">
+          <Button type="button" variant="outline" className={cn('bg-accent')} onClick={() => form.reset()}>
+            Reset
+          </Button>
           <Button
             type="submit"
-            disabled={isSubmitting || updateCompanyMutation.isPending || !form.formState.isValid}
+            className={cn(
+              'bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary',
+              updateCompanyMutation.isPending && 'flex items-center gap-3 cursor-wait pointer-events-none'
+            )}
           >
-            {updateCompanyMutation.isPending ? 'Updating...' : 'Update Company'}
+            {updateCompanyMutation.isPending ? (
+              <>
+              Saving...
+                <Loader color="#62c5ff" size="1.25rem" />
+              </>
+            ) : (
+              'Save changes'
+            )}
           </Button>
-        </div>
+        </DialogFooter>
       </form>
     </Form>
   )

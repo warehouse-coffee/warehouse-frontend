@@ -7,6 +7,7 @@ import { z } from 'zod'
 
 import { CreateCompanyCommand } from '@/app/api/web-api-client'
 import { Button } from '@/components/ui/button'
+import { DialogFooter } from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -16,9 +17,10 @@ import {
   FormMessage
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { useCreateCompany } from '@/hooks/company/useCreateCompany'
+import { Loader } from '@/components/ui/loader'
+import { useCreateCompany } from '@/hooks/company'
+import { cn } from '@/lib/utils'
 
-// Validation schema
 const formSchema = z.object({
   companyId: z.string().min(1, 'Company ID is required').min(2, 'Company ID must be at least 2 characters'),
   companyName: z.string().min(1, 'Company name is required').min(2, 'Company name must be at least 2 characters'),
@@ -127,7 +129,7 @@ export function CompanyCreate({ onClose }: CompanyCreateProps) {
           )}
         />
 
-        <div className="flex justify-end gap-4">
+        <DialogFooter className="mt-6">
           <Button
             type="button"
             variant="outline"
@@ -138,11 +140,21 @@ export function CompanyCreate({ onClose }: CompanyCreateProps) {
           </Button>
           <Button
             type="submit"
-            disabled={isSubmitting || createCompanyMutation.isPending || !form.formState.isValid}
+            className={cn(
+              'bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary',
+              createCompanyMutation.isPending && 'flex items-center gap-3 cursor-wait pointer-events-none'
+            )}
           >
-            {createCompanyMutation.isPending ? 'Creating...' : 'Create Company'}
+            {createCompanyMutation.isPending ? (
+              <>
+                Creating...
+                <Loader color="#62c5ff" size="1.25rem" />
+              </>
+            ) : (
+              'Create Company'
+            )}
           </Button>
-        </div>
+        </DialogFooter>
       </form>
     </Form>
   )

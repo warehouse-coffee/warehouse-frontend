@@ -36,9 +36,9 @@ const fetchUsers = async ({ pageIndex, pageSize }: FetchUsersParams): Promise<{ 
   return data
 }
 
-export const useUserList = (pageIndex: number, pageSize: number, searchText?: string) => {
+export const useUserList = (pageIndex: number, pageSize: number) => {
   return useSuspenseQuery({
-    queryKey: ['users', pageIndex, pageSize, searchText],
+    queryKey: ['users', pageIndex, pageSize],
     queryFn: () => fetchUsers({ pageIndex, pageSize })
   })
 }

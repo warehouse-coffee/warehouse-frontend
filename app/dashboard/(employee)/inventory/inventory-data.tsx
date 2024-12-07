@@ -45,16 +45,6 @@ export default function InventoryData({ data, table }: InventoryDataProps) {
 
   const rows = table.getRowModel().rows
 
-  if (rows.length === 0) {
-    return (
-      <TableRow>
-        <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
-          No inventory data found.
-        </TableCell>
-      </TableRow>
-    )
-  }
-
   return rows.map((row: any) => {
     const rowId = row.getValue('id')
     const isDialogOpen = dialogsOpen.edit && itemRef.current === rowId

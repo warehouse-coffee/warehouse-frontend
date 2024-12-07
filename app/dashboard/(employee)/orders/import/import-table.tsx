@@ -64,8 +64,8 @@ export default function ImportTable() {
     pageSize: 5
   })
 
-  const [globalSearch, setGlobalSearch] = useState<string>('')
-  const debouncedGlobalSearch = useDebounce(globalSearch, 500)
+  const [searchValue, setSearchValue] = useState<string>('')
+  const debouncedSearchValue = useDebounce(searchValue, 500)
   const [isSearching, setIsSearching] = useState<boolean>(false)
   const [sorting, setSorting] = useState<SortingState>([])
 
@@ -84,26 +84,29 @@ export default function ImportTable() {
     pagination.pageSize
   )
 
+  const handleSearch = (value: string) => {
+    setSearchValue(value)
+    setIsSearching(true)
+  }
+
   useEffect(() => {
     if (orderData?.orders) {
-      setData(orderData.orders)
+      let filteredData = [...orderData.orders]
+
+      // Apply search filter
+      if (debouncedSearchValue) {
+        filteredData = filteredData.filter(item => {
+          const matchesId = item.orderId?.toString().toLowerCase().includes(debouncedSearchValue.toLowerCase())
+          return matchesId
+        })
+      }
+
+      setData(filteredData)
       setTotalElements(orderData.page?.totalElements ?? 0)
       setTotalPages(orderData.page?.totalPages ?? 0)
       setIsSearching(false)
     }
-  }, [orderData])
-
-  useEffect(() => {
-    if (debouncedGlobalSearch) {
-      setIsSearching(true)
-      const timer = setTimeout(() => {
-        setIsSearching(false)
-      }, 500)
-      return () => clearTimeout(timer)
-    } else {
-      setIsSearching(false)
-    }
-  }, [debouncedGlobalSearch])
+  }, [orderData, debouncedSearchValue])
 
   const table = useReactTable({
     data,
@@ -265,10 +268,10 @@ export default function ImportTable() {
     getSortedRowModel: getSortedRowModel(),
     state: {
       pagination,
-      columnFilters: debouncedGlobalSearch ? [
+      columnFilters: debouncedSearchValue ? [
         {
           id: 'orderId',
-          value: debouncedGlobalSearch
+          value: debouncedSearchValue
         }
       ] : [],
       sorting
@@ -290,8 +293,8 @@ export default function ImportTable() {
             <Input
               placeholder="Search order by ID..."
               className="min-w-[20rem]"
-              value={globalSearch}
-              onChange={(e) => setGlobalSearch(e.target.value)}
+              value={searchValue}
+              onChange={(e) => handleSearch(e.target.value)}
             />
             {isSearching && (
               <div className="absolute right-4 top-1/2 -translate-y-1/2">
@@ -354,30 +357,51 @@ export default function ImportTable() {
             ))}
           </TableHeader>
           <TableBody>
-            <ErrorBoundary
-              onReset={reset}
-              fallbackRender={({ resetErrorBoundary }) => (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <span>There was an error loading the import orders.</span>
-                      <Button
-                        onClick={() => resetErrorBoundary()}
-                        variant="outline"
-                        className="bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary"
-                      >
-                        Try again
-                      </Button>
+            {isSearching ? (
+              <ImportDataLoading />
+            ) : table.getRowModel().rows.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="h-24 text-muted-foreground text-center">
+                  {debouncedSearchValue ? (
+                    <div className="flex flex-col items-center gap-1">
+                      <span>
+                        No orders found matching &quot;<span className="font-medium">{debouncedSearchValue}</span>&quot;
+                      </span>
+                      <span className="text-sm">
+                        Try adjusting your search to find what you&apos;re looking for.
+                      </span>
                     </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            >
-              <ImportData
-                data={data}
-                table={table}
-              />
-            </ErrorBoundary>
+                  ) : (
+                    'No orders available.'
+                  )}
+                </TableCell>
+              </TableRow>
+            ) : (
+              <ErrorBoundary
+                onReset={reset}
+                fallbackRender={({ resetErrorBoundary }) => (
+                  <TableRow>
+                    <TableCell colSpan={7} className="h-24 text-center">
+                      <div className="flex flex-col items-center gap-2">
+                        <span>There was an error loading the import orders.</span>
+                        <Button
+                          onClick={() => resetErrorBoundary()}
+                          variant="outline"
+                          className="bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary"
+                        >
+                          Try again
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+              >
+                <ImportData
+                  data={data}
+                  table={table}
+                />
+              </ErrorBoundary>
+            )}
           </TableBody>
         </Table>
       </div>

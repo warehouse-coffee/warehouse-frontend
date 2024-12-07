@@ -117,27 +117,6 @@ export default function UsersData({
     }
   }, [deleteUserMutation, userRef])
 
-  if (table.getRowModel().rows.length === 0) {
-    return (
-      <TableRow>
-        <TableCell colSpan={5} className="h-24 text-muted-foreground text-center">
-          {table.getState().globalFilter ? (
-            <div className="flex flex-col items-center gap-1">
-              <span>
-                No users found matching &quot;<span className="font-medium">{table.getState().globalFilter}</span>&quot;
-              </span>
-              <span className="text-sm">
-                Try adjusting your search to find what you&apos;re looking for.
-              </span>
-            </div>
-          ) : (
-            'No users available.'
-          )}
-        </TableCell>
-      </TableRow>
-    )
-  }
-
   return (
     <>
       {table.getRowModel().rows.map((row: Row<User>) => (
@@ -213,7 +192,7 @@ export default function UsersData({
           <DialogHeader>
             <DialogTitle>Delete User</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this user?
+              Are you sure you want to delete {userRef.current?.userName}?
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
