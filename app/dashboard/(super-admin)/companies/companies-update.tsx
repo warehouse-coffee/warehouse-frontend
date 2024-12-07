@@ -19,9 +19,9 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Loader } from '@/components/ui/loader'
+import { companyFormSchema } from '@/configs/zod-schema'
 import { useGetCompanyDetail, useUpdateCompany } from '@/hooks/company'
 import { cn } from '@/lib/utils'
-import { companyFormSchema } from '@/configs/zod-schema'
 
 type FormValues = z.infer<typeof companyFormSchema>
 
