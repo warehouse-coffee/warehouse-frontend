@@ -10,9 +10,9 @@ import { Button } from '@/components/ui/button'
 import { DialogFooter } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Loader } from '@/components/ui/loader'
+import { companyFormSchema } from '@/configs/zod-schema'
 import { useCreateCompany } from '@/hooks/company'
 import { cn } from '@/lib/utils'
-import { companyFormSchema } from '@/configs/zod-schema'
 
 type FormValues = z.infer<typeof companyFormSchema>
 
@@ -122,10 +122,10 @@ export default function CompaniesCreate({ onClose }: CompanyCreateProps) {
       </div>
 
       <DialogFooter className="mt-6">
-        <Button 
-          type="button" 
-          variant="outline" 
-          className={cn('bg-accent')} 
+        <Button
+          type="button"
+          variant="outline"
+          className={cn('bg-accent')}
           onClick={() => reset()}
         >
           Reset
