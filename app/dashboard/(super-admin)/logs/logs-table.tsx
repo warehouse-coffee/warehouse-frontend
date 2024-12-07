@@ -20,6 +20,7 @@ import { ErrorBoundary } from 'react-error-boundary'
 import DashboardTablePagination from '@/components/dashboard/dashboard-table-pagination'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import { DateTimePicker24h } from '@/components/ui/date-time-picker'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -87,6 +88,7 @@ export default function LogsTable() {
   })
   const [levelFilters, setLevelFilters] = useState<string[]>([])
   const [searchValue, setSearchValue] = useState<string>('')
+  const [selectedDate, setSelectedDate] = useState<Date>()
   const debouncedSearchValue = useDebounce(searchValue, 500)
   const [isSearching, setIsSearching] = useState<boolean>(false)
   const [totalPages, setTotalPages] = useState<number>(0)
@@ -95,7 +97,8 @@ export default function LogsTable() {
 
   const { data: logData } = useLogList(
     pagination.pageIndex,
-    pagination.pageSize
+    pagination.pageSize,
+    selectedDate
   )
 
   const handleSort = (columnId: string) => {
@@ -247,6 +250,12 @@ export default function LogsTable() {
               </div>
             )}
           </div>
+        </div>
+        <div>
+          <DateTimePicker24h
+            date={selectedDate}
+            onChange={setSelectedDate}
+          />
         </div>
       </div>
       <div className="rounded-md border">

@@ -21,7 +21,7 @@ const updateSafeStock = async (data: UpdateSafeStockCommand) => {
   if (!response.ok) {
     throw new Error('Failed to update safe stock')
   }
-  
+
   const result = await response.json()
 
   return result
@@ -32,9 +32,9 @@ export const useUpdateSafeStock = (onComplete: () => void) => {
   return useMutation({
     mutationFn: updateSafeStock,
     onSuccess: () => {
-      queryClient.invalidateQueries({ 
+      queryClient.invalidateQueries({
         queryKey: ['safe-stock'],
-        refetchType: 'all' 
+        refetchType: 'all'
       })
       queryClient.invalidateQueries({
         queryKey: ['inventory-list-by-storage'],

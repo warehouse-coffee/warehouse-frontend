@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 
-import { API_ENDPOINTS } from '@/constants/endpoint'
+import { API_ENDPOINTS, METHODS } from '@/constants'
 
 interface FetchImportOrderListParams {
   pageIndex: number
@@ -14,7 +14,9 @@ const fetchImportOrderList = async ({ pageIndex, pageSize }: FetchImportOrderLis
   })
 
   const response = await fetch(`${API_ENDPOINTS.GET_IMPORT_ORDERS}?${params}`, {
+    method: METHODS.POST,
     credentials: 'include',
+    body: JSON.stringify(params),
     headers: {
       'Content-Type': 'application/json'
     }

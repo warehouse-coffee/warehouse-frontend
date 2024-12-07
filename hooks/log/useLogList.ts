@@ -1,26 +1,34 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 
-import { API_ENDPOINTS } from '@/constants/endpoint'
+import { API_ENDPOINTS, METHODS } from '@/constants'
 
 interface FetchLogsParams {
   pageIndex: number
   pageSize: number
+  date?: Date
 }
 
-const fetchLogs = async ({ pageIndex, pageSize }: FetchLogsParams) => {
+const fetchLogs = async ({ pageIndex, pageSize, date }: FetchLogsParams) => {
   const params = new URLSearchParams({
     pageNumber: (pageIndex + 1).toString(),
     size: pageSize.toString()
   })
 
-  // console.log('Fetching logs with params:', {
-  //   pageIndex,
-  //   pageSize,
-  //   url: `${API_ENDPOINTS.GET_ALL_LOGS}?${params}`
-  // })
+  if (date) {
+    params.append('date', date.toISOString())
+  }
 
   const response = await fetch(`${API_ENDPOINTS.GET_ALL_LOGS}?${params}`, {
-    credentials: 'include'
+    method: METHODS.POST,
+    credentials: 'include',
+    body: JSON.stringify({
+      pageNumber: pageIndex + 1,
+      size: pageSize,
+      date: date?.toISOString()
+    }),
+    headers: {
+      'Content-Type': 'application/json'
+    }
   })
 
   if (!response.ok) {
@@ -36,10 +44,10 @@ const fetchLogs = async ({ pageIndex, pageSize }: FetchLogsParams) => {
   return data
 }
 
-export const useLogList = (pageIndex: number, pageSize: number) => {
+export const useLogList = (pageIndex: number, pageSize: number, date?: Date) => {
   return useSuspenseQuery({
-    queryKey: ['logs', pageIndex, pageSize],
-    queryFn: () => fetchLogs({ pageIndex, pageSize }),
+    queryKey: ['logs', pageIndex, pageSize, date?.toISOString()],
+    queryFn: () => fetchLogs({ pageIndex, pageSize, date }),
     refetchOnWindowFocus: false
   })
 }

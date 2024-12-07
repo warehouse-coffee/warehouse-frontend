@@ -4,7 +4,7 @@ import { cookieStore, tokenUtils } from '@/lib/auth'
 
 import { GetUserListQuery, SuperAdminClient, Page } from '../../../../web-api-client'
 
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
   const token = cookieStore.get('auth_token')
 
   if (!token || !tokenUtils.isValid(token)) {

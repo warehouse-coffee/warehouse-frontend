@@ -11,7 +11,7 @@ const deleteCategory = async (id: string) => {
 
   if (!response.ok) {
     const errorData = await response.json()
-    throw new Error(errorData.error || `Failed to delete category`)
+    throw new Error(errorData.error || 'Failed to delete category')
   }
 
   return response.json()
@@ -28,7 +28,7 @@ export const useDeleteCategory = (onComplete?: () => void) => {
         refetchType: 'all'
       })
 
-      toast.success(`Category deleted successfully`)
+      toast.success('Category deleted successfully')
     },
     onError: (error: Error) => {
       handleApiError(error)

@@ -5,6 +5,7 @@ import { TableCell, TableRow } from '@/components/ui/table'
 import { LOG_TYPES } from '@/constants'
 import { formatDate } from '@/lib/utils'
 import { Log, LogLevel } from '@/types'
+
 interface LogsDataProps {
   data: Log[]
   table: any
@@ -34,19 +35,6 @@ const LogLevelBadge = ({ level }: { level: LogLevel }) => {
 
 export default function LogsData({ data, table }: LogsDataProps) {
   const rows = table.getRowModel().rows
-
-  if (rows.length === 0) {
-    return (
-      <TableRow>
-        <TableCell
-          colSpan={5}
-          className="h-24 text-center text-muted-foreground"
-        >
-          No logs available.
-        </TableCell>
-      </TableRow>
-    )
-  }
 
   return (
     <>
