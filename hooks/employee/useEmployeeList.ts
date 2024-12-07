@@ -1,7 +1,8 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 
 import { EmployeeListVM } from '@/app/api/web-api-client'
-import { API_ENDPOINTS } from '@/constants'
+import { API_ENDPOINTS, METHODS } from '@/constants'
+import { stringify } from 'querystring'
 
 interface FetchEmployeesParams {
   pageIndex: number
@@ -14,7 +15,12 @@ const fetchEmployees = async ({ pageIndex, pageSize }: FetchEmployeesParams): Pr
     size: pageSize.toString()
   })
   const response = await fetch(`${API_ENDPOINTS.GET_ALL_EMPLOYEES}?${params}`, {
-    credentials: 'include'
+    method: METHODS.POST,
+    credentials: 'include',
+    body: JSON.stringify(params),
+    headers: {
+      'Content-Type': 'application/json'
+    }
   })
   if (!response.ok) {
     throw new Error('Failed to fetch employee')
