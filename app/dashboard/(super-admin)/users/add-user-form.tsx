@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { useGetCompanyList } from '@/hooks/company'
 import { useCreateUser } from '@/hooks/user'
 import { cn, formatLabel, formatRoleLabel, getAvailableRoles } from '@/lib/utils'
-import { CompanyInfo, CreateUserInput, RoleName } from '@/types'
+import { Company, CreateUserInput, RoleName } from '@/types'
 
 const initialFormState: CreateUserInput = {
   userName: '',
@@ -111,7 +111,7 @@ export default function AddUserForm({ onClose }: { onClose: () => void }) {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      {companyList.map((company: CompanyInfo) => (
+                      {companyList.map((company: Company) => (
                         <SelectItem key={company.companyId} value={company.companyId}>
                           {company.companyId}
                         </SelectItem>
