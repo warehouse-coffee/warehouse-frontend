@@ -1,5 +1,6 @@
 'use client'
 
+import type { Metadata } from 'next'
 import { Suspense } from 'react'
 
 import DashboardFetchLoader from '@/components/dashboard/dashboard-fetch-loader'
@@ -16,6 +17,12 @@ import { useDialog } from '@/hooks/useDialog'
 
 import EmployeesCreatePage from './employees-create'
 import EmployeesTable from './employees-table'
+
+export const metadata: Metadata = {
+  icons: {
+    icon: '/icon.png'
+  }
+}
 
 export default function EmployeesPage() {
   const { closeDialog, dialogsOpen, setDialogsOpen } = useDialog({

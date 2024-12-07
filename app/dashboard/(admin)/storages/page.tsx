@@ -1,5 +1,6 @@
 'use client'
 
+import type { Metadata } from 'next'
 import { Suspense, useState, useCallback } from 'react'
 import React from 'react'
 
@@ -22,6 +23,12 @@ import { cn } from '@/lib/utils'
 import { StorageTable } from './storage-table'
 import StoragesCreatePage from './storages-create'
 import { UpdateStorage } from './update-storage'
+
+export const metadata: Metadata = {
+  icons: {
+    icon: '/icon.png'
+  }
+}
 
 export default function StoragesPage() {
   const { closeDialog, dialogsOpen, setDialogsOpen } = useDialog({

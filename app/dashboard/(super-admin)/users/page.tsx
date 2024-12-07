@@ -1,3 +1,5 @@
+import type { Metadata } from 'next'
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,6 +10,12 @@ import {
 } from '@/components/ui/breadcrumb'
 
 import UsersTable from './users-table'
+
+export const metadata: Metadata = {
+  icons: {
+    icon: '/icon.png'
+  }
+}
 
 export default function UsersPage() {
   return (

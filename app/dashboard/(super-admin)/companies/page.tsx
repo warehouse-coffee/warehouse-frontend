@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 
 import {
   Breadcrumb,
@@ -9,6 +10,12 @@ import {
 } from '@/components/ui/breadcrumb'
 
 import CompanyTable from './companies-table'
+
+export const metadata: Metadata = {
+  icons: {
+    icon: '/icon.png'
+  }
+}
 
 export default function CompaniesPage() {
 
