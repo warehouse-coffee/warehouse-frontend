@@ -2,11 +2,14 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { Minimize2, Send, RotateCcw, MessageCircle, Bot } from 'lucide-react'
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import useClickOutside from '@/hooks/useClickOutside'
+import { cn } from '@/lib/utils'
+import { useAuthStore } from '@/stores/auth-store'
 
 import { Textarea } from './ui/textarea'
 
@@ -15,51 +18,105 @@ interface Message {
     content: string
 }
 
+const suggestionButtons = [
+  {
+    text: 'Empty Storage Status',
+    prompt: 'What is the current empty storage status?'
+  },
+  {
+    text: 'Empty Area Check',
+    prompt: 'Can you check for any empty areas?'
+  },
+  {
+    text: 'Tomorrow\'s Coffee Price',
+    prompt: 'What is the price of coffee tomorrow?'
+  },
+  {
+    text: 'Today\'s Coffee Price',
+    prompt: 'What is the current coffee price today?'
+  },
+  {
+    text: 'Near Expired Products',
+    prompt: 'Show me the list of near expired products'
+  },
+  {
+    text: 'Most Valuable Product',
+    prompt: 'What is our most valuable product?'
+  }
+]
+
 export default function ChatBox() {
-  const [isMinimized, setIsMinimized] = useState(true)
+  const [isMinimized, setIsMinimized] = useState<boolean>(true)
   const [messages, setMessages] = useState<Message[]>([])
-  const [inputMessage, setInputMessage] = useState('')
-  const [isThinking, setIsThinking] = useState(false)
+  const [inputMessage, setInputMessage] = useState<string>('')
+  const [isThinking, setIsThinking] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
-  const isInitialMount = useRef(true)
+  const [showSuggestions, setShowSuggestions] = useState<boolean>(true)
+  const isInitialMount = useRef<boolean>(true)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   var api_count = 0
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
+  const chatBoxRef = useRef<HTMLDivElement>(null)
+
+  const { userInfo, isAuthenticated } = useAuthStore()
 
   useEffect(() => {
-    const storedMessages = sessionStorage.getItem('chatMessages')
-    if (storedMessages) {
-      try {
-        const parsedMessages = JSON.parse(storedMessages)
-        if (Array.isArray(parsedMessages)) {
-          setMessages(parsedMessages)
+    if (isAuthenticated && userInfo?.userId) {
+      const storedMessages = sessionStorage.getItem(`chatMessages_${userInfo.userId}`)
+      if (storedMessages) {
+        try {
+          const parsedMessages = JSON.parse(storedMessages)
+          if (Array.isArray(parsedMessages)) {
+            setMessages(parsedMessages)
+            setShowSuggestions(false)
+          }
+        } catch (error) {
+          console.error('Error parsing stored messages:', error)
         }
-      } catch (error) {
-        console.error('Error parsing stored messages:', error)
+      } else {
+        setMessages([])
+        setShowSuggestions(true)
       }
+    } else {
+      setMessages([])
+      setShowSuggestions(true)
     }
-  }, [])
+  }, [isAuthenticated, userInfo])
 
   useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false
+    if (!isInitialMount.current && isAuthenticated && userInfo?.userId) {
+      sessionStorage.setItem(`chatMessages_${userInfo.userId}`, JSON.stringify(messages))
     } else {
-      sessionStorage.setItem('chatMessages', JSON.stringify(messages))
+      isInitialMount.current = false
     }
     scrollToBottom()
-  }, [messages])
+  }, [messages, isAuthenticated, userInfo])
 
   useEffect(() => {
-    if (!isMinimized) {
+    if (!isMinimized && messages.length > 0) {
       setTimeout(() => {
         scrollToBottom()
       }, 300)
     }
-  }, [isMinimized])
+  }, [isMinimized, messages.length])
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  const resetChat = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+    setMessages([])
+    setError(null)
+    setIsThinking(false)
+    setShowSuggestions(true)
+    api_count = 0
+    if (isAuthenticated && userInfo?.userId) {
+      sessionStorage.removeItem(`chatMessages_${userInfo.userId}`)
+    }
   }
 
   const handleSendMessage = async (e: React.FormEvent) => {
@@ -71,7 +128,6 @@ export default function ChatBox() {
       setError(null)
       if (textareaRef.current)
         textareaRef.current.style.height = '40px'
-      // Simulate AI response
       setIsThinking(true)
       try {
         if (api_count == 0) {
@@ -114,28 +170,17 @@ export default function ChatBox() {
       setTimeout(() => {
         scrollToBottom()
       }, 300)
+    } else if (messages.length === 0) {
+      setShowSuggestions(true)
     }
-  }
-
-  const resetChat = () => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort()
-    }
-    setMessages([])
-    setError(null)
-    setIsThinking(false)
-    api_count = 0
-    sessionStorage.removeItem('chatMessages')
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (textareaRef.current) {
       setInputMessage(e.target.value)
       const textarea = textareaRef.current
-      // Reset the height so it can shrink if necessary
       textarea.style.height = 'auto'
 
-      // Calculate the new height, limited to a max of 3 rows worth of content
       const scrollHeight = textarea.scrollHeight
       const maxHeight = 3 * parseFloat(getComputedStyle(textarea).lineHeight)
 
@@ -150,18 +195,61 @@ export default function ChatBox() {
     }
   }
 
-  // const formatMessage = (message: string): JSX.Element[] => {
-  //     return
+  const handleSuggestionClick = async (prompt: string) => {
+    setShowSuggestions(false)
 
-  // };
+    const newMessage: Message = { role: 'user', content: prompt }
+    setMessages(prevMessages => [...prevMessages, newMessage])
+
+    setIsThinking(true)
+    try {
+      if (api_count == 0) {
+        api_count++
+        abortControllerRef.current = new AbortController()
+        const request = await fetch('/api/gemini', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            'api_key': 'FpK202Eu5u98M3Ikv7Yo',
+            'user_prompt': prompt
+          }),
+          signal: abortControllerRef.current.signal
+        })
+        const response_obj = await request.json()
+        api_count = 0
+        setIsThinking(false)
+        if (response_obj.statusText) {
+          setError(response_obj.statusText)
+          return
+        }
+        const aiResponse: Message = { role: 'AI', content: response_obj.response }
+        setMessages(prevMessages => [...prevMessages, aiResponse])
+      }
+    } catch (error) {
+      api_count = 0
+      setIsThinking(false)
+      setError('Failed to send message. wait a few seconds and try again')
+    }
+  }
+
+  const handleClickOutside = useCallback(() => {
+    if (!isMinimized) {
+      setIsMinimized(true)
+    }
+  }, [isMinimized])
+
+  useClickOutside(chatBoxRef, handleClickOutside)
 
   return (
     <motion.div
+      ref={chatBoxRef}
       initial={{ opacity: 0, y: 100 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 100 }}
       transition={{ duration: 0.3 }}
-      className="fixed bottom-5 right-5 z-[9999]"
+      className={cn('fixed bottom-5 right-5 z-[9999]')}
     >
       <motion.div
         layout
@@ -248,47 +336,68 @@ export default function ChatBox() {
               {/* Message bubbles */}
               <CardContent className="px-3.5 pt-4 pb-0 flex-grow overflow-hidden bg-[#111111] h-[400px]">
                 <ScrollArea className="h-full pr-3">
-                  <AnimatePresence mode="popLayout">
-                    {messages.map((message, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{
-                          opacity: 0,
-                          x: message.role === 'user' ? 50 : -50,
-                          scale: 0.8
-                        }}
-                        animate={{
-                          opacity: 1,
-                          x: 0,
-                          scale: 1,
-                          transition: {
-                            type: 'spring',
-                            stiffness: 300,
-                            damping: 24
-                          }
-                        }}
-                        className={`mb-4 ${message.role === 'user' ? 'text-right' : 'text-left'}`}
-                      >
-                        <div className={`max-w-[85%] inline-block px-3 py-2 shadow-sm
-                          ${message.role === 'user'
-                        ? 'bg-gradient-to-r from-[#4DA6FF] to-[#65B1FF] text-white rounded-[.75rem] rounded-br-sm'
-                        : 'bg-[#1A1A1A] text-gray-100 rounded-[.75rem] rounded-tl-sm border border-[#2A2A2A]'
-                      }`}
+                  {showSuggestions && !isMinimized && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="grid grid-cols-2 gap-3 mb-4"
+                    >
+                      {suggestionButtons.map((button, index) => (
+                        <Button
+                          key={index}
+                          variant="outline"
+                          className="w-full text-sm py-2 px-3 h-auto whitespace-normal text-left bg-[#1A1A1A] border-[#2A2A2A] hover:bg-[#2A2A2A] text-gray-100"
+                          onClick={() => handleSuggestionClick(button.prompt)}
                         >
-                          <motion.p
-                            initial={{ opacity: 0 }}
-                            animate={{
-                              opacity: 1,
-                              transition: { delay: 0.1 }
-                            }}
-                            className="text-sm leading-relaxed whitespace-pre-wrap"
+                          {button.text}
+                        </Button>
+                      ))}
+                    </motion.div>
+                  )}
+                  {messages.length > 0 && (
+                    <AnimatePresence mode="popLayout">
+                      {messages.map((message, index) => (
+                        <motion.div
+                          key={index}
+                          initial={{
+                            opacity: 0,
+                            x: message.role === 'user' ? 50 : -50,
+                            scale: 0.8
+                          }}
+                          animate={{
+                            opacity: 1,
+                            x: 0,
+                            scale: 1,
+                            transition: {
+                              type: 'spring',
+                              stiffness: 300,
+                              damping: 24
+                            }
+                          }}
+                          className={`mb-4 ${message.role === 'user' ? 'text-right' : 'text-left'}`}
+                        >
+                          <div className={`max-w-[85%] inline-block px-3 py-2 shadow-sm
+                            ${message.role === 'user'
+                          ? 'bg-gradient-to-r from-[#4DA6FF] to-[#65B1FF] text-white rounded-[.75rem] rounded-br-sm'
+                          : 'bg-[#1A1A1A] text-gray-100 rounded-[.75rem] rounded-tl-sm border border-[#2A2A2A]'
+                        }`}
                           >
-                            {message.content}
-                          </motion.p>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
+                            <motion.p
+                              initial={{ opacity: 0 }}
+                              animate={{
+                                opacity: 1,
+                                transition: { delay: 0.1 }
+                              }}
+                              className="text-sm leading-relaxed whitespace-pre-wrap"
+                            >
+                              {message.content}
+                            </motion.p>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  )}
 
                   {isThinking && (
                     <motion.div

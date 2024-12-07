@@ -5,8 +5,6 @@ import ChatBox from '@/components/chat'
 import DashboardMain from '@/components/dashboard/dashboard-main'
 import { ThemeProvider } from '@/components/theme-provider'
 
-// import DashboardLoading from './loading'
-
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider
@@ -16,10 +14,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       enableSystem
     >
       <AuthWrapper>
-        <DashboardMain>
-          <ChatBox />
-          {children}
-        </DashboardMain>
+        <ChatBox />
+        <DashboardMain>{children}</DashboardMain>
       </AuthWrapper>
     </ThemeProvider>
   )
