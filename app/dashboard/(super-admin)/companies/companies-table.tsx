@@ -13,7 +13,8 @@ import {
   getSortedRowModel,
   SortingState
 } from '@tanstack/react-table'
-import { ArrowUpDown, CirclePlus, ArrowUpAZ, ArrowDownAZ, Filter, Search, Pencil, Trash } from 'lucide-react'
+import { CirclePlus, Filter, Search } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import React, { useState, useEffect, useMemo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
@@ -22,7 +23,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger
@@ -31,7 +31,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger
@@ -57,11 +56,15 @@ import { useDeleteCompany, useGetCompanyList } from '@/hooks/company'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useDialog } from '@/hooks/useDialog'
 import { cn } from '@/lib/utils'
-import { CompanyInfo } from '@/types'
+import { Company } from '@/types'
 
 import CompaniesDataLoading from './companies-data-loading'
 import { CompanyCreate } from './company-create'
-import { CompanyUpdate } from './company-update'
+
+const CompaniesDataMain = dynamic(() => import('./companies-data'), {
+  ssr: false,
+  loading: () => <CompaniesDataLoading />
+})
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value)
@@ -89,9 +92,7 @@ const NoMatchingMessage: React.FC<NoMatchingMessageProps> = ({ value }) => (
 export default function CompanyTable() {
   const { reset } = useQueryErrorResetBoundary()
   const { closeDialog, dialogsOpen, setDialogsOpen } = useDialog({
-    add: false,
-    edit: false,
-    delete: false
+    add: false
   })
 
   const [pagination, setPagination] = useState<PaginationState>({
@@ -110,33 +111,9 @@ export default function CompanyTable() {
   const [isSearching, setIsSearching] = useState<boolean>(false)
   const [totalPages, setTotalPages] = useState<number>(0)
 
-  const [editingCompanyId, setEditingCompanyId] = useState<string | null>(null)
-  const [deletingCompany, setDeletingCompany] = useState<CompanyInfo | null>(null)
+  const { data: companies, isLoading } = useGetCompanyList()
 
-  const { data: companies, isLoading, refetch } = useGetCompanyList()
-  const deleteCompanyMutation = useDeleteCompany()
-
-  const handleEdit = (company: CompanyInfo) => {
-    if (company.companyId) {
-      setEditingCompanyId(company.companyId)
-      setDialogsOpen(prev => ({ ...prev, edit: true }))
-    }
-  }
-
-  const handleDelete = (company: CompanyInfo) => {
-    setDeletingCompany(company)
-    setDialogsOpen(prev => ({ ...prev, delete: true }))
-  }
-
-  const confirmDelete = async () => {
-    if (deletingCompany?.companyId) {
-      await deleteCompanyMutation.mutateAsync(deletingCompany.companyId)
-      setDialogsOpen(prev => ({ ...prev, delete: false }))
-      refetch()
-    }
-  }
-
-  const [data, setData] = useState<CompanyInfo[]>([])
+  const [data, setData] = useState<Company[]>([])
 
   const handleSort = (columnId: string) => {
     setSortConfig(prev => {
@@ -187,7 +164,7 @@ export default function CompanyTable() {
       Object.entries(columnFilters).forEach(([columnId, filterValue]) => {
         if (filterValue) {
           filteredData = filteredData.filter(item => {
-            const value = String(item[columnId as keyof CompanyInfo] || '').toLowerCase()
+            const value = String(item[columnId as keyof Company] || '').toLowerCase()
             return value.includes(filterValue.toLowerCase())
           })
         }
@@ -209,7 +186,7 @@ export default function CompanyTable() {
     }
   }, [companies, columnFilters, debouncedSearchValue, pagination.pageSize])
 
-  const columns = useMemo<ColumnDef<CompanyInfo>[]>(() => [
+  const columns = useMemo<ColumnDef<Company>[]>(() => [
     {
       accessorKey: 'companyId',
       header: 'Company ID',
@@ -289,7 +266,7 @@ export default function CompanyTable() {
           <TableHeader>
             <TableRow>
               <TableHead>
-                <div className="flex items-center gap-2">
+                <div className="flex items-start gap-2">
                   Company ID
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -318,20 +295,37 @@ export default function CompanyTable() {
                 </div>
               </TableHead>
               <TableHead>
-                <div className="flex items-center gap-2">
-                  Name
-                  {sortConfig.companyName === 'asc' ? (
-                    <ArrowUpAZ className="h-4 w-4 cursor-pointer" onClick={() => handleSort('companyName')} />
-                  ) : sortConfig.companyName === 'desc' ? (
-                    <ArrowDownAZ className="h-4 w-4 cursor-pointer" onClick={() => handleSort('companyName')} />
-                  ) : (
-                    <ArrowUpDown className="h-4 w-4 cursor-pointer" onClick={() => handleSort('companyName')} />
-                  )}
+                <div className="flex items-start gap-2">
+                  Company Name
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Filter className="h-4 w-4 cursor-pointer" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="min-w-[16rem]">
+                      <DropdownMenuLabel>Filter by</DropdownMenuLabel>
+                      <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727]" />
+                      <div className="px-2 py-2">
+                        <div className="relative">
+                          <Search className='absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4' />
+                          <Input
+                            placeholder="Search name..."
+                            className="flex-grow pl-8 pr-2.5"
+                            value={columnFilters['companyName'] || ''}
+                            onChange={(e) => handleFilter('companyName', e.target.value)}
+                          />
+                        </div>
+                      </div>
+                      <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727]" />
+                      <DropdownMenuGroup className="max-h-[200px] overflow-y-auto">
+                        {!data.length && <NoMatchingMessage value={columnFilters['phoneContact']} />}
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </TableHead>
-              <TableHead>
-                <div className="flex items-center gap-2">
-                  Phone Contact
+              <TableHead className="text-center">
+                <div className="flex items-center justify-center gap-2">
+                  Phone
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Filter className="h-4 w-4 cursor-pointer" />
@@ -358,7 +352,7 @@ export default function CompanyTable() {
                   </DropdownMenu>
                 </div>
               </TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="text-end">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -401,35 +395,10 @@ export default function CompanyTable() {
                   </TableRow>
                 )}
               >
-                {table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.original.companyId}>
-                    <TableCell className="py-3">{row.original.companyId}</TableCell>
-                    <TableCell className="py-3">{row.original.companyName}</TableCell>
-                    <TableCell className="py-3">{row.original.phoneContact}</TableCell>
-                    <TableCell className="text-right py-3">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => handleEdit(row.original)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                          <span className="sr-only">Edit</span>
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => handleDelete(row.original)}
-                        >
-                          <Trash className="h-4 w-4" />
-                          <span className="sr-only">Delete</span>
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                <CompaniesDataMain
+                  data={data}
+                  table={table}
+                />
               </ErrorBoundary>
             )}
           </TableBody>
@@ -469,62 +438,6 @@ export default function CompanyTable() {
           </PaginationContent>
         </Pagination>
       </div>
-
-      {/* Edit Dialog */}
-      <Dialog open={dialogsOpen.edit} onOpenChange={(open) => setDialogsOpen(prev => ({ ...prev, edit: open }))}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Company</DialogTitle>
-          </DialogHeader>
-          {editingCompanyId && (
-            <CompanyUpdate
-              companyId={editingCompanyId}
-              onSuccess={() => {
-                refetch()
-                setDialogsOpen(prev => ({ ...prev, edit: false }))
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete Dialog */}
-      <Dialog open={dialogsOpen.delete} onOpenChange={(open) => setDialogsOpen(prev => ({ ...prev, delete: open }))}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Company</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete {deletingCompany?.companyName}? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              className={cn('bg-accent')}
-              type="button"
-              variant="outline"
-              onClick={() => closeDialog('delete')}
-            >
-              Cancel
-            </Button>
-            <Button
-              className={cn(
-                'bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary',
-                deleteCompanyMutation.isPending && 'flex items-center gap-3 cursor-not-allowed pointer-events-none'
-              )}
-              onClick={confirmDelete}
-            >
-              {deleteCompanyMutation.isPending ? (
-                <>
-                  Deleting...
-                  <Loader color="#62c5ff" size="1.25rem" />
-                </>
-              ) : (
-                'Delete'
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </section>
   )
 }

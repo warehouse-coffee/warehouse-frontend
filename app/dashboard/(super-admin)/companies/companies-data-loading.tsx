@@ -5,17 +5,17 @@ export default function CompaniesDataLoading() {
   return (
     [...Array(5)].map((_, index) => (
       <TableRow key={index}>
-        <TableCell className="py-3">
-          <Skeleton className="h-4 w-[8rem]" />
+        <TableCell className="py-3 text-center">
+          <Skeleton className="h-4 w-[8rem] mx-auto" />
         </TableCell>
-        <TableCell className="py-3">
-          <Skeleton className="h-4 w-[15rem]" />
+        <TableCell className="py-3 text-center">
+          <Skeleton className="h-4 w-[15rem] mx-auto" />
         </TableCell>
-        <TableCell className="py-3">
-          <Skeleton className="h-4 w-[10rem]" />
+        <TableCell className="py-3 text-center">
+          <Skeleton className="h-4 w-[10rem] mx-auto" />
         </TableCell>
-        <TableCell className="text-right py-3">
-          <div className="flex justify-end gap-2">
+        <TableCell className="py-3 text-center">
+          <div className="flex justify-center gap-2">
             <Skeleton className="h-8 w-8" />
             <Skeleton className="h-8 w-8" />
           </div>

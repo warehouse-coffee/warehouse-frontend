@@ -21,16 +21,9 @@ import { Input } from '@/components/ui/input'
 import { Loader } from '@/components/ui/loader'
 import { useGetCompanyDetail, useUpdateCompany } from '@/hooks/company'
 import { cn } from '@/lib/utils'
+import { companyFormSchema } from '@/configs/zod-schema'
 
-// Validation schema
-const formSchema = z.object({
-  companyId: z.string().min(1, 'Company ID is required'),
-  companyName: z.string().min(1, 'Company name is required'),
-  phoneContact: z.string().min(1, 'Phone number is required'),
-  emailContact: z.string().min(1, 'Email is required')
-})
-
-type FormValues = z.infer<typeof formSchema>
+type FormValues = z.infer<typeof companyFormSchema>
 
 interface CompanyUpdateProps {
   companyId: string
@@ -43,7 +36,7 @@ export function CompanyUpdate({ companyId, onSuccess }: CompanyUpdateProps) {
   const [isSubmitting, setIsSubmitting] = React.useState(false)
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(companyFormSchema),
     defaultValues: {
       companyId: '',
       companyName: '',

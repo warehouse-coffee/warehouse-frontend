@@ -27,6 +27,13 @@ export const resetPasswordSchema = z.object({
   path: ['confirmPassword']
 })
 
+export const companyFormSchema = z.object({
+  companyId: z.string().min(1, 'Company ID is required').min(2, 'Company ID must be at least 2 characters'),
+  companyName: z.string().min(1, 'Company name is required').min(2, 'Company name must be at least 2 characters'),
+  phoneContact: z.string().min(1, 'Phone number is required').min(10, 'Phone number must be at least 10 characters'),
+  emailContact: z.string().min(1, 'Email is required').email('Invalid email address')
+})
+
 export const settingsFormSchema = z.object({
   aiServiceKey: z.string().min(1, 'AI Service Key is required'),
   emailServiceKey: z.string().min(1, 'Email Service Key is required'),

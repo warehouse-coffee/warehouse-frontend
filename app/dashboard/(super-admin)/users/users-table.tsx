@@ -255,7 +255,7 @@ export default function UsersTable() {
                 <span>Add User</span>
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-[30rem]">
+            <DialogContent className="max-w-[32rem]">
               <DialogHeader>
                 <DialogTitle>Add User</DialogTitle>
                 <DialogDescription>
