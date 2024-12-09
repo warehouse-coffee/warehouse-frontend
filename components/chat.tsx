@@ -346,7 +346,7 @@ export default function ChatBox() {
                         className="max-w-[85%] inline-block px-3 py-2 shadow-sm bg-[#1A1A1A] text-gray-100 rounded-[.75rem] rounded-tl-sm border border-[#2A2A2A]"
                       >
                         <motion.p className="text-sm leading-relaxed whitespace-pre-wrap">
-                          Hello! I'm your AI Assistant. How can I help you today?
+                          Hello! I&apos;m your AI Assistant. How can I help you today?
                         </motion.p>
                       </motion.div>
 
