@@ -37,7 +37,6 @@ import { useStorageOfUserDetail } from '@/hooks/storage'
 import { useDebounce } from '@/hooks/useDebounce'
 
 import InventoryDataLoading from './inventory-data-loading'
-import SafeStockForm from './safe-stock-form'
 
 const InventoryDataMain = dynamic(() => import('./inventory-data'), {
   ssr: false,
@@ -54,7 +53,6 @@ export default function InventoryTable() {
 
   const [searchValue, setSearchValue] = useState<string>('')
   const debouncedSearchValue = useDebounce(searchValue, 500)
-  const [isSearching, setIsSearching] = useState<boolean>(false)
 
   const [totalElements, setTotalElements] = useState<number>(0)
   const [totalPages, setTotalPages] = useState<number>(0)
@@ -64,10 +62,10 @@ export default function InventoryTable() {
   const { data: storageData } = useStorageOfUserDetail()
   const storageList = useMemo(() => storageData?.storages || [], [storageData?.storages])
 
-  const { data: inventoryData } = useInventoriesByStorage(
+  const { data: inventoryData, isFetching } = useInventoriesByStorage(
     selectedStorageId,
-    pagination.pageIndex,
-    pagination.pageSize
+    debouncedSearchValue ? 0 : pagination.pageIndex,
+    debouncedSearchValue ? 1000 : pagination.pageSize
   )
 
   const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
@@ -90,14 +88,15 @@ export default function InventoryTable() {
 
   const handleSearch = (value: string) => {
     setSearchValue(value)
-    setIsSearching(true)
+    setPagination(prev => ({ ...prev, pageIndex: 0 }))
   }
 
   useEffect(() => {
     if (inventoryData?.inventories) {
+      setData(inventoryData.inventories)
+
       let filteredData = [...inventoryData.inventories]
 
-      // Apply search filter
       if (debouncedSearchValue) {
         filteredData = filteredData.filter(item => {
           const matchesName = item.productName?.toLowerCase().includes(debouncedSearchValue.toLowerCase())
@@ -105,12 +104,25 @@ export default function InventoryTable() {
         })
       }
 
-      setData(filteredData)
-      setTotalElements(inventoryData.page?.totalElements ?? 0)
-      setTotalPages(inventoryData.page?.totalPages ?? 0)
-      setIsSearching(false)
+      if (debouncedSearchValue) {
+        if (filteredData.length === 0) {
+          setData([])
+          setTotalElements(0)
+          setTotalPages(0)
+        } else {
+          const startIndex = pagination.pageIndex * pagination.pageSize
+          const endIndex = startIndex + pagination.pageSize
+          setData(filteredData.slice(startIndex, endIndex))
+          setTotalElements(filteredData.length)
+          setTotalPages(Math.ceil(filteredData.length / pagination.pageSize))
+        }
+      } else {
+        setData(filteredData)
+        setTotalElements(inventoryData.page?.totalElements ?? 0)
+        setTotalPages(inventoryData.page?.totalPages ?? 0)
+      }
     }
-  }, [inventoryData, debouncedSearchValue])
+  }, [inventoryData, debouncedSearchValue, pagination])
 
   const [sorting, setSorting] = useState<SortingState>([])
 
@@ -375,7 +387,7 @@ export default function InventoryTable() {
               value={searchValue}
               onChange={(e) => handleSearch(e.target.value)}
             />
-            {isSearching && (
+            {isFetching && (
               <div className="absolute right-4 top-1/2 -translate-y-1/2">
                 <Loader color="#fff" size="1.15rem" />
               </div>
@@ -400,7 +412,7 @@ export default function InventoryTable() {
             ))}
           </TableHeader>
           <TableBody>
-            {isSearching ? (
+            {isFetching ? (
               <InventoryDataLoading />
             ) : table.getRowModel().rows.length === 0 ? (
               <TableRow>
@@ -449,7 +461,7 @@ export default function InventoryTable() {
         </Table>
       </div>
       <DashboardTablePagination
-        itemName="product"
+        itemName="item"
         table={table}
         totalElements={totalElements}
         totalPages={totalPages}

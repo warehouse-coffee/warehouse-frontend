@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const pageNumber = parseInt(searchParams.get('pageNumber') || '')
     const size = parseInt(searchParams.get('size') || '')
-    // const searchText = searchParams.get('searchText')
+    const searchText = searchParams.get('searchText') || ''
 
     const client = new SuperAdminClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token)
 
@@ -25,11 +25,11 @@ export async function POST(request: NextRequest) {
     })
 
     const query = new GetUserListQuery({
-      page: page
+      page: page,
+      searchText: searchText
     })
 
     const response = await client.getAllUsers(query)
-    // console.log(response)
     return NextResponse.json(response)
   } catch (error) {
     if (error instanceof Error) {

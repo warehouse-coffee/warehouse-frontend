@@ -16,7 +16,6 @@ const fetchSaleOrderList = async ({ pageIndex, pageSize }: FetchSaleOrderListPar
   const response = await fetch(`${API_ENDPOINTS.GET_SALE_ORDERS}?${params}`, {
     method: METHODS.POST,
     credentials: 'include',
-    body: JSON.stringify(params),
     headers: {
       'Content-Type': 'application/json'
     }

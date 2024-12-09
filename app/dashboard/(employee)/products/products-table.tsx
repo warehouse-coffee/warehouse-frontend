@@ -51,38 +51,33 @@ export default function ProductsTable() {
 
   const [searchValue, setSearchValue] = useState<string>('')
   const debouncedSearchValue = useDebounce(searchValue, 500)
-  const [isSearching, setIsSearching] = useState<boolean>(false)
 
   const [totalElements, setTotalElements] = useState<number>(0)
   const [totalPages, setTotalPages] = useState<number>(0)
   const [data, setData] = useState<any[]>([])
 
-  const { data: productsData } = useProductList(
-    pagination.pageIndex,
-    pagination.pageSize
+  const { data: productsData, isFetching } = useProductList(
+    debouncedSearchValue ? 0 : pagination.pageIndex,
+    debouncedSearchValue ? 1000 : pagination.pageSize
   )
 
   const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-    // Rank the item
     const itemRank = rankItem(row.getValue(columnId), value)
-
-    // Store the itemRank info
     addMeta({ itemRank })
-
-    // Return if the item should be filtered in/out
     return itemRank.passed
   }
 
   const handleSearch = (value: string) => {
     setSearchValue(value)
-    setIsSearching(true)
+    setPagination(prev => ({ ...prev, pageIndex: 0 }))
   }
 
   useEffect(() => {
     if (productsData?.productList) {
+      setData(productsData.productList)
+
       let filteredData = [...productsData.productList]
 
-      // Apply search filter
       if (debouncedSearchValue) {
         filteredData = filteredData.filter(item => {
           const matchesName = item.name?.toLowerCase().includes(debouncedSearchValue.toLowerCase())
@@ -90,12 +85,25 @@ export default function ProductsTable() {
         })
       }
 
-      setData(filteredData)
-      setTotalElements(productsData.page?.totalElements ?? 0)
-      setTotalPages(productsData.page?.totalPages ?? 0)
-      setIsSearching(false)
+      if (debouncedSearchValue) {
+        if (filteredData.length === 0) {
+          setData([])
+          setTotalElements(0)
+          setTotalPages(0)
+        } else {
+          const startIndex = pagination.pageIndex * pagination.pageSize
+          const endIndex = startIndex + pagination.pageSize
+          setData(filteredData.slice(startIndex, endIndex))
+          setTotalElements(filteredData.length)
+          setTotalPages(Math.ceil(filteredData.length / pagination.pageSize))
+        }
+      } else {
+        setData(filteredData)
+        setTotalElements(productsData.page?.totalElements ?? 0)
+        setTotalPages(productsData.page?.totalPages ?? 0)
+      }
     }
-  }, [productsData, debouncedSearchValue])
+  }, [productsData, debouncedSearchValue, pagination])
 
   const [sorting, setSorting] = useState<SortingState>([])
 
@@ -321,7 +329,7 @@ export default function ProductsTable() {
               value={searchValue}
               onChange={(e) => handleSearch(e.target.value)}
             />
-            {isSearching && (
+            {isFetching && (
               <div className="absolute right-4 top-1/2 -translate-y-1/2">
                 <Loader color="#fff" size="1.15rem" />
               </div>
@@ -346,7 +354,7 @@ export default function ProductsTable() {
             ))}
           </TableHeader>
           <TableBody>
-            {isSearching ? (
+            {isFetching ? (
               <ProductsDataLoading />
             ) : table.getRowModel().rows.length === 0 ? (
               <TableRow>

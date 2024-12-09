@@ -285,7 +285,7 @@ export default function ChatBox() {
                   className="text-white text-sm font-medium -ml-1 whitespace-nowrap overflow-hidden w-0
                     group-hover:w-auto transition-all duration-250 opacity-0 group-hover:opacity-100"
                 >
-                                    Chat with AI
+                  Chat with AI
                 </span>
               </div>
 
@@ -333,7 +333,6 @@ export default function ChatBox() {
                 </div>
               </CardHeader>
 
-              {/* Message bubbles */}
               <CardContent className="px-3.5 pt-4 pb-0 flex-grow overflow-hidden bg-[#111111] h-[400px]">
                 <ScrollArea className="h-full pr-3">
                   {showSuggestions && !isMinimized && (
@@ -341,18 +340,36 @@ export default function ChatBox() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3 }}
-                      className="grid grid-cols-2 gap-3 mb-4"
+                      className="flex flex-col gap-4"
                     >
-                      {suggestionButtons.map((button, index) => (
-                        <Button
-                          key={index}
-                          variant="outline"
-                          className="w-full text-sm py-2 px-3 h-auto whitespace-normal text-left bg-[#1A1A1A] border-[#2A2A2A] hover:bg-[#2A2A2A] text-gray-100"
-                          onClick={() => handleSuggestionClick(button.prompt)}
-                        >
-                          {button.text}
-                        </Button>
-                      ))}
+                      <motion.div
+                        className="max-w-[85%] inline-block px-3 py-2 shadow-sm bg-[#1A1A1A] text-gray-100 rounded-[.75rem] rounded-tl-sm border border-[#2A2A2A]"
+                      >
+                        <motion.p className="text-sm leading-relaxed whitespace-pre-wrap">
+                          Hello! I'm your AI Assistant. How can I help you today?
+                        </motion.p>
+                      </motion.div>
+
+                      <motion.div
+                        className="max-w-[85%] inline-block px-3 py-2 shadow-sm bg-[#1A1A1A] text-gray-100 rounded-[.75rem] rounded-tl-sm border border-[#2A2A2A]"
+                      >
+                        <motion.p className="text-sm leading-relaxed whitespace-pre-wrap">
+                          Here are some frequently asked questions you might be interested in:
+                        </motion.p>
+                      </motion.div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        {suggestionButtons.map((button, index) => (
+                          <Button
+                            key={index}
+                            variant="outline"
+                            className="w-full text-sm py-2 px-3 h-auto whitespace-normal text-left bg-[#1A1A1A] border-[#2A2A2A] hover:bg-[#2A2A2A] text-gray-100"
+                            onClick={() => handleSuggestionClick(button.prompt)}
+                          >
+                            {button.text}
+                          </Button>
+                        ))}
+                      </div>
                     </motion.div>
                   )}
                   {messages.length > 0 && (
@@ -452,7 +469,6 @@ export default function ChatBox() {
                 </ScrollArea>
               </CardContent>
 
-              {/* Input area */}
               <CardFooter className="p-4 border-t border-[#222222] bg-[#111111]">
                 <form onSubmit={handleSendMessage} className="flex w-full gap-2">
                   <Textarea

@@ -16,7 +16,6 @@ const fetchImportOrderList = async ({ pageIndex, pageSize }: FetchImportOrderLis
   const response = await fetch(`${API_ENDPOINTS.GET_IMPORT_ORDERS}?${params}`, {
     method: METHODS.POST,
     credentials: 'include',
-    body: JSON.stringify(params),
     headers: {
       'Content-Type': 'application/json'
     }

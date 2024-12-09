@@ -21,11 +21,6 @@ const fetchLogs = async ({ pageIndex, pageSize, date }: FetchLogsParams) => {
   const response = await fetch(`${API_ENDPOINTS.GET_ALL_LOGS}?${params}`, {
     method: METHODS.POST,
     credentials: 'include',
-    body: JSON.stringify({
-      pageNumber: pageIndex + 1,
-      size: pageSize,
-      date: date?.toISOString()
-    }),
     headers: {
       'Content-Type': 'application/json'
     }
@@ -44,7 +39,11 @@ const fetchLogs = async ({ pageIndex, pageSize, date }: FetchLogsParams) => {
   return data
 }
 
-export const useLogList = (pageIndex: number, pageSize: number, date?: Date) => {
+export const useLogList = (
+  pageIndex: number,
+  pageSize: number,
+  date?: Date
+) => {
   return useSuspenseQuery({
     queryKey: ['logs', pageIndex, pageSize, date?.toISOString()],
     queryFn: () => fetchLogs({ pageIndex, pageSize, date }),

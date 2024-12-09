@@ -4,7 +4,6 @@ import { rankItem } from '@tanstack/match-sorter-utils'
 import { useQueryErrorResetBoundary } from '@tanstack/react-query'
 import {
   getCoreRowModel,
-  getPaginationRowModel,
   useReactTable,
   PaginationState,
   getFilteredRowModel,
@@ -90,14 +89,13 @@ export default function LogsTable() {
   const [searchValue, setSearchValue] = useState<string>('')
   const [selectedDate, setSelectedDate] = useState<Date>()
   const debouncedSearchValue = useDebounce(searchValue, 500)
-  const [isSearching, setIsSearching] = useState<boolean>(false)
   const [totalPages, setTotalPages] = useState<number>(0)
   const [totalElements, setTotalElements] = useState<number>(0)
   const [data, setData] = useState<any[]>([])
 
-  const { data: logData } = useLogList(
-    pagination.pageIndex,
-    pagination.pageSize,
+  const { data: logData, isFetching } = useLogList(
+    debouncedSearchValue || levelFilters.length > 0 ? 0 : pagination.pageIndex,
+    debouncedSearchValue || levelFilters.length > 0 ? 1000 : pagination.pageSize,
     selectedDate
   )
 
@@ -148,11 +146,13 @@ export default function LogsTable() {
 
   const handleSearch = (value: string) => {
     setSearchValue(value)
-    setIsSearching(true)
+    setPagination(prev => ({ ...prev, pageIndex: 0 }))
   }
 
   useEffect(() => {
     if (logData?.logVMs) {
+      setData(logData.logVMs)
+
       let filteredData = [...logData.logVMs]
 
       Object.entries(columnFilters).forEach(([columnId, filterValue]) => {
@@ -178,12 +178,25 @@ export default function LogsTable() {
         })
       }
 
-      setData(filteredData)
-      setTotalElements(filteredData.length)
-      setTotalPages(Math.ceil(filteredData.length / pagination.pageSize))
-      setIsSearching(false)
+      if (debouncedSearchValue || levelFilters.length > 0 || Object.keys(columnFilters).length > 0) {
+        if (filteredData.length === 0) {
+          setData([])
+          setTotalElements(0)
+          setTotalPages(0)
+        } else {
+          const startIndex = pagination.pageIndex * pagination.pageSize
+          const endIndex = startIndex + pagination.pageSize
+          setData(filteredData.slice(startIndex, endIndex))
+          setTotalElements(filteredData.length)
+          setTotalPages(Math.ceil(filteredData.length / pagination.pageSize))
+        }
+      } else {
+        setData(filteredData)
+        setTotalElements(logData.page?.totalElements || filteredData.length)
+        setTotalPages(logData.page?.totalPages || Math.ceil(filteredData.length / pagination.pageSize))
+      }
     }
-  }, [logData, columnFilters, levelFilters, debouncedSearchValue, pagination.pageSize])
+  }, [logData, columnFilters, levelFilters, debouncedSearchValue, pagination])
 
   const table = useReactTable({
     data,
@@ -215,7 +228,6 @@ export default function LogsTable() {
       }
     ],
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     state: {
@@ -244,7 +256,7 @@ export default function LogsTable() {
               value={searchValue}
               onChange={(e) => handleSearch(e.target.value)}
             />
-            {isSearching && (
+            {isFetching && (
               <div className="absolute right-4 top-1/2 -translate-y-1/2">
                 <Loader color="#fff" size="1.15rem" />
               </div>
@@ -255,6 +267,7 @@ export default function LogsTable() {
           <DateTimePicker24h
             date={selectedDate}
             onChange={setSelectedDate}
+            allowPastDates
           />
         </div>
       </div>
@@ -334,33 +347,6 @@ export default function LogsTable() {
               <TableHead>
                 <div className="flex items-center justify-center gap-2">
                   Message
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Filter className="h-4 w-4 cursor-pointer" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="min-w-[16rem]">
-                      <DropdownMenuLabel>Filter by</DropdownMenuLabel>
-                      <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727]" />
-                      <div className="px-2 py-2">
-                        <div className="relative">
-                          <Search className='absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4' />
-                          <Input
-                            placeholder="Search by message..."
-                            className="flex-grow pl-8 pr-2.5"
-                            value={columnFilters['message'] || ''}
-                            onChange={(e) => handleFilter('message', e.target.value)}
-                          />
-                        </div>
-                      </div>
-                      {columnFilters['message'] && !data.some(item =>
-                        item.message?.toLowerCase().includes(columnFilters['message'].toLowerCase())
-                      ) && (
-                        <div className="px-2 pb-2">
-                          <NoMatchingMessage value={columnFilters['message']} />
-                        </div>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
                 </div>
               </TableHead>
               <TableHead>
@@ -390,7 +376,7 @@ export default function LogsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isSearching ? (
+            {isFetching ? (
               <LogsDataLoading />
             ) : table.getRowModel().rows.length === 0 ? (
               <TableRow>

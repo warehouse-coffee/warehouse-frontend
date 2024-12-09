@@ -7,18 +7,27 @@ import { User } from '@/types'
 interface FetchUsersParams {
   pageIndex: number
   pageSize: number
+  searchTerm?: string
+  status?: string
 }
 
-const fetchUsers = async ({ pageIndex, pageSize }: FetchUsersParams): Promise<{ users: User[], page: Page }> => {
+const fetchUsers = async ({ pageIndex, pageSize, searchTerm, status }: FetchUsersParams): Promise<{ users: User[], page: Page }> => {
   const params = new URLSearchParams({
     pageNumber: (pageIndex + 1).toString(),
     size: pageSize.toString()
   })
 
+  if (searchTerm) {
+    params.append('searchTerm', searchTerm)
+  }
+
+  if (status) {
+    params.append('status', status)
+  }
+
   const response = await fetch(`${API_ENDPOINTS.GET_ALL_USERS}?${params}`, {
     method: METHODS.POST,
     credentials: 'include',
-    body: JSON.stringify(params),
     headers: {
       'Content-Type': 'application/json'
     }
@@ -41,9 +50,14 @@ const fetchUsers = async ({ pageIndex, pageSize }: FetchUsersParams): Promise<{ 
   return data
 }
 
-export const useUserList = (pageIndex: number, pageSize: number) => {
+export const useUserList = (
+  pageIndex: number,
+  pageSize: number,
+  searchTerm?: string,
+  status?: string
+) => {
   return useSuspenseQuery({
-    queryKey: ['users', pageIndex, pageSize],
-    queryFn: () => fetchUsers({ pageIndex, pageSize })
+    queryKey: ['users', pageIndex, pageSize, searchTerm, status],
+    queryFn: () => fetchUsers({ pageIndex, pageSize, searchTerm, status })
   })
 }

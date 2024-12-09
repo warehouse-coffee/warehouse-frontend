@@ -17,7 +17,6 @@ const fetchEmployees = async ({ pageIndex, pageSize }: FetchEmployeesParams): Pr
   const response = await fetch(`${API_ENDPOINTS.GET_ALL_EMPLOYEES}?${params}`, {
     method: METHODS.POST,
     credentials: 'include',
-    body: JSON.stringify(params),
     headers: {
       'Content-Type': 'application/json'
     }

@@ -51,7 +51,6 @@ import {
 import { useDebounce } from '@/hooks/useDebounce'
 import { useDialog } from '@/hooks/useDialog'
 import { useUserList } from '@/hooks/user'
-import { cn } from '@/lib/utils'
 import { User } from '@/types'
 
 import AddUserForm from './add-user-form'
@@ -105,12 +104,16 @@ export default function UsersTable() {
   const [totalElements, setTotalElements] = useState<number>(0)
   const [searchValue, setSearchValue] = useState<string>('')
   const debouncedSearchValue = useDebounce(searchValue, 500)
-  const [isSearching, setIsSearching] = useState<boolean>(false)
+  const [usernameFilter, setUsernameFilter] = useState<string>('')
+  const debouncedUsernameFilter = useDebounce(usernameFilter, 500)
+  const [isFilteringUsername, setIsFilteringUsername] = useState<boolean>(false)
+  const [statusFilter, setStatusFilter] = useState<string>('')
+  const debouncedStatusFilter = useDebounce(statusFilter, 500)
   const [totalPages, setTotalPages] = useState<number>(0)
 
-  const { data: userData } = useUserList(
-    pagination.pageIndex,
-    pagination.pageSize
+  const { data: userData, isFetching } = useUserList(
+    (debouncedSearchValue || Object.keys(columnFilters).length > 0) ? 0 : pagination.pageIndex,
+    (debouncedSearchValue || Object.keys(columnFilters).length > 0) ? 1000 : pagination.pageSize
   )
 
   const handleSort = (columnId: string) => {
@@ -138,6 +141,19 @@ export default function UsersTable() {
   }
 
   const handleFilter = (columnId: string, value: string) => {
+    if (columnId === 'userName') {
+      setUsernameFilter(value)
+      setIsFilteringUsername(true)
+      setPagination(prev => ({ ...prev, pageIndex: 0 }))
+      return
+    }
+
+    if (columnId === 'isActived') {
+      setStatusFilter(value)
+      setPagination(prev => ({ ...prev, pageIndex: 0 }))
+      return
+    }
+
     setColumnFilters(prev => {
       const newFilters = { ...prev }
       if (newFilters[columnId] === value) {
@@ -151,7 +167,7 @@ export default function UsersTable() {
 
   const handleSearch = (value: string) => {
     setSearchValue(value)
-    setIsSearching(true)
+    setPagination(prev => ({ ...prev, pageIndex: 0 }))
   }
 
   const columns = useMemo<ColumnDef<User>[]>(() => [
@@ -184,7 +200,7 @@ export default function UsersTable() {
       let filteredData = [...userData.users]
 
       Object.entries(columnFilters).forEach(([columnId, filterValue]) => {
-        if (filterValue) {
+        if (filterValue && columnId !== 'userName' && columnId !== 'isActived') {
           filteredData = filteredData.filter(item => {
             const value = String(item[columnId as keyof User] || '').toLowerCase()
             return value.includes(filterValue.toLowerCase())
@@ -195,17 +211,23 @@ export default function UsersTable() {
       if (debouncedSearchValue) {
         filteredData = filteredData.filter(user => {
           const matchesEmail = user.email?.toLowerCase().includes(debouncedSearchValue.toLowerCase())
-          const matchesUsername = user.userName?.toLowerCase().includes(debouncedSearchValue.toLowerCase())
-          return matchesEmail || matchesUsername
+          return matchesEmail
+        })
+      }
+
+      if (debouncedUsernameFilter) {
+        filteredData = filteredData.filter(user => {
+          const matchesUsername = user.userName?.toLowerCase().includes(debouncedUsernameFilter.toLowerCase())
+          return matchesUsername
         })
       }
 
       setData(filteredData)
-      setTotalElements(userData.page?.totalElements ?? 0)
-      setTotalPages(userData.page?.totalPages ?? 0)
-      setIsSearching(false)
+      setTotalElements(filteredData.length)
+      setTotalPages(Math.ceil(filteredData.length / pagination.pageSize))
+      setIsFilteringUsername(false)
     }
-  }, [userData, columnFilters, debouncedSearchValue])
+  }, [userData, columnFilters, debouncedSearchValue, debouncedUsernameFilter, pagination.pageSize])
 
   const table = useReactTable({
     data,
@@ -221,7 +243,6 @@ export default function UsersTable() {
     },
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
-    globalFilterFn: fuzzyFilter,
     filterFns: {
       fuzzy: fuzzyFilter
     },
@@ -240,7 +261,7 @@ export default function UsersTable() {
               value={searchValue}
               onChange={(e) => handleSearch(e.target.value)}
             />
-            {isSearching && (
+            {isFetching && (
               <div className="absolute right-4 top-1/2 -translate-y-1/2">
                 <Loader color="#fff" size="1.15rem" />
               </div>
@@ -297,14 +318,19 @@ export default function UsersTable() {
                           <Input
                             placeholder="Search by username..."
                             className="flex-grow pl-8 pr-2.5"
-                            value={columnFilters['userName'] || ''}
+                            value={usernameFilter}
                             onChange={(e) => handleFilter('userName', e.target.value)}
                           />
+                          {isFilteringUsername && (
+                            <div className="absolute right-2.5 top-1/2 -translate-y-1/2">
+                              <Loader color="#fff" size="1.15rem" />
+                            </div>
+                          )}
                         </div>
                       </DropdownMenuGroup>
                       <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727]" />
                       <DropdownMenuGroup className="max-h-[200px] overflow-y-auto">
-                        {!data.length && <NoMatchingMessage value={columnFilters['userName']} />}
+                        {!data.length && <NoMatchingMessage value={usernameFilter} />}
                       </DropdownMenuGroup>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -452,7 +478,7 @@ export default function UsersTable() {
                 </TableRow>
               )}
             >
-              {isSearching ? (
+              {isFetching ? (
                 <UsersDataLoading />
               ) : table.getRowModel().rows.length === 0 ? (
                 <TableRow>

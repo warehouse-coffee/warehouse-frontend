@@ -66,7 +66,6 @@ export default function ImportTable() {
 
   const [searchValue, setSearchValue] = useState<string>('')
   const debouncedSearchValue = useDebounce(searchValue, 500)
-  const [isSearching, setIsSearching] = useState<boolean>(false)
   const [sorting, setSorting] = useState<SortingState>([])
 
   const [totalElements, setTotalElements] = useState<number>(0)
@@ -79,34 +78,48 @@ export default function ImportTable() {
     return itemRank.passed
   }
 
-  const { data: orderData } = useImportOrderList(
-    pagination.pageIndex,
-    pagination.pageSize
+  const { data: orderData, isFetching } = useImportOrderList(
+    debouncedSearchValue ? 0 : pagination.pageIndex,
+    debouncedSearchValue ? 1000 : pagination.pageSize
   )
 
   const handleSearch = (value: string) => {
     setSearchValue(value)
-    setIsSearching(true)
+    setPagination(prev => ({ ...prev, pageIndex: 0 }))
   }
 
   useEffect(() => {
     if (orderData?.orders) {
+      setData(orderData.orders)
+
       let filteredData = [...orderData.orders]
 
-      // Apply search filter
       if (debouncedSearchValue) {
         filteredData = filteredData.filter(item => {
-          const matchesId = item.orderId?.toString().toLowerCase().includes(debouncedSearchValue.toLowerCase())
+          const matchesId = item.orderId?.toLowerCase().includes(debouncedSearchValue.toLowerCase())
           return matchesId
         })
       }
 
-      setData(filteredData)
-      setTotalElements(orderData.page?.totalElements ?? 0)
-      setTotalPages(orderData.page?.totalPages ?? 0)
-      setIsSearching(false)
+      if (debouncedSearchValue) {
+        if (filteredData.length === 0) {
+          setData([])
+          setTotalElements(0)
+          setTotalPages(0)
+        } else {
+          const startIndex = pagination.pageIndex * pagination.pageSize
+          const endIndex = startIndex + pagination.pageSize
+          setData(filteredData.slice(startIndex, endIndex))
+          setTotalElements(filteredData.length)
+          setTotalPages(Math.ceil(filteredData.length / pagination.pageSize))
+        }
+      } else {
+        setData(filteredData)
+        setTotalElements(orderData.page?.totalElements ?? 0)
+        setTotalPages(orderData.page?.totalPages ?? 0)
+      }
     }
-  }, [orderData, debouncedSearchValue])
+  }, [orderData, debouncedSearchValue, pagination])
 
   const table = useReactTable({
     data,
@@ -296,7 +309,7 @@ export default function ImportTable() {
               value={searchValue}
               onChange={(e) => handleSearch(e.target.value)}
             />
-            {isSearching && (
+            {isFetching && (
               <div className="absolute right-4 top-1/2 -translate-y-1/2">
                 <Loader color="#fff" size="1.15rem" />
               </div>
@@ -357,7 +370,7 @@ export default function ImportTable() {
             ))}
           </TableHeader>
           <TableBody>
-            {isSearching ? (
+            {isFetching ? (
               <ImportDataLoading />
             ) : table.getRowModel().rows.length === 0 ? (
               <TableRow>
