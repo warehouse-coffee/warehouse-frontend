@@ -147,7 +147,7 @@ export default function UsersTable() {
       setPagination(prev => ({ ...prev, pageIndex: 0 }))
       return
     }
-  
+
     setColumnFilters(prev => {
       const newFilters = { ...prev }
       if (newFilters[columnId] === value) {
@@ -193,7 +193,7 @@ export default function UsersTable() {
   useEffect(() => {
     if (userData?.users) {
       let filteredData = [...userData.users]
-  
+
       Object.entries(columnFilters).forEach(([columnId, filterValue]) => {
         if (filterValue && columnId !== 'userName') {
           if (columnId === 'isActived') {
@@ -208,21 +208,21 @@ export default function UsersTable() {
           }
         }
       })
-  
+
       if (debouncedSearchValue) {
         filteredData = filteredData.filter(user => {
           const matchesEmail = user.email?.toLowerCase().includes(debouncedSearchValue.toLowerCase())
           return matchesEmail
         })
       }
-  
+
       if (debouncedUsernameFilter) {
         filteredData = filteredData.filter(user => {
           const matchesUsername = user.userName?.toLowerCase().includes(debouncedUsernameFilter.toLowerCase())
           return matchesUsername
         })
       }
-  
+
       if (debouncedSearchValue || Object.keys(columnFilters).length > 0) {
         if (filteredData.length === 0) {
           setData([])
