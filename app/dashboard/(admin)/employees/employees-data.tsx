@@ -1,15 +1,10 @@
 'use client'
-import { Row } from '@tanstack/react-table'
-import {
-  Pencil,
-  Trash
-} from 'lucide-react'
-import dynamic from 'next/dynamic'
-import { useCallback } from 'react'
+
+import { Pencil, Trash2 } from 'lucide-react'
 import React from 'react'
+import dynamic from 'next/dynamic'
 
 import DashboardFetchLoader from '@/components/dashboard/dashboard-fetch-loader'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -19,55 +14,27 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
-import { Loader } from '@/components/ui/loader'
 import { Switch } from '@/components/ui/switch'
 import { TableCell, TableRow } from '@/components/ui/table'
-import { useDeleteEmployee, useActiveEmployee } from '@/hooks/employee'
+import { useActiveEmployee, useDeleteEmployee } from '@/hooks/employee'
 import { useDialog } from '@/hooks/useDialog'
 import { cn } from '@/lib/utils'
 import { Employee } from '@/types'
 
-const EmployeeActions = React.memo(
-  ({
-    employee,
-    onEdit,
-    onDelete
-  }: {
-    employee: Employee;
-    onEdit: (employee: Employee) => void;
-    onDelete: (employee: Employee) => void;
-  }) => (
-    <TableCell className="text-right">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-8 w-8"
-        onClick={() => onEdit(employee)}
-      >
-        <Pencil className="h-4 w-4" />
-        <span className="sr-only">Edit</span>
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-8 w-8"
-        onClick={() => onDelete(employee)}
-      >
-        <Trash className="h-4 w-4" />
-        <span className="sr-only">Delete</span>
-      </Button>
-    </TableCell>
-  )
-)
-EmployeeActions.displayName = 'EmployeeActions'
-const EmployeeUpdateForm = dynamic(() => import('./employees-update'), {
+const EmployeesUpdate = dynamic(() => import('./employees-update'), { 
   ssr: false,
   loading: () => <DashboardFetchLoader />
 })
-export default function EmployeesData({ table, onRefresh }: { table: any, onRefresh?: () => void }) {
+
+interface EmployeesDataProps {
+  data: Employee[]
+  table: any
+}
+
+export default function EmployeesData({ data, table }: EmployeesDataProps) {
   const {
     dialogsOpen,
-    itemRef: employeeRef,
+    itemRef,
     openDialog,
     closeDialog,
     setDialogsOpen
@@ -75,127 +42,125 @@ export default function EmployeesData({ table, onRefresh }: { table: any, onRefr
     edit: false,
     delete: false
   })
+
+  const activateEmployeeMutation = useActiveEmployee()
   const deleteEmployeeMutation = useDeleteEmployee(() => {
     closeDialog('delete')
   })
-  const activateEmployeeMutation = useActiveEmployee()
-  const handleEditEmployee = useCallback(
-    (employee: Employee) => {
-      openDialog('edit', employee)
-    },
-    [openDialog]
-  )
-  const handleDeleteEmployee = useCallback(
-    (employee: Employee) => {
-      openDialog('delete', employee)
-    },
-    [openDialog]
-  )
-  const confirmDeleteEmployee = useCallback(() => {
-    if (employeeRef.current) {
-      deleteEmployeeMutation.mutate(employeeRef.current.id ?? '')
-    }
-  }, [deleteEmployeeMutation, employeeRef])
-  const handleToggleActive = async (employee: Employee) => {
+
+  const handleToggleActive = async (employee: any) => {
     try {
       await activateEmployeeMutation.mutateAsync({
         id: employee.id!,
         active: !employee.isActived
       })
-      onRefresh?.()
     } catch (error) {
       console.error('Error toggling employee status:', error)
     }
   }
-  if (table.getRowModel().rows.length === 0) {
-    return (
-      <TableRow>
-        <TableCell
-          colSpan={5}
-          className="h-24 text-muted-foreground text-center"
-        >
-          {table.getState().globalFilter ? (
-            <div className="flex flex-col items-center gap-1">
-              <span>
-                No employees found matching &quot;
-                <span className="font-medium">
-                  {table.getState().globalFilter}
-                </span>
-                &quot;
-              </span>
-              <span className="text-sm">
-                Try adjusting your search to find what you&apos;re looking for.
-              </span>
-            </div>
-          ) : (
-            'No employees available.'
-          )}
-        </TableCell>
-      </TableRow>
-    )
+
+  const handleDelete = async () => {
+    if (itemRef.current) {
+      await deleteEmployeeMutation.mutateAsync(itemRef.current.id!)
+    }
   }
-  const getInitials = (userName: string) => {
-    return userName
-      .split(/[@.]/)
-      .map((part) => part[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2)
-  }
+
+  const rows = table.getRowModel().rows
+
   return (
     <>
-      {table.getRowModel().rows.map((row: Row<Employee>) => (
-        <TableRow key={row.original.id}>
-          <TableCell className="flex items-center gap-3">
-            <Avatar className="w-8 h-8">
-              <AvatarFallback>
-                {row.original.userName
-                  ? getInitials(row.original.userName)
-                  : 'NA'}
-              </AvatarFallback>
-            </Avatar>
-            {row.original.userName}
-          </TableCell>
-          <TableCell>{row.original.email}</TableCell>
-          <TableCell>{row.original.phoneNumber || 'N/A'}</TableCell>
-          <TableCell>
-            <div className="flex items-center gap-2">
-              <Switch
-                checked={row.original.isActived}
-                onCheckedChange={() => handleToggleActive(row.original)}
-                disabled={activateEmployeeMutation.isPending}
-                className={cn(
-                  row.original.isActived ? 'bg-green-500' : 'bg-red-500',
-                  'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2',
-                  activateEmployeeMutation.isPending && 'opacity-50 cursor-not-allowed'
-                )}
-              />
-              <span
-                className={cn(
-                  'text-sm font-medium',
-                  row.original.isActived ? 'text-green-600' : 'text-red-600'
-                )}
-              >
-                {row.original.isActived ? 'Active' : 'Inactive'}
-              </span>
-            </div>
-          </TableCell>
-          <TableCell>
-            <EmployeeActions
-              employee={row.original}
-              onEdit={handleEditEmployee}
-              onDelete={handleDeleteEmployee}
+      {rows.map((row: any) => {
+        const employee = row.original
+        return (
+          <TableRow key={employee.id || row.id} className="border-b border-border/50 hover:bg-accent/5">
+            <TableCell className="text-center py-[.75rem]">
+              <div className="w-[8rem] mx-auto truncate">
+                {employee.userName}
+              </div>
+            </TableCell>
+            <TableCell className="text-center py-[.75rem]">
+              <div className="w-[10rem] mx-auto truncate">
+                {employee.email}
+              </div>
+            </TableCell>
+            <TableCell className="text-center py-[.75rem]">
+              <div className="w-[6rem] mx-auto truncate">
+                {employee.phoneNumber}
+              </div>
+            </TableCell>
+            <TableCell className="text-center py-[.75rem]">
+              <div className="flex items-center justify-center gap-2">
+                <Switch
+                  checked={employee.isActived}
+                  onCheckedChange={() => handleToggleActive(employee)}
+                  disabled={activateEmployeeMutation.isPending}
+                  className={cn(
+                    'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2',
+                    employee.isActived 
+                      ? 'bg-primary/90 dark:bg-primary/80'
+                      : 'bg-destructive/90 dark:bg-destructive/80',
+                    activateEmployeeMutation.isPending && 'opacity-50 cursor-not-allowed',
+                    '[&>span]:bg-white dark:[&>span]:bg-white'
+                  )}
+                />
+                <span
+                  className={cn(
+                    'text-sm font-medium w-[4rem] truncate',
+                    employee.isActived 
+                      ? 'text-primary dark:text-primary' 
+                      : 'text-destructive dark:text-red-500'
+                  )}
+                >
+                  {employee.isActived ? 'Active' : 'Inactive'}
+                </span>
+              </div>
+            </TableCell>
+            <TableCell className="py-[.75rem]">
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={() => openDialog('edit', employee)}
+                >
+                  <Pencil className="h-4 w-4" />
+                  <span className="sr-only">Edit</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={() => openDialog('delete', employee)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  <span className="sr-only">Delete</span>
+                </Button>
+              </div>
+            </TableCell>
+          </TableRow>
+        )
+      })}
+
+      <Dialog open={dialogsOpen.edit} onOpenChange={(open) => setDialogsOpen(prev => ({ ...prev, edit: open }))}>
+        <DialogContent className="max-w-[55rem]">
+          <DialogHeader>
+            <DialogTitle>Edit Employee</DialogTitle>
+            <DialogDescription>
+              Make changes to employee details here. Click save when you're done.
+            </DialogDescription>
+          </DialogHeader>
+          {itemRef.current && (
+            <EmployeesUpdate
+              id={itemRef.current.id ?? ''}
+              onClose={() => closeDialog('edit')}
+              isOpen={dialogsOpen.edit ?? false}
             />
-          </TableCell>
-        </TableRow>
-      ))}
-      <Dialog
-        open={dialogsOpen.delete}
-        onOpenChange={(open: any) =>
-          setDialogsOpen((prev) => ({ ...prev, delete: open }))
-        }
-      >
-        <DialogContent className="w-[26.5rem]">
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={dialogsOpen.delete} onOpenChange={(open) => setDialogsOpen(prev => ({ ...prev, delete: open }))}>
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Employee</DialogTitle>
             <DialogDescription>
@@ -204,49 +169,19 @@ export default function EmployeesData({ table, onRefresh }: { table: any, onRefr
           </DialogHeader>
           <DialogFooter>
             <Button
-              type="button"
-              onClick={() => closeDialog('delete')}
-              className={cn('bg-accent')}
               variant="outline"
+              onClick={() => closeDialog('delete')}
             >
               Cancel
             </Button>
             <Button
-              type="submit"
-              className={`bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary ${
-                deleteEmployeeMutation.isPending
-                  ? 'flex items-center gap-3 cursor-not-allowed pointer-events-none'
-                  : ''
-              }`}
-              onClick={confirmDeleteEmployee}
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={deleteEmployeeMutation.isPending}
             >
-              {deleteEmployeeMutation.isPending ? (
-                <>
-                  Deleting...
-                  <Loader color="#62c5ff" size="1.25rem" />
-                </>
-              ) : (
-                'Delete'
-              )}
+              {deleteEmployeeMutation.isPending ? 'Deleting...' : 'Delete'}
             </Button>
           </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      <Dialog open={dialogsOpen.edit} onOpenChange={(open) => setDialogsOpen(prev => ({ ...prev, edit: open }))}>
-        <DialogContent className="w-[800px] sm:w-[1000px] !max-w-none">
-          <DialogHeader>
-            <DialogTitle>Edit User</DialogTitle>
-            <DialogDescription>
-              Make changes to user details here. Click save when you&apos;re done.
-            </DialogDescription>
-          </DialogHeader>
-          {employeeRef.current && (
-            <EmployeeUpdateForm
-              id={employeeRef.current.id ?? ''}
-              onClose={() => closeDialog('edit')}
-              isOpen={dialogsOpen.edit ?? false}
-            />
-          )}
         </DialogContent>
       </Dialog>
     </>

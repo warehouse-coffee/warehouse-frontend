@@ -316,7 +316,7 @@ export default function ImportTable() {
             )}
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <Dialog open={dialogsOpen.manageCategory} onOpenChange={(open) => setDialogsOpen(prev => ({ ...prev, manageCategory: open }))}>
             <DialogTrigger asChild>
               <Button variant="outline" className="bg-gray-600/10 text-white dark:bg-gray-600/30 dark:text-white">

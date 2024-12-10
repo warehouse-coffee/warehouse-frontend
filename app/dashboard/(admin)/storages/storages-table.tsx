@@ -12,13 +12,12 @@ import {
   FilterFn,
   flexRender
 } from '@tanstack/react-table'
-import { ArrowUpDown, ArrowUpAZ, ArrowDownAZ, UserPlus } from 'lucide-react'
+import { ArrowUpDown, ArrowUpAZ, ArrowDownAZ, CirclePlus } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import React, { useState, useEffect } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
-import { EmployeeDto } from '@/app/api/web-api-client'
-import DashboardFetchLoader from '@/components/dashboard/dashboard-fetch-loader'
+import { StorageDto2 } from '@/app/api/web-api-client'
 import DashboardTablePagination from '@/components/dashboard/dashboard-table-pagination'
 import { Button } from '@/components/ui/button'
 import {
@@ -39,20 +38,16 @@ import {
   TableRow,
   TableCell
 } from '@/components/ui/table'
-import { useEmployeeList } from '@/hooks/employee/useEmployeeList'
+import { useUserStorageList } from '@/hooks/storage'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useDialog } from '@/hooks/useDialog'
 
-import EmployeesDataLoading from './employees-data-loading'
+import StoragesCreate from './storages-create'
+import StoragesDataLoading from './storages-data-loading'
 
-const EmployeesData = dynamic(() => import('./employees-data'), {
+const StoragesData = dynamic(() => import('./storages-data'), {
   ssr: false,
-  loading: () => <EmployeesDataLoading />
-})
-
-const EmployeesCreate = dynamic(() => import('./employees-create'), {
-  ssr: false,
-  loading: () => <DashboardFetchLoader />
+  loading: () => <StoragesDataLoading />
 })
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
@@ -61,7 +56,7 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   return itemRank.passed
 }
 
-export default function EmployeesTable() {
+export default function StorageTable() {
   const { reset } = useQueryErrorResetBoundary()
   const { closeDialog, dialogsOpen, setDialogsOpen } = useDialog({
     add: false
@@ -77,9 +72,9 @@ export default function EmployeesTable() {
   const debouncedSearchValue = useDebounce(searchValue, 500)
   const [totalPages, setTotalPages] = useState<number>(0)
   const [totalElements, setTotalElements] = useState<number>(0)
-  const [data, setData] = useState<EmployeeDto[]>([])
+  const [data, setData] = useState<StorageDto2[]>([])
 
-  const { data: employeeData, isFetching } = useEmployeeList(
+  const { data: storageData, isFetching } = useUserStorageList(
     debouncedSearchValue ? 0 : pagination.pageIndex,
     debouncedSearchValue ? 1000 : pagination.pageSize
   )
@@ -90,15 +85,14 @@ export default function EmployeesTable() {
   }
 
   useEffect(() => {
-    if (employeeData?.employees) {
-      let filteredData = [...employeeData.employees]
+    if (storageData?.storages) {
+      let filteredData = [...storageData.storages]
 
       if (debouncedSearchValue) {
-        filteredData = filteredData.filter(employee => {
-          const matchesName = employee.userName?.toLowerCase().includes(debouncedSearchValue.toLowerCase())
-          const matchesEmail = employee.email?.toLowerCase().includes(debouncedSearchValue.toLowerCase())
-          const matchesPhone = employee.phoneNumber?.toLowerCase().includes(debouncedSearchValue.toLowerCase())
-          return matchesName || matchesEmail || matchesPhone
+        filteredData = filteredData.filter(storage => {
+          const matchesName = storage.name?.toLowerCase().includes(debouncedSearchValue.toLowerCase())
+          const matchesAddress = storage.address?.toLowerCase().includes(debouncedSearchValue.toLowerCase())
+          return matchesName || matchesAddress
         })
       }
 
@@ -116,17 +110,17 @@ export default function EmployeesTable() {
         }
       } else {
         setData(filteredData)
-        setTotalElements(employeeData.page?.totalElements || filteredData.length)
-        setTotalPages(employeeData.page?.totalPages || Math.ceil(filteredData.length / pagination.pageSize))
+        setTotalElements(storageData.page?.totalElements || filteredData.length)
+        setTotalPages(storageData.page?.totalPages || Math.ceil(filteredData.length / pagination.pageSize))
       }
     }
-  }, [employeeData, debouncedSearchValue, pagination])
+  }, [storageData, debouncedSearchValue, pagination])
 
   const table = useReactTable({
     data,
     columns: [
       {
-        accessorKey: 'userName',
+        accessorKey: 'id',
         header: ({ column }) => (
           <div
             className="flex items-center justify-center gap-2 cursor-pointer select-none"
@@ -141,18 +135,17 @@ export default function EmployeesTable() {
                 : undefined
             }
           >
-            User Name
+            ID
             {{
               asc: <ArrowUpAZ className="h-4 w-4" />,
               desc: <ArrowDownAZ className="h-4 w-4" />
             }[column.getIsSorted() as string] ?? <ArrowUpDown className="h-4 w-4" />}
           </div>
         ),
-        filterFn: fuzzyFilter,
-        size: 150
+        filterFn: fuzzyFilter
       },
       {
-        accessorKey: 'email',
+        accessorKey: 'name',
         header: ({ column }) => (
           <div
             className="flex items-center justify-center gap-2 cursor-pointer select-none"
@@ -167,18 +160,17 @@ export default function EmployeesTable() {
                 : undefined
             }
           >
-            Email
+            Name
             {{
               asc: <ArrowUpAZ className="h-4 w-4" />,
               desc: <ArrowDownAZ className="h-4 w-4" />
             }[column.getIsSorted() as string] ?? <ArrowUpDown className="h-4 w-4" />}
           </div>
         ),
-        filterFn: fuzzyFilter,
-        size: 200
+        filterFn: fuzzyFilter
       },
       {
-        accessorKey: 'phoneNumber',
+        accessorKey: 'address',
         header: ({ column }) => (
           <div
             className="flex items-center justify-center gap-2 cursor-pointer select-none"
@@ -193,18 +185,17 @@ export default function EmployeesTable() {
                 : undefined
             }
           >
-            Phone Number
+            Address
             {{
               asc: <ArrowUpAZ className="h-4 w-4" />,
               desc: <ArrowDownAZ className="h-4 w-4" />
             }[column.getIsSorted() as string] ?? <ArrowUpDown className="h-4 w-4" />}
           </div>
         ),
-        filterFn: fuzzyFilter,
-        size: 150
+        filterFn: fuzzyFilter
       },
       {
-        accessorKey: 'isActived',
+        accessorKey: 'status',
         header: ({ column }) => (
           <div
             className="flex items-center justify-center gap-2 cursor-pointer select-none"
@@ -226,13 +217,11 @@ export default function EmployeesTable() {
             }[column.getIsSorted() as string] ?? <ArrowUpDown className="h-4 w-4" />}
           </div>
         ),
-        filterFn: fuzzyFilter,
-        size: 100
+        filterFn: fuzzyFilter
       },
       {
         id: 'actions',
-        header: () => <div className="text-right">Actions</div>,
-        size: 100
+        header: () => <div className="text-right">Actions</div>
       }
     ],
     getCoreRowModel: getCoreRowModel(),
@@ -258,7 +247,7 @@ export default function EmployeesTable() {
         <div className="flex items-center gap-4">
           <div className="relative">
             <Input
-              placeholder="Search employees..."
+              placeholder="Search storages..."
               className="min-w-[20rem]"
               value={searchValue}
               onChange={(e) => handleSearch(e.target.value)}
@@ -274,20 +263,18 @@ export default function EmployeesTable() {
           <Dialog open={dialogsOpen.add} onOpenChange={(open) => setDialogsOpen(prev => ({ ...prev, add: open }))}>
             <DialogTrigger asChild>
               <Button variant="outline" className="bg-black text-white hover:bg-black hover:text-white dark:bg-primary/10 dark:text-primary">
-                <UserPlus className="mr-2 h-4 w-4" />
-                <span>Add Employee</span>
+                <CirclePlus className="mr-2 h-4 w-4" />
+                <span>Add Storage</span>
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-[60rem]">
+            <DialogContent className="max-w-[50rem]">
               <DialogHeader>
-                <DialogTitle>Add Employee</DialogTitle>
+                <DialogTitle>Add Storage</DialogTitle>
                 <DialogDescription>
-                  Fill in the required details to create a new employee account.
+                  Fill in the required details to create a new storage location.
                 </DialogDescription>
               </DialogHeader>
-              <EmployeesCreate
-                onClose={() => closeDialog('add')}
-              />
+              <StoragesCreate onClose={() => closeDialog('add')} />
             </DialogContent>
           </Dialog>
         </div>
@@ -315,7 +302,7 @@ export default function EmployeesTable() {
                 <TableRow>
                   <TableCell colSpan={5} className="h-24 text-center">
                     <div className="flex flex-col items-center gap-2">
-                      <span>There was an error loading the employee data.</span>
+                      <span>There was an error loading the storage data.</span>
                       <Button
                         onClick={() => resetErrorBoundary()}
                         variant="outline"
@@ -329,26 +316,26 @@ export default function EmployeesTable() {
               )}
             >
               {isFetching ? (
-                <EmployeesDataLoading />
+                <StoragesDataLoading />
               ) : table.getRowModel().rows.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="h-24 text-muted-foreground text-center">
                     {debouncedSearchValue ? (
                       <div className="flex flex-col items-center gap-1">
                         <span>
-                          No employees found matching &quot;<span className="font-medium">{debouncedSearchValue}</span>&quot;
+                          No storages found matching &quot;<span className="font-medium">{debouncedSearchValue}</span>&quot;
                         </span>
                         <span className="text-sm">
                           Try adjusting your search to find what you&apos;re looking for.
                         </span>
                       </div>
                     ) : (
-                      'No employees available.'
+                      'No storages available.'
                     )}
                   </TableCell>
                 </TableRow>
               ) : (
-                <EmployeesData
+                <StoragesData
                   data={data}
                   table={table}
                 />
@@ -358,7 +345,7 @@ export default function EmployeesTable() {
         </Table>
       </div>
       <DashboardTablePagination
-        itemName="employee"
+        itemName="storage"
         table={table}
         totalElements={totalElements}
         totalPages={totalPages}

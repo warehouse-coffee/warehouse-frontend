@@ -75,7 +75,7 @@ export function TopOrders({ id }: { id: string }) {
 
 const OrderList = memo(({ orders }: { orders?: TopOrder[] }) => {
   if (!orders || orders.length === 0) {
-    return <p className="text-center text-muted-foreground py-3">No orders found</p>
+    return <p className="text-center text-muted-foreground py-[.75rem]">No orders found</p>
   }
 
   return (

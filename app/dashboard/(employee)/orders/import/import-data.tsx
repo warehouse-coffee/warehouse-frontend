@@ -68,28 +68,28 @@ export default function ImportData({ data, table }: ImportDataProps) {
       {rows.map((row: any) => {
         const order = row.original
         return (
-          <TableRow key={order.orderId}>
-            <TableCell className="text-center">
+          <TableRow key={order.orderId} className="border-b border-border/50 hover:bg-accent/5">
+            <TableCell className="py-[.75rem] text-center">
               {order.orderId}
             </TableCell>
-            <TableCell className="text-center">
+            <TableCell className="py-[.75rem] text-center">
               <Badge variant="outline" className="dark:bg-primary/10 dark:text-primary">
                 {order.type}
               </Badge>
             </TableCell>
-            <TableCell className="text-center">
+            <TableCell className="py-[.75rem] text-center">
               {formatDate(order.date)}
             </TableCell>
-            <TableCell className="text-center">
+            <TableCell className="py-[.75rem] text-center">
               {formatCurrency(order.totalPrice)}
             </TableCell>
-            <TableCell className="text-center">
+            <TableCell className="py-[.75rem] text-center">
               {order.orderDetailsCount}
             </TableCell>
-            <TableCell className="text-center">
+            <TableCell className="py-[.75rem] text-center">
               {order.totalQuantity}
             </TableCell>
-            <TableCell className="text-center">
+            <TableCell className="py-[.75rem] text-center">
               <Button
                 variant="ghost"
                 size="icon"

@@ -1,26 +1,14 @@
 import { ProductPerformance } from '@/app/api/web-api-client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from '@/components/ui/tooltip'
+import { formatCurrency } from '@/lib/utils'
 
 interface ProductComparisonProps {
-  topProducts: ProductPerformance[];
-  slowMovingProducts: ProductPerformance[];
+  topProducts: ProductPerformance[]
+  slowMovingProducts: ProductPerformance[]
 }
+
 export function ProductComparison({ topProducts, slowMovingProducts }: ProductComparisonProps) {
-  const formatNumber = (value: number | string) => {
-    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 4 }).format(Number(value))
-  }
-
-  const truncateValue = (value: string, maxLength: number = 8) => {
-    return value.length > maxLength ? value.slice(0, 4) + '...' : value
-  }
-
   const renderProductTable = (products: ProductPerformance[], title: string) => (
     <Card>
       <CardHeader>
@@ -30,53 +18,34 @@ export function ProductComparison({ topProducts, slowMovingProducts }: ProductCo
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Storage ID</TableHead>
-              <TableHead>Product Name</TableHead>
-              <TableHead className="text-right">Total Sold</TableHead>
-              <TableHead className="text-right">Average Storage Time (Days)</TableHead>
+              <TableHead className="text-center">ID</TableHead>
+              <TableHead className="text-center w-[15rem]">Product Name</TableHead>
+              <TableHead className="text-center">Total Sold</TableHead>
+              <TableHead className="text-center">Avg Time (Days)</TableHead>
             </TableRow>
           </TableHeader>
-          {products.length > 0 ? (
-            <TableBody>
-              {products.map((item, index) => (
-                <TableRow key={index}>
-                  <TableCell>{item.storageId}</TableCell>
-                  <TableCell>{item.productName}</TableCell>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <TableCell className="text-right">
-                          {truncateValue(formatNumber(item.totalSold ?? 0))}
-                        </TableCell>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{formatNumber(item.totalSold ?? 0)}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <TableCell className="text-right">
-                          {truncateValue(formatNumber(item.averageStorageTime ?? 0))}
-                        </TableCell>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{formatNumber(
-                          item.averageStorageTime ?? 0)}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+          <TableBody>
+            {products.length > 0 ? (
+              products.map((item, index) => (
+                <TableRow key={index} className="border-b border-border/50 hover:bg-accent/5">
+                  <TableCell className="font-medium text-center">{item.storageId}</TableCell>
+                  <TableCell className="text-center w-[15rem]">{item.productName}</TableCell>
+                  <TableCell className="text-center">
+                    {formatCurrency(item.totalSold ?? 0)}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {Math.floor(item.averageStorageTime ?? 0)}
+                  </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          ) : (
-            <TableBody>
+              ))
+            ) : (
               <TableRow>
-                <TableCell colSpan={4} className="text-center">No data available</TableCell>
+                <TableCell colSpan={4} className="h-24 text-center">
+                  No data available
+                </TableCell>
               </TableRow>
-            </TableBody>
-          )}
+            )}
+          </TableBody>
         </Table>
       </CardContent>
     </Card>

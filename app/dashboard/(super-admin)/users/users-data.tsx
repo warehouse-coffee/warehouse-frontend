@@ -46,7 +46,7 @@ const UserActions = React.memo(({ user, onView, onEdit, onDelete }: {
   onEdit: (user: User) => void,
   onDelete: (user: User) => void
 }) => (
-  <TableCell className="text-right">
+  <TableCell className="text-right py-[.75rem]">
     <Button
       variant="ghost"
       size="icon"
@@ -120,32 +120,41 @@ export default function UsersData({
   return (
     <>
       {table.getRowModel().rows.map((row: Row<User>) => (
-        <TableRow key={row.original.id}>
-          <TableCell className="flex items-center gap-3">
-            <Avatar className="w-8 h-8">
-              <AvatarImage
-                src={row.original.avatarImage as string}
-                alt={row.original.userName}
-              />
-              <AvatarFallback>
-                {row.original.userName?.slice(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            {row.original.userName}
+        <TableRow key={row.original.id} className="border-b border-border/50 hover:bg-accent/5">
+          <TableCell className="py-[.75rem]">
+            <div className="flex items-center gap-3">
+              <Avatar className="w-8 h-8">
+                <AvatarImage
+                  src={row.original.avatarImage as string}
+                  alt={row.original.userName}
+                  className="w-8 h-8"
+                />
+                <AvatarFallback className="w-8 h-8">
+                  {row.original.userName?.slice(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <span className="font-medium truncate max-w-[300px]">{row.original.userName}</span>
+            </div>
           </TableCell>
-          <TableCell>{row.original.email}</TableCell>
-          <TableCell>
+          <TableCell className="py-[.75rem]">
+            <span className="truncate block max-w-[300px]">{row.original.email}</span>
+          </TableCell>
+          <TableCell className="py-[.75rem]">
             {row.original.isActived ? (
-              <Badge variant="outline" className="dark:bg-primary/10 dark:text-primary">
+              <Badge variant="outline" className="bg-primary/10 text-primary dark:bg-primary/10 dark:text-primary">
                 Active
               </Badge>
             ) : (
-              <Badge variant="destructive" className="dark:bg-destructive/30 dark:text-red-500">
+              <Badge variant="destructive" className="bg-destructive/10 text-destructive dark:bg-destructive/30 dark:text-red-500">
                 Inactive
               </Badge>
             )}
           </TableCell>
-          <TableCell>{formatRoleLabel(row.original.roleName ?? '')}</TableCell>
+          <TableCell className="py-[.75rem]">
+            <Badge variant="outline" className="bg-primary/10 text-primary dark:bg-primary/10 dark:text-primary">
+              {formatRoleLabel(row.original.roleName ?? '')}
+            </Badge>
+          </TableCell>
           <UserActions
             user={row.original}
             onView={handleViewUser}

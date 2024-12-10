@@ -25,11 +25,11 @@ export default function ProductsData({ data, table }: ProductsDataProps) {
   }
 
   return rows.map((row: any) => (
-    <TableRow key={row.id}>
-      <TableCell className="text-center">{row.getValue('name')}</TableCell>
-      <TableCell className="text-center">{row.getValue('units')}</TableCell>
-      <TableCell className="text-center">{row.getValue('quantity')}</TableCell>
-      <TableCell className="text-center">
+    <TableRow key={row.id} className="border-b border-border/50 hover:bg-accent/5">
+      <TableCell className="py-[.75rem] text-center">{row.getValue('name')}</TableCell>
+      <TableCell className="py-[.75rem] text-center">{row.getValue('units')}</TableCell>
+      <TableCell className="py-[.75rem] text-center">{row.getValue('quantity')}</TableCell>
+      <TableCell className="py-[.75rem] text-center">
         {row.getValue('status') === 'In Stock' ? (
           <Badge variant="outline" className="dark:bg-primary/10 dark:text-primary">
             In Stock
@@ -44,13 +44,13 @@ export default function ProductsData({ data, table }: ProductsDataProps) {
           </Badge>
         )}
       </TableCell>
-      <TableCell className="text-center">
+      <TableCell className="py-[.75rem] text-center">
         {format(new Date(row.getValue('expiration')), 'dd/MM/yyyy')}
       </TableCell>
-      <TableCell className="text-center">
+      <TableCell className="py-[.75rem] text-center">
         {format(new Date(row.getValue('importDate')), 'dd/MM/yyyy')}
       </TableCell>
-      <TableCell className="text-center">
+      <TableCell className="py-[.75rem] text-center">
         {row.getValue('exportDate') ? format(new Date(row.getValue('exportDate')), 'dd/MM/yyyy') : '-'}
       </TableCell>
     </TableRow>

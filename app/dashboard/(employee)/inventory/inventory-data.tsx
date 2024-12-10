@@ -49,16 +49,16 @@ export default function InventoryData({ data, table }: InventoryDataProps) {
     const isDialogOpen = dialogsOpen.edit && itemRef.current === rowId
 
     return (
-      <TableRow key={rowId}>
-        <TableCell className="text-center">#{rowId}</TableCell>
-        <TableCell className="text-center">{row.getValue('productName')}</TableCell>
-        <TableCell className="text-center">{row.getValue('availableQuantity')}</TableCell>
-        <TableCell className="text-center">
+      <TableRow key={rowId} className="border-b border-border/50 hover:bg-accent/5">
+        <TableCell className="py-[.75rem] text-center">#{rowId}</TableCell>
+        <TableCell className="py-[.75rem] text-center">{row.getValue('productName')}</TableCell>
+        <TableCell className="py-[.75rem] text-center">{row.getValue('availableQuantity')}</TableCell>
+        <TableCell className="py-[.75rem] text-center">
           {format(new Date(row.getValue('expiration')), 'dd/MM/yyyy')}
         </TableCell>
-        <TableCell className="text-center">{formatCurrency(row.getValue('totalPrice'))}</TableCell>
-        <TableCell className="text-center">{formatCurrency(row.getValue('totalSalePrice'))}</TableCell>
-        <TableCell className="text-center">
+        <TableCell className="py-[.75rem] text-center">{formatCurrency(row.getValue('totalPrice'))}</TableCell>
+        <TableCell className="py-[.75rem] text-center">{formatCurrency(row.getValue('totalSalePrice'))}</TableCell>
+        <TableCell className="py-[.75rem] text-center">
           <Dialog
             open={isDialogOpen}
             onOpenChange={(open) => handleOpenDialog(open, rowId)}
@@ -91,7 +91,7 @@ export default function InventoryData({ data, table }: InventoryDataProps) {
             </DialogContent>
           </Dialog>
         </TableCell>
-        <TableCell className="text-center">
+        <TableCell className="py-[.75rem] text-center">
           {row.getValue('status') === 'In Stock' ? (
             <Badge variant="outline" className="dark:bg-primary/10 dark:text-primary">
               {row.getValue('status')}

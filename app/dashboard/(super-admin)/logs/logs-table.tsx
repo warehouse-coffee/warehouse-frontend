@@ -173,8 +173,7 @@ export default function LogsTable() {
       if (debouncedSearchValue) {
         filteredData = filteredData.filter(log => {
           const matchesMessage = log.message?.toLowerCase().includes(debouncedSearchValue.toLowerCase())
-          const matchesType = log.type?.toLowerCase().includes(debouncedSearchValue.toLowerCase())
-          return matchesMessage || matchesType
+          return matchesMessage
         })
       }
 

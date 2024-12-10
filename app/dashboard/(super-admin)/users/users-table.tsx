@@ -147,13 +147,7 @@ export default function UsersTable() {
       setPagination(prev => ({ ...prev, pageIndex: 0 }))
       return
     }
-
-    if (columnId === 'isActived') {
-      setStatusFilter(value)
-      setPagination(prev => ({ ...prev, pageIndex: 0 }))
-      return
-    }
-
+  
     setColumnFilters(prev => {
       const newFilters = { ...prev }
       if (newFilters[columnId] === value) {
@@ -163,6 +157,7 @@ export default function UsersTable() {
       }
       return newFilters
     })
+    setPagination(prev => ({ ...prev, pageIndex: 0 }))
   }
 
   const handleSearch = (value: string) => {
@@ -198,36 +193,55 @@ export default function UsersTable() {
   useEffect(() => {
     if (userData?.users) {
       let filteredData = [...userData.users]
-
+  
       Object.entries(columnFilters).forEach(([columnId, filterValue]) => {
-        if (filterValue && columnId !== 'userName' && columnId !== 'isActived') {
-          filteredData = filteredData.filter(item => {
-            const value = String(item[columnId as keyof User] || '').toLowerCase()
-            return value.includes(filterValue.toLowerCase())
-          })
+        if (filterValue && columnId !== 'userName') {
+          if (columnId === 'isActived') {
+            filteredData = filteredData.filter(item => {
+              return String(item.isActived) === filterValue
+            })
+          } else {
+            filteredData = filteredData.filter(item => {
+              const value = String(item[columnId as keyof User] || '').toLowerCase()
+              return value.includes(filterValue.toLowerCase())
+            })
+          }
         }
       })
-
+  
       if (debouncedSearchValue) {
         filteredData = filteredData.filter(user => {
           const matchesEmail = user.email?.toLowerCase().includes(debouncedSearchValue.toLowerCase())
           return matchesEmail
         })
       }
-
+  
       if (debouncedUsernameFilter) {
         filteredData = filteredData.filter(user => {
           const matchesUsername = user.userName?.toLowerCase().includes(debouncedUsernameFilter.toLowerCase())
           return matchesUsername
         })
       }
-
-      setData(filteredData)
-      setTotalElements(filteredData.length)
-      setTotalPages(Math.ceil(filteredData.length / pagination.pageSize))
-      setIsFilteringUsername(false)
+  
+      if (debouncedSearchValue || Object.keys(columnFilters).length > 0) {
+        if (filteredData.length === 0) {
+          setData([])
+          setTotalElements(0)
+          setTotalPages(0)
+        } else {
+          const startIndex = pagination.pageIndex * pagination.pageSize
+          const endIndex = startIndex + pagination.pageSize
+          setData(filteredData.slice(startIndex, endIndex))
+          setTotalElements(filteredData.length)
+          setTotalPages(Math.ceil(filteredData.length / pagination.pageSize))
+        }
+      } else {
+        setData(filteredData)
+        setTotalElements(userData.page?.totalElements || filteredData.length)
+        setTotalPages(userData.page?.totalPages || Math.ceil(filteredData.length / pagination.pageSize))
+      }
     }
-  }, [userData, columnFilters, debouncedSearchValue, debouncedUsernameFilter, pagination.pageSize])
+  }, [userData, columnFilters, debouncedSearchValue, debouncedUsernameFilter, pagination])
 
   const table = useReactTable({
     data,

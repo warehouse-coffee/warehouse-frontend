@@ -62,15 +62,15 @@ export default function CompaniesData({ data, table }: CompaniesDataProps) {
       {table.getRowModel().rows.map((row: any) => {
         const company = row.original
         return (
-          <TableRow key={company.companyId}>
-            <TableCell className="py-3">{company.companyId}</TableCell>
-            <TableCell className={cn('py-3', !company.companyName && 'text-muted-foreground')}>
+          <TableRow key={company.companyId} className="border-b border-border/50 hover:bg-accent/5">
+            <TableCell className="py-[.75rem]">{company.companyId}</TableCell>
+            <TableCell className={cn('py-[.75rem]', !company.companyName && 'text-muted-foreground')}>
               {company.companyName ?? 'Not Updated'}
             </TableCell>
-            <TableCell className={cn('py-3 text-center', !company.phoneContact && 'text-muted-foreground')}>
+            <TableCell className={cn('py-[.75rem] text-center', !company.phoneContact && 'text-muted-foreground')}>
               {company.phoneContact ?? 'Not Updated'}
             </TableCell>
-            <TableCell className="py-3 text-right">
+            <TableCell className="py-[.75rem] text-right">
               <Button
                 variant="ghost"
                 size="icon"

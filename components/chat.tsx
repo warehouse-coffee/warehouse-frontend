@@ -260,7 +260,7 @@ export default function ChatBox() {
         }}
       >
         <Card className={`overflow-hidden shadow-xl border-0 bg-[#111111]/90 backdrop-blur-md
-          ${isMinimized ? 'h-12 rounded-full transition-all duration-300' : 'w-[400px] rounded-xl'}`}>
+          ${isMinimized ? 'h-12 rounded-full transition-all duration-250' : 'w-[400px] rounded-xl'}`}>
           {isMinimized ? (
             <motion.div
               className="relative w-full h-full flex items-center justify-center cursor-pointer
