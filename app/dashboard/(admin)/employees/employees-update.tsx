@@ -14,14 +14,14 @@ import {
   PaginationContent,
   PaginationItem,
   PaginationNext,
-  PaginationPrevious,
+  PaginationPrevious
 } from '@/components/ui/pagination'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
-  TooltipTrigger,
+  TooltipTrigger
 } from '@/components/ui/tooltip'
 import { TransitionPanel } from '@/components/ui/transition-panel'
 import { useEmployeeDetail, useUpdateEmployee } from '@/hooks/employee'
@@ -266,7 +266,7 @@ export default function EmployeesUpdatePage({ id, onClose, isOpen }: { id: strin
         </form>
       </CardContent>
     </Card>,
-    
+
     // Company Information Panel
     <Card key="company" className="h-full">
       <CardHeader className="pb-2">

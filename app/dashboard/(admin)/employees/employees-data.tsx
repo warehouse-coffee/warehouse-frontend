@@ -1,8 +1,8 @@
 'use client'
 
 import { Pencil, Trash2 } from 'lucide-react'
-import React from 'react'
 import dynamic from 'next/dynamic'
+import React from 'react'
 
 import DashboardFetchLoader from '@/components/dashboard/dashboard-fetch-loader'
 import { Button } from '@/components/ui/button'
@@ -21,7 +21,7 @@ import { useDialog } from '@/hooks/useDialog'
 import { cn } from '@/lib/utils'
 import { Employee } from '@/types'
 
-const EmployeesUpdate = dynamic(() => import('./employees-update'), { 
+const EmployeesUpdate = dynamic(() => import('./employees-update'), {
   ssr: false,
   loading: () => <DashboardFetchLoader />
 })
@@ -96,7 +96,7 @@ export default function EmployeesData({ data, table }: EmployeesDataProps) {
                   disabled={activateEmployeeMutation.isPending}
                   className={cn(
                     'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2',
-                    employee.isActived 
+                    employee.isActived
                       ? 'bg-primary/90 dark:bg-primary/80'
                       : 'bg-destructive/90 dark:bg-destructive/80',
                     activateEmployeeMutation.isPending && 'opacity-50 cursor-not-allowed',
@@ -106,8 +106,8 @@ export default function EmployeesData({ data, table }: EmployeesDataProps) {
                 <span
                   className={cn(
                     'text-sm font-medium w-[4rem] truncate',
-                    employee.isActived 
-                      ? 'text-primary dark:text-primary' 
+                    employee.isActived
+                      ? 'text-primary dark:text-primary'
                       : 'text-destructive dark:text-red-500'
                   )}
                 >
@@ -146,7 +146,7 @@ export default function EmployeesData({ data, table }: EmployeesDataProps) {
           <DialogHeader>
             <DialogTitle>Edit Employee</DialogTitle>
             <DialogDescription>
-              Make changes to employee details here. Click save when you're done.
+              Make changes to employee details here. Click save when you&apos;re done.
             </DialogDescription>
           </DialogHeader>
           {itemRef.current && (

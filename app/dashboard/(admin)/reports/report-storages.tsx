@@ -1,15 +1,14 @@
 'use client'
 
-import { format } from 'date-fns'
 import { DollarSign, Package, ShoppingCart } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { DateRange } from 'react-day-picker'
 
 import { ReportVM, WarehousePerformance, ImportSummary, ProductPerformance } from '@/app/api/web-api-client'
+import NumberTicker from '@/components/magicui/number-ticker'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { DateTimeRangePicker24h } from '@/components/ui/date-time-picker'
-import NumberTicker from '@/components/magicui/number-ticker'
 import { TransitionPanel } from '@/components/ui/transition-panel'
 import { useReportStorage } from '@/hooks/report'
 import { cn } from '@/lib/utils'
@@ -99,7 +98,7 @@ export default function ReportStorages() {
       </div>
 
       <div className="max-w-[20rem] mb-5">
-        <DateTimeRangePicker24h 
+        <DateTimeRangePicker24h
           dateRange={dateRange}
           onChange={setDateRange}
         />
