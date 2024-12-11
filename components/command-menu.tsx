@@ -1,5 +1,6 @@
 'use client'
 
+import { User, Settings } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -90,6 +91,22 @@ export function CommandMenu() {
               </CommandGroup>
             </>
           )}
+
+          <CommandSeparator />
+          <CommandGroup heading="Personal">
+            <CommandItem
+              onSelect={() => runCommand(() => router.push('/dashboard/profile'))}
+            >
+              <User className="mr-2 h-4 w-4" />
+              <span>Profile</span>
+            </CommandItem>
+            <CommandItem
+              onSelect={() => runCommand(() => router.push('/dashboard/settings'))}
+            >
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Settings</span>
+            </CommandItem>
+          </CommandGroup>
         </CommandList>
       </CommandDialog>
     </>
