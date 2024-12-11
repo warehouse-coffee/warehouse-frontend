@@ -7,6 +7,8 @@ import {
   BreadcrumbSeparator
 } from '@/components/ui/breadcrumb'
 
+import ProductsTable from './products-table'
+
 export default function ProductsPage() {
   return (
     <>
@@ -23,12 +25,13 @@ export default function ProductsPage() {
       </Breadcrumb>
       <div className="mt-[.5rem]">
         <div className="flex flex-col gap-[.3rem]">
-          <h1 className="text-[1.5rem] font-bold">Products Management</h1>
+          <h1 className="text-[1.5rem] font-bold">Products Overview</h1>
           <p className="text-[.85rem] text-muted-foreground">
-            Manage products and assign their status effectively here.
+            View product details and track their current status here.
           </p>
         </div>
       </div>
+      <ProductsTable />
     </>
   )
 }

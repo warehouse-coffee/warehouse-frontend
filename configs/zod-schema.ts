@@ -9,6 +9,31 @@ export const loginSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters long')
 })
 
+export const forgotPasswordSchema = z.object({
+  email: z.string().email('Please enter a valid email address')
+})
+
+export const resetPasswordSchema = z.object({
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least 1 uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least 1 lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least 1 number')
+    .regex(/[^A-Za-z0-9]/, 'Password must contain at least 1 special character'),
+  confirmPassword: z.string()
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'Passwords do not match',
+  path: ['confirmPassword']
+})
+
+export const companyFormSchema = z.object({
+  companyId: z.string().min(1, 'Company ID is required').min(2, 'Company ID must be at least 2 characters'),
+  companyName: z.string().min(1, 'Company name is required').min(2, 'Company name must be at least 2 characters'),
+  phoneContact: z.string().min(1, 'Phone number is required').min(10, 'Phone number must be at least 10 characters'),
+  emailContact: z.string().min(1, 'Email is required').email('Invalid email address')
+})
+
 export const settingsFormSchema = z.object({
   aiServiceKey: z.string().min(1, 'AI Service Key is required'),
   emailServiceKey: z.string().min(1, 'Email Service Key is required'),
@@ -46,4 +71,10 @@ export const saleOrderSchema = z.object({
       to: z.date()
     })
   })).min(1, 'At least one product is required')
+})
+
+export const safeStockSchema = z.object({
+  safeStock: z.number()
+    .min(0, 'Safe stock must be greater than or equal to 0')
+    .max(1000000, 'Safe stock must be less than 1,000,000')
 })

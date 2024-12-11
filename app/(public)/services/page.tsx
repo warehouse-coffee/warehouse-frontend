@@ -1,6 +1,7 @@
 'use client'
 
 import { BarChart3, Coffee, LineChart, ShoppingCart, Users } from 'lucide-react'
+import Link from 'next/link'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
@@ -79,11 +80,11 @@ export default function Services() {
             </CardDescription>
           </CardContent>
           <CardFooter className="flex justify-center">
-            <a href='./login'>
+            <Link href="/login">
               <Button size="lg" className="font-semibold text-white">
                 <ShoppingCart className="mr-2 h-5 w-5" /> Get Started
               </Button>
-            </a>
+            </Link>
           </CardFooter>
         </Card>
       </main>

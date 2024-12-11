@@ -204,6 +204,46 @@ export class CategoriesClient {
         }
         return Promise.resolve<CategoryListVM>(null as any);
     }
+
+    deleteCategory(id: number): Promise<boolean> {
+        let url_ = this.baseUrl + "/api/Categories/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "DELETE",
+            headers: {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processDeleteCategory(_response);
+        });
+    }
+
+    protected processDeleteCategory(response: Response): Promise<boolean> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<boolean>(null as any);
+    }
 }
 
 export class CoffeePriceClient {
@@ -1504,6 +1544,47 @@ export class IdentityUserClient {
         }
         return Promise.resolve<boolean>(null as any);
     }
+
+    checkEmail(email: string): Promise<boolean> {
+        let url_ = this.baseUrl + "/api/IdentityUser/checkemail?";
+        if (email === undefined || email === null)
+            throw new Error("The parameter 'email' must be defined and cannot be null.");
+        else
+            url_ += "email=" + encodeURIComponent("" + email) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processCheckEmail(_response);
+        });
+    }
+
+    protected processCheckEmail(response: Response): Promise<boolean> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<boolean>(null as any);
+    }
 }
 
 export class InventoriesClient {
@@ -1637,6 +1718,88 @@ export class InventoriesClient {
             });
         }
         return Promise.resolve<InventoryListVM>(null as any);
+    }
+
+    getSafeStock(id: number): Promise<number> {
+        let url_ = this.baseUrl + "/api/Inventories/safestock?";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined and cannot be null.");
+        else
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetSafeStock(_response);
+        });
+    }
+
+    protected processGetSafeStock(response: Response): Promise<number> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<number>(null as any);
+    }
+
+    updateSafeStock(command: UpdateSafeStockCommand): Promise<boolean> {
+        let url_ = this.baseUrl + "/api/Inventories/safestock";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(command);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": `Bearer ${this.token}`,
+                "X-XSRF-TOKEN": `${this.XSRF}`,
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processUpdateSafeStock(_response);
+        });
+    }
+
+    protected processUpdateSafeStock(response: Response): Promise<boolean> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<boolean>(null as any);
     }
 }
 
@@ -3068,7 +3231,6 @@ export interface ICreateCategoryCommand {
 
 export class CategoryDto implements ICategoryDto {
     name?: string | undefined;
-    products?: ProductDto[] | undefined;
 
     constructor(data?: ICategoryDto) {
         if (data) {
@@ -3082,11 +3244,6 @@ export class CategoryDto implements ICategoryDto {
     init(_data?: any) {
         if (_data) {
             this.name = _data["name"];
-            if (Array.isArray(_data["products"])) {
-                this.products = [] as any;
-                for (let item of _data["products"])
-                    this.products!.push(ProductDto.fromJS(item));
-            }
         }
     }
 
@@ -3100,90 +3257,12 @@ export class CategoryDto implements ICategoryDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["name"] = this.name;
-        if (Array.isArray(this.products)) {
-            data["products"] = [];
-            for (let item of this.products)
-                data["products"].push(item.toJSON());
-        }
         return data;
     }
 }
 
 export interface ICategoryDto {
     name?: string | undefined;
-    products?: ProductDto[] | undefined;
-}
-
-export class ProductDto implements IProductDto {
-    name?: string | undefined;
-    units?: string | undefined;
-    quantity?: number;
-    image?: string | undefined;
-    status?: string | undefined;
-    expiration?: Date | undefined;
-    importDate?: Date | undefined;
-    exportDate?: Date | undefined;
-    categoryId?: number | undefined;
-    areaId?: number | undefined;
-
-    constructor(data?: IProductDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.name = _data["name"];
-            this.units = _data["units"];
-            this.quantity = _data["quantity"];
-            this.image = _data["image"];
-            this.status = _data["status"];
-            this.expiration = _data["expiration"] ? new Date(_data["expiration"].toString()) : <any>undefined;
-            this.importDate = _data["importDate"] ? new Date(_data["importDate"].toString()) : <any>undefined;
-            this.exportDate = _data["exportDate"] ? new Date(_data["exportDate"].toString()) : <any>undefined;
-            this.categoryId = _data["categoryId"];
-            this.areaId = _data["areaId"];
-        }
-    }
-
-    static fromJS(data: any): ProductDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new ProductDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["name"] = this.name;
-        data["units"] = this.units;
-        data["quantity"] = this.quantity;
-        data["image"] = this.image;
-        data["status"] = this.status;
-        data["expiration"] = this.expiration ? this.expiration.toISOString() : <any>undefined;
-        data["importDate"] = this.importDate ? this.importDate.toISOString() : <any>undefined;
-        data["exportDate"] = this.exportDate ? this.exportDate.toISOString() : <any>undefined;
-        data["categoryId"] = this.categoryId;
-        data["areaId"] = this.areaId;
-        return data;
-    }
-}
-
-export interface IProductDto {
-    name?: string | undefined;
-    units?: string | undefined;
-    quantity?: number;
-    image?: string | undefined;
-    status?: string | undefined;
-    expiration?: Date | undefined;
-    importDate?: Date | undefined;
-    exportDate?: Date | undefined;
-    categoryId?: number | undefined;
-    areaId?: number | undefined;
 }
 
 export class CategoryListVM implements ICategoryListVM {
@@ -6537,6 +6616,7 @@ export interface IInventoryListVM {
 }
 
 export class InventoryDto implements IInventoryDto {
+    id?: number;
     productName?: string;
     availableQuantity?: number;
     expiration?: Date | undefined;
@@ -6556,6 +6636,7 @@ export class InventoryDto implements IInventoryDto {
 
     init(_data?: any) {
         if (_data) {
+            this.id = _data["id"];
             this.productName = _data["productName"];
             this.availableQuantity = _data["availableQuantity"];
             this.expiration = _data["expiration"] ? new Date(_data["expiration"].toString()) : <any>undefined;
@@ -6575,6 +6656,7 @@ export class InventoryDto implements IInventoryDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
         data["productName"] = this.productName;
         data["availableQuantity"] = this.availableQuantity;
         data["expiration"] = this.expiration ? this.expiration.toISOString() : <any>undefined;
@@ -6587,6 +6669,7 @@ export class InventoryDto implements IInventoryDto {
 }
 
 export interface IInventoryDto {
+    id?: number;
     productName?: string;
     availableQuantity?: number;
     expiration?: Date | undefined;
@@ -6646,6 +6729,47 @@ export interface IGetInventoriesByStorageQuery {
     storageId?: number;
     page?: Page;
     filters?: FilterData[] | undefined;
+}
+
+
+export class UpdateSafeStockCommand implements IUpdateSafeStockCommand {
+    inventoryId?: number;
+    safeStock?: number;
+
+    constructor(data?: IUpdateSafeStockCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.inventoryId = _data["inventoryId"];
+            this.safeStock = _data["safeStock"];
+        }
+    }
+
+    static fromJS(data: any): UpdateSafeStockCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateSafeStockCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["inventoryId"] = this.inventoryId;
+        data["safeStock"] = this.safeStock;
+        return data;
+    }
+}
+
+export interface IUpdateSafeStockCommand {
+    inventoryId?: number;
+    safeStock?: number;
 }
 
 export class CreateInventoryOutboundCommand implements ICreateInventoryOutboundCommand {
@@ -7268,7 +7392,7 @@ export class SaleOrderProduct implements ISaleOrderProduct {
     productName?: string;
     quantity?: number;
     price?: number;
-    expectedPickupDate?: Date | undefined;
+    expectedPickupDate?: Date;
 
     constructor(data?: ISaleOrderProduct) {
         if (data) {
@@ -7309,7 +7433,7 @@ export interface ISaleOrderProduct {
     productName?: string;
     quantity?: number;
     price?: number;
-    expectedPickupDate?: Date | undefined;
+    expectedPickupDate?: Date;
 }
 
 export class SaleAndImportOrderVM implements ISaleAndImportOrderVM {
@@ -7562,6 +7686,78 @@ export class ProductListVM implements IProductListVM {
 export interface IProductListVM {
     productList?: ProductDto[] | undefined;
     page?: Page | undefined;
+}
+
+export class ProductDto implements IProductDto {
+    name?: string | undefined;
+    units?: string | undefined;
+    quantity?: number;
+    image?: string | undefined;
+    status?: string | undefined;
+    expiration?: Date | undefined;
+    importDate?: Date | undefined;
+    exportDate?: Date | undefined;
+    categoryId?: number | undefined;
+    areaId?: number | undefined;
+
+    constructor(data?: IProductDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.units = _data["units"];
+            this.quantity = _data["quantity"];
+            this.image = _data["image"];
+            this.status = _data["status"];
+            this.expiration = _data["expiration"] ? new Date(_data["expiration"].toString()) : <any>undefined;
+            this.importDate = _data["importDate"] ? new Date(_data["importDate"].toString()) : <any>undefined;
+            this.exportDate = _data["exportDate"] ? new Date(_data["exportDate"].toString()) : <any>undefined;
+            this.categoryId = _data["categoryId"];
+            this.areaId = _data["areaId"];
+        }
+    }
+
+    static fromJS(data: any): ProductDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["units"] = this.units;
+        data["quantity"] = this.quantity;
+        data["image"] = this.image;
+        data["status"] = this.status;
+        data["expiration"] = this.expiration ? this.expiration.toISOString() : <any>undefined;
+        data["importDate"] = this.importDate ? this.importDate.toISOString() : <any>undefined;
+        data["exportDate"] = this.exportDate ? this.exportDate.toISOString() : <any>undefined;
+        data["categoryId"] = this.categoryId;
+        data["areaId"] = this.areaId;
+        return data;
+    }
+}
+
+export interface IProductDto {
+    name?: string | undefined;
+    units?: string | undefined;
+    quantity?: number;
+    image?: string | undefined;
+    status?: string | undefined;
+    expiration?: Date | undefined;
+    importDate?: Date | undefined;
+    exportDate?: Date | undefined;
+    categoryId?: number | undefined;
+    areaId?: number | undefined;
 }
 
 export class GetProductListQuery implements IGetProductListQuery {

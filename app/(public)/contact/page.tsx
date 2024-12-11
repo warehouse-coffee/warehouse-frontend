@@ -1,6 +1,8 @@
 'use client'
+
 import { motion, AnimatePresence } from 'framer-motion'
 import { Coffee, Github, Linkedin, Mail, MapPin, Phone, Twitter, CheckCircle } from 'lucide-react'
+import Image from 'next/image'
 import React, { useState, useEffect } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -111,11 +113,15 @@ export default function Contact() {
             {team.map((member) => (
               <Card className="w-full md:w-1/3" key={member.name}>
                 <CardHeader>
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    className="rounded-full w-32 h-32 object-cover self-center"
-                  />
+                  <div className="size-32 relative mx-auto mb-4">
+                    <Image
+                      src={member.image}
+                      alt={member.name}
+                      fill
+                      className="rounded-full object-cover self-center"
+                    />
+                  </div>
+
                   <CardTitle className="text-center">{member.name}</CardTitle>
                   <CardDescription className="text-center">{member.role}</CardDescription>
                 </CardHeader>

@@ -1,46 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { CompaniesClient } from '@/app/api/web-api-client'
-import { cookieStore } from '@/lib/auth'
+import { cookieStore, tokenUtils } from '@/lib/auth'
 
-export async function DELETE(
-  request: NextRequest
-) {
+import { CompaniesClient } from '../../../../web-api-client'
+
+export async function DELETE(request: NextRequest) {
+  const token = cookieStore.get('auth_token')
+
+  if (!token || !tokenUtils.isValid(token)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
-    // Get authentication token
-    const token = cookieStore.get('auth_token')
+    const { searchParams } = new URL(request.url)
+    const companyId = searchParams.get('companyId')
 
-    if (!token) {
-      return new NextResponse('Unauthorized', { status: 401 })
+    if (!companyId) {
+      return NextResponse.json({ error: 'Company ID is required' }, { status: 400 })
     }
 
-    // Khởi tạo CompaniesClient với token
-    const client = new CompaniesClient(
-      process.env.NEXT_PUBLIC_BACKEND_API_URL,
-      undefined,
-      token,
-      undefined
-    )
-
-    const { searchParams } = new URL(request.url)
-    const id = searchParams.get('id') || ''
-    // Gọi API để xóa company
-    await client.deleteCompany(id)
-
-    // Trả về kết quả thành công
-    return NextResponse.json({ message: 'Company deleted successfully' }, { status: 200 })
-  } catch (error) {
-    return new NextResponse(
-      JSON.stringify({
-        message: 'Error deleting company',
-        error: error instanceof Error ? error.message : 'Unknown error'
-      }),
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }
-    )
+    const client = new CompaniesClient(process.env.NEXT_PUBLIC_BACKEND_API_URL!, undefined, token)
+    const result = await client.deleteCompany(companyId)
+    return NextResponse.json(result)
+  } catch (error: any) {
+    const errorMessage = error.message || 'Failed to delete company'
+    return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
 }

@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { useGetCompanyList } from '@/hooks/company'
 import { useCreateUser } from '@/hooks/user'
 import { cn, formatLabel, formatRoleLabel, getAvailableRoles } from '@/lib/utils'
-import { CompanyInfo, CreateUserInput, RoleName } from '@/types'
+import { Company, CreateUserInput, RoleName } from '@/types'
 
 const initialFormState: CreateUserInput = {
   userName: '',
@@ -60,7 +60,7 @@ export default function AddUserForm({ onClose }: { onClose: () => void }) {
         {Object.entries(createForm).map(([key, value]) => (
           <div key={key} className="w-full flex items-center gap-4">
             <Label htmlFor={key} className="w-[35%]">
-              {formatLabel(key)}
+              {formatLabel(key)} <span className="text-red-500">*</span>
             </Label>
             <div className="w-full">
               {key === 'roleName' ? (
@@ -111,7 +111,7 @@ export default function AddUserForm({ onClose }: { onClose: () => void }) {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      {companyList.map((company: CompanyInfo) => (
+                      {companyList.map((company: Company) => (
                         <SelectItem key={company.companyId} value={company.companyId}>
                           {company.companyId}
                         </SelectItem>

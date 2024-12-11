@@ -3,25 +3,32 @@ import { TableCell, TableRow } from '@/components/ui/table'
 
 export default function EmployeesDataLoading() {
   return (
-    [...Array(5)].map((_, index) => (
-      <TableRow key={index}>
-        <TableCell>
-          <div className="flex items-center gap-3">
-            <Skeleton className="h-8 w-8 rounded-full" />
-            <Skeleton className="h-4 w-[10rem]" />
-          </div>
-        </TableCell>
-        <TableCell><Skeleton className="h-4 w-[15rem]" /></TableCell>
-        <TableCell><Skeleton className="h-4 w-[6rem]" /></TableCell>
-        <TableCell><Skeleton className="h-4 w-[8rem]" /></TableCell>
-        <TableCell className="text-right">
-          <div className="flex justify-end gap-2">
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-          </div>
-        </TableCell>
-      </TableRow>
-    ))
+    <>
+      {Array.from({ length: 5 }).map((_, index) => (
+        <TableRow key={index} className="border-b border-border/50">
+          <TableCell className="text-center py-[.75rem]">
+            <Skeleton className="h-4 w-[8rem] mx-auto" />
+          </TableCell>
+          <TableCell className="text-center py-[.75rem]">
+            <Skeleton className="h-4 w-[10rem] mx-auto" />
+          </TableCell>
+          <TableCell className="text-center py-[.75rem]">
+            <Skeleton className="h-4 w-[6rem] mx-auto" />
+          </TableCell>
+          <TableCell className="text-center py-[.75rem]">
+            <div className="flex items-center justify-center gap-2">
+              <Skeleton className="h-6 w-11 rounded-full" />
+              <Skeleton className="h-4 w-[4rem]" />
+            </div>
+          </TableCell>
+          <TableCell className="py-[.75rem]">
+            <div className="flex justify-end gap-2">
+              <Skeleton className="h-8 w-8" />
+              <Skeleton className="h-8 w-8" />
+            </div>
+          </TableCell>
+        </TableRow>
+      ))}
+    </>
   )
 }

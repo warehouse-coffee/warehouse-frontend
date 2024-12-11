@@ -1,38 +1,55 @@
-'use client'
-
-import { Trash2 } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { X } from 'lucide-react'
 import React, { useState, useEffect } from 'react'
 
 import { AreaDto2, StorageDto2, UpdateStorageCommand } from '@/app/api/web-api-client'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { DialogFooter } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Loader } from '@/components/ui/loader'
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
 import { useUpdateStorage } from '@/hooks/storage'
-export function UpdateStorage({ storage, onSuccess }: { storage?: StorageDto2, onSuccess?: () => void }) {
-  const [name, setName] = useState('')
-  const [address, setAddress] = useState('')
-  const [status, setStatus] = useState('Active')
-  const [areas, setAreas] = useState<AreaDto2[]>([])
-  const [newArea, setNewArea] = useState('')
-  const updateStorage = useUpdateStorage(() => {
+import { cn } from '@/lib/utils'
+
+interface UpdateStorageProps {
+  storage?: StorageDto2
+  onSuccess?: () => void
+  onClose: () => void
+}
+
+export default function UpdateStorage({ storage, onSuccess, onClose }: UpdateStorageProps) {
+  const [formData, setFormData] = useState({
+    name: '',
+    location: '',
+    status: 'Active',
+    areas: [] as AreaDto2[],
+    newArea: ''
+  })
+
+  const updateStorageMutation = useUpdateStorage(() => {
     if (onSuccess) {
       onSuccess()
     }
+    onClose()
   })
+
   useEffect(() => {
     if (storage) {
-      setName(storage.name || '')
-      setAddress(storage.address || '')
-      setStatus(storage.status || 'Active')
-      setAreas(storage.areas || [])
+      setFormData({
+        name: storage.name || '',
+        location: storage.address || '',
+        status: storage.status || 'Active',
+        areas: storage.areas || [],
+        newArea: ''
+      })
     }
   }, [storage])
 
@@ -40,26 +57,44 @@ export function UpdateStorage({ storage, onSuccess }: { storage?: StorageDto2, o
     e.preventDefault()
     const updatedStorage = new UpdateStorageCommand({
       storageId: storage?.id || 0,
-      name,
-      location: address,
-      status,
-      areas: areas.map(area => new AreaDto2({ name: area.name }))
+      name: formData.name,
+      location: formData.location,
+      status: formData.status,
+      areas: formData.areas.map(area => new AreaDto2({ name: area.name }))
     })
-    updateStorage.mutate(updatedStorage)
+    updateStorageMutation.mutate(updatedStorage)
   }
 
   const addArea = () => {
-    if (newArea.trim()) {
+    if (formData.newArea.trim()) {
       const area = new AreaDto2()
-      area.name = newArea.trim()
+      area.name = formData.newArea.trim()
       area.id = 0
-      setAreas([...areas, area])
-      setNewArea('')
+      setFormData(prev => ({
+        ...prev,
+        areas: [...prev.areas, area],
+        newArea: ''
+      }))
     }
   }
 
   const removeArea = (index: number) => {
-    setAreas(areas.filter((_, i) => i !== index))
+    setFormData(prev => ({
+      ...prev,
+      areas: prev.areas.filter((_, i) => i !== index)
+    }))
+  }
+
+  const handleReset = () => {
+    if (storage) {
+      setFormData({
+        name: storage.name || '',
+        location: storage.address || '',
+        status: storage.status || 'Active',
+        areas: storage.areas || [],
+        newArea: ''
+      })
+    }
   }
 
   if (!storage) {
@@ -67,71 +102,140 @@ export function UpdateStorage({ storage, onSuccess }: { storage?: StorageDto2, o
   }
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle>Update Storage</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="address">Address</Label>
-            <Input
-              id="address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
-            <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
+    <form onSubmit={handleSubmit}>
+      <div className="space-y-4">
+        <div>
+          <Label htmlFor="name">
+            Name <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            id="name"
+            value={formData.name}
+            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+            className="mt-1.5"
+            required
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="location">
+            Location <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            id="location"
+            value={formData.location}
+            onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+            className="mt-1.5"
+            required
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="status">
+            Status <span className="text-red-500">*</span>
+          </Label>
+          <Select
+            value={formData.status}
+            onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
+          >
+            <SelectTrigger className="mt-1.5">
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
                 <SelectItem value="Active">Active</SelectItem>
+                <SelectItem value="UnderMaintenance">Under Maintenance</SelectItem>
                 <SelectItem value="Inactive">Inactive</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label>Areas</Label>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <Label>
+            Areas <span className="text-red-500">*</span>
+          </Label>
+          <div className="mt-1.5 space-y-3">
             <div className="flex flex-wrap gap-2">
-              {areas.map((area, index) => (
-                <div key={index} className="flex items-center bg-secondary text-secondary-foreground rounded-full px-3 py-1">
-                  <span>{area.name}</span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-4 w-4 ml-2 hover:bg-destructive hover:text-destructive-foreground rounded-full"
-                    onClick={() => removeArea(index)}
+              <AnimatePresence mode="popLayout">
+                {formData.areas.map((area, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.2 }}
+                    className="inline-flex items-center justify-center bg-accent rounded-md px-2 py-1 text-sm"
                   >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
-                </div>
-              ))}
+                    {area.name}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeArea(index)}
+                      className="h-[1rem] w-[1rem] p-0 cursor-pointer ml-2 rounded-full hover:bg-white/20 transition-colors duration-200"
+                    >
+                      <X className="h-[.65rem] w-[.65rem]" />
+                    </Button>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </div>
             <div className="flex gap-2">
               <Input
-                value={newArea}
-                onChange={(e) => setNewArea(e.target.value)}
+                value={formData.newArea}
+                onChange={(e) => setFormData(prev => ({ ...prev, newArea: e.target.value }))}
                 placeholder="Add new area"
+                className="flex-1 transition-all duration-200"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    addArea()
+                  }
+                }}
               />
-              <Button type="button" onClick={addArea}>Add Area</Button>
+              <motion.div
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button
+                  type="button"
+                  onClick={addArea}
+                  className="bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary transition-all duration-200"
+                >
+                  Add Area
+                </Button>
+              </motion.div>
             </div>
           </div>
-          <Button type="submit" className="w-full">Update Storage</Button>
-        </form>
-      </CardContent>
-    </Card>
+        </div>
+      </div>
+
+      <DialogFooter className="mt-6">
+        <Button
+          type="button"
+          variant="outline"
+          className={cn('bg-accent')}
+          onClick={handleReset}
+        >
+          Reset
+        </Button>
+        <Button
+          type="submit"
+          className={cn(
+            'bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary',
+            updateStorageMutation.isPending && 'flex items-center gap-3 cursor-wait pointer-events-none'
+          )}
+        >
+          {updateStorageMutation.isPending ? (
+            <>
+              Saving...
+              <Loader color="#62c5ff" size="1.25rem" />
+            </>
+          ) : (
+            'Save changes'
+          )}
+        </Button>
+      </DialogFooter>
+    </form>
   )
 }

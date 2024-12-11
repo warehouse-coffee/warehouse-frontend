@@ -1,22 +1,13 @@
 import { ImportSummary } from '@/app/api/web-api-client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from '@/components/ui/tooltip'
+import { formatCurrency } from '@/lib/utils'
 
-export function ImportStatistics(data: ImportSummary[]) {
-  const formatCurrency = (value: string) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(parseFloat(value))
-  }
+interface ImportStatisticsProps {
+  data: ImportSummary[]
+}
 
-  const truncateValue = (value: string, maxLength: number = 8) => {
-    return value.length > maxLength ? value.slice(0, 4) + '...' : value
-  }
-
+export function ImportStatistics({ data }: ImportStatisticsProps) {
   return (
     <Card>
       <CardHeader>
@@ -26,37 +17,30 @@ export function ImportStatistics(data: ImportSummary[]) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Supplier Name</TableHead>
-              <TableHead className="text-right">Total Import Cost</TableHead>
+              <TableHead className="text-center">Supplier Name</TableHead>
+              <TableHead className="text-center">Total Import Cost</TableHead>
             </TableRow>
           </TableHeader>
-          {data.length > 0 ? (
-            <TableBody>
-              {data.map((item, index) => (
-                <TableRow key={index}>
-                  <TableCell>{item.supplierName}</TableCell>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <TableCell className="text-right">
-                          {truncateValue(formatCurrency(item.totalImportCost?.toString() || '0'))}
-                        </TableCell>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{formatCurrency(item.totalImportCost?.toString() || '0')}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+          <TableBody>
+            {data.length > 0 ? (
+              data.map((item, index) => (
+                <TableRow key={index} className="border-b border-border/50 hover:bg-accent/5">
+                  <TableCell className="text-center">{item.supplierName}</TableCell>
+                  <TableCell
+                    className="text-center font-semibold text-primary dark:text-primary"
+                  >
+                    {formatCurrency(parseFloat(item.totalImportCost?.toString() ?? '0'))}
+                  </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          ) : (
-            <TableBody>
+              ))
+            ) : (
               <TableRow>
-                <TableCell colSpan={2} className="text-center">No data available</TableCell>
+                <TableCell colSpan={2} className="h-[4rem] text-center text-muted-foreground">
+                  No data available
+                </TableCell>
               </TableRow>
-            </TableBody>
-          )}
+            )}
+          </TableBody>
         </Table>
       </CardContent>
     </Card>

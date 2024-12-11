@@ -1,12 +1,14 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-import { CreateCompanyCommand } from '@/app/api/web-api-client'
+import { UpdateCompanyCommand } from '@/app/api/web-api-client'
+import DashboardFetchLoader from '@/components/dashboard/dashboard-fetch-loader'
 import { Button } from '@/components/ui/button'
+import { DialogFooter } from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -16,54 +18,66 @@ import {
   FormMessage
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { useCreateCompany } from '@/hooks/company/useCreateCompany'
+import { Loader } from '@/components/ui/loader'
+import { companyFormSchema } from '@/configs/zod-schema'
+import { useGetCompanyDetail, useUpdateCompany } from '@/hooks/company'
+import { cn } from '@/lib/utils'
 
-// Validation schema
-const formSchema = z.object({
-  companyId: z.string().min(1, 'Company ID is required').min(2, 'Company ID must be at least 2 characters'),
-  companyName: z.string().min(1, 'Company name is required').min(2, 'Company name must be at least 2 characters'),
-  phone: z.string().min(1, 'Phone number is required').min(10, 'Phone number must be at least 10 characters'),
-  email: z.string().min(1, 'Email is required').email('Invalid email address')
-})
+type FormValues = z.infer<typeof companyFormSchema>
 
-type FormValues = z.infer<typeof formSchema>
-
-interface CompanyCreateProps {
-  onClose: () => void
+interface CompanyUpdateProps {
+  companyId: string
+  onSuccess: () => void
 }
 
-export function CompanyCreate({ onClose }: CompanyCreateProps) {
-  const createCompanyMutation = useCreateCompany(onClose)
+export default function CompaniesUpdate({ companyId, onSuccess }: CompanyUpdateProps) {
+  const { data: company, isLoading } = useGetCompanyDetail(companyId)
+  const updateCompanyMutation = useUpdateCompany(companyId)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(companyFormSchema),
     defaultValues: {
       companyId: '',
       companyName: '',
-      phone: '',
-      email: ''
+      phoneContact: '',
+      emailContact: ''
     }
   })
 
-  const onSubmit = React.useCallback(async (data: FormValues) => {
-    if (isSubmitting || createCompanyMutation.isPending) return
+  useEffect(() => {
+    if (company) {
+      form.reset({
+        companyId: company.companyId || '',
+        companyName: company.companyName || '',
+        phoneContact: company.phoneContact || '',
+        emailContact: company.emailContact || ''
+      })
+    }
+  }, [company, form])
 
+  const onSubmit = React.useCallback(async (data: FormValues) => {
+    if (isSubmitting || updateCompanyMutation.isPending) return
     setIsSubmitting(true)
     try {
-      const command = new CreateCompanyCommand({
+      const command = new UpdateCompanyCommand({
         companyId: data.companyId,
         companyName: data.companyName,
-        phone: data.phone,
-        email: data.email
+        phone: data.phoneContact,
+        email: data.emailContact
       })
-      await createCompanyMutation.mutateAsync(command)
+      await updateCompanyMutation.mutateAsync(command)
+      onSuccess()
     } catch (error) {
-      console.error('Error creating company:', error)
+      console.error('Error updating company:', error)
     } finally {
       setIsSubmitting(false)
     }
-  }, [createCompanyMutation, isSubmitting])
+  }, [updateCompanyMutation, isSubmitting, onSuccess])
+
+  if (isLoading) {
+    return <DashboardFetchLoader />
+  }
 
   return (
     <Form {...form}>
@@ -78,7 +92,7 @@ export function CompanyCreate({ onClose }: CompanyCreateProps) {
             <FormItem>
               <FormLabel>Company ID <span className="text-red-500">*</span></FormLabel>
               <FormControl>
-                <Input placeholder="Enter company ID" required {...field} />
+                <Input placeholder="Enter company ID" required {...field} disabled />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -101,7 +115,7 @@ export function CompanyCreate({ onClose }: CompanyCreateProps) {
 
         <FormField
           control={form.control}
-          name="phone"
+          name="phoneContact"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Phone Number <span className="text-red-500">*</span></FormLabel>
@@ -115,7 +129,7 @@ export function CompanyCreate({ onClose }: CompanyCreateProps) {
 
         <FormField
           control={form.control}
-          name="email"
+          name="emailContact"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Email <span className="text-red-500">*</span></FormLabel>
@@ -127,22 +141,27 @@ export function CompanyCreate({ onClose }: CompanyCreateProps) {
           )}
         />
 
-        <div className="flex justify-end gap-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onClose}
-            disabled={isSubmitting || createCompanyMutation.isPending}
-          >
-            Cancel
+        <DialogFooter className="mt-6">
+          <Button type="button" variant="outline" className={cn('bg-accent')} onClick={() => form.reset()}>
+            Reset
           </Button>
           <Button
             type="submit"
-            disabled={isSubmitting || createCompanyMutation.isPending || !form.formState.isValid}
+            className={cn(
+              'bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary',
+              updateCompanyMutation.isPending && 'flex items-center gap-3 cursor-wait pointer-events-none'
+            )}
           >
-            {createCompanyMutation.isPending ? 'Creating...' : 'Create Company'}
+            {updateCompanyMutation.isPending ? (
+              <>
+              Saving...
+                <Loader color="#62c5ff" size="1.25rem" />
+              </>
+            ) : (
+              'Save changes'
+            )}
           </Button>
-        </div>
+        </DialogFooter>
       </form>
     </Form>
   )

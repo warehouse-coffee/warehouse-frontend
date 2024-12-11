@@ -4,7 +4,7 @@ import {
 } from '@google/generative-ai'
 import { NextRequest, NextResponse } from 'next/server'
 
-import { cookieStore } from '@/lib/auth'
+import { cookieStore, tokenUtils } from '@/lib/auth'
 
 import { LLMClient } from '../web-api-client'
 
@@ -34,7 +34,6 @@ const cases = {
 
 export async function POST(req: NextRequest) {
   const token = cookieStore.get('auth_token')
-  // console.log(token)
   const input_object = await req.json()
   const accessApiKey = input_object['api_key']
   const prompt = input_object['user_prompt']
@@ -43,6 +42,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ statusText: 'Access Denied' }, { status: 401 })
 
   if (!prompt) return NextResponse.json({ statusText: 'No prompt provided' }, { status: 400 })
+
+  if (!token) return NextResponse.json({ statusText: 'No token provided' }, { status: 401 })
+
+  const userInfo = tokenUtils.getUserInfo(token)
+  if (!userInfo) return NextResponse.json({ statusText: 'Invalid token' }, { status: 401 })
 
   const genAI_1 = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY_1!)
   const genAI_2 = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY_2!)
@@ -70,8 +74,14 @@ export async function POST(req: NextRequest) {
   })
 
   const intentCheck = await intentCheckLLM.generateContent(prompt)
-  // console.log(intentCheck.response.text());
   const intent_obj: { intent: keyof typeof cases } = JSON.parse(intentCheck.response.text())
+
+  if (userInfo.role === 'Super-Admin' && (intent_obj.intent === 'empty_storage' || intent_obj.intent === 'empty_area')) {
+    return NextResponse.json({
+      response: 'I apologize, but since you are not an Admin or Employee role, I cannot provide information about empty storage or areas. This information is restricted to Admin and Employee roles only.',
+      intent: intent_obj.intent
+    })
+  }
 
   let text_res = ''
   let data = null

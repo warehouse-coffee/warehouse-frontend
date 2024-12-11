@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils'
 interface DateTimePicker24hProps {
   date?: Date
   onChange?: (date: Date) => void
+  allowPastDates?: boolean
 }
 
 interface DateTimeRangePicker24hProps {
@@ -25,7 +26,7 @@ interface DateTimeRangePicker24hProps {
   onChange?: (range: DateRange) => void
 }
 
-export function DateTimePicker24h({ date, onChange }: DateTimePicker24hProps) {
+export function DateTimePicker24h({ date, onChange, allowPastDates = false }: DateTimePicker24hProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   const hours = Array.from({ length: 24 }, (_, i) => i)
@@ -56,6 +57,14 @@ export function DateTimePicker24h({ date, onChange }: DateTimePicker24hProps) {
     }
   }
 
+  const isDateDisabled = (date: Date) => {
+    if (allowPastDates) return false
+
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    return date < today
+  }
+
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
@@ -81,11 +90,7 @@ export function DateTimePicker24h({ date, onChange }: DateTimePicker24hProps) {
             selected={date}
             onSelect={handleDateSelect}
             initialFocus
-            disabled={(date) => {
-              const today = new Date()
-              today.setHours(0, 0, 0, 0)
-              return date < today
-            }}
+            disabled={isDateDisabled}
           />
           <div className="flex flex-col sm:flex-row sm:h-[300px] divide-y sm:divide-y-0 sm:divide-x">
             <ScrollArea className="w-64 sm:w-auto">

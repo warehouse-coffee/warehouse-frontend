@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { useGetCompanyList } from '@/hooks/company'
 import { useUpdateUser } from '@/hooks/user'
 import { cn, formatLabel, formatRoleLabel, getAvailableRoles } from '@/lib/utils'
-import { UpdateUser, RoleName, CompanyInfo } from '@/types'
+import { UpdateUser, RoleName, Company } from '@/types'
 
 type EditFormType = UpdateUser & { password: string, avatarImage: File | string | null }
 
@@ -190,7 +190,7 @@ export default function UsersEditForm({ user, onClose, isOpen }: { user: UpdateU
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {companyList.map((company: CompanyInfo) => (
+                        {companyList.map((company: Company) => (
                           <SelectItem key={company.companyId} value={company.companyId}>
                             {company.companyId}
                           </SelectItem>

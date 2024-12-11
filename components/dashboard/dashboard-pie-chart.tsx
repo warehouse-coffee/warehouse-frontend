@@ -98,12 +98,18 @@ export function DashboardPieChart({ id, userRole }: DashboardPieChartProps) {
     )
   }
 
-  const predictionDate = new Date(predictionData.date)
-  const formattedDate = predictionDate.toLocaleDateString('en-US', {
+  const dateFormatOptions = {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
-  })
+  } as const
+
+  const currentDate = new Date(predictionData.date)
+  const formattedDate = currentDate.toLocaleDateString('en-US', dateFormatOptions)
+
+  const tomorrowDate = new Date(currentDate)
+  tomorrowDate.setDate(tomorrowDate.getDate() + 1)
+  const formattedTomorrowDate = tomorrowDate.toLocaleDateString('en-US', dateFormatOptions)
 
   let tommorowDate = new Date(predictionData.date)
   tommorowDate.setDate(tommorowDate.getDate() + 1)
@@ -176,7 +182,7 @@ export function DashboardPieChart({ id, userRole }: DashboardPieChartProps) {
           {getTrendIcon(predictionData.aI_predict)}
         </div>
         <div className="leading-none text-muted-foreground">
-          Forecast for {formattedtommorowDate}
+          Forecast for {formattedTomorrowDate}
         </div>
       </CardFooter>
     </Card>

@@ -15,7 +15,7 @@ import { Loader } from '@/components/ui/loader'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { useDeleteOrder } from '@/hooks/order'
 import { useDialog } from '@/hooks/useDialog'
-import { formatDate, formatCurrency } from '@/lib/utils'
+import { formatDate, formatCurrency, cn } from '@/lib/utils'
 import { ImportOrder } from '@/types'
 
 interface ImportDataProps {
@@ -68,28 +68,28 @@ export default function ImportData({ data, table }: ImportDataProps) {
       {rows.map((row: any) => {
         const order = row.original
         return (
-          <TableRow key={order.orderId}>
-            <TableCell className="text-center">
+          <TableRow key={order.orderId} className="border-b border-border/50 hover:bg-accent/5">
+            <TableCell className="py-[.75rem] text-center">
               {order.orderId}
             </TableCell>
-            <TableCell className="text-center">
+            <TableCell className="py-[.75rem] text-center">
               <Badge variant="outline" className="dark:bg-primary/10 dark:text-primary">
                 {order.type}
               </Badge>
             </TableCell>
-            <TableCell className="text-center">
+            <TableCell className="py-[.75rem] text-center">
               {formatDate(order.date)}
             </TableCell>
-            <TableCell className="text-center">
+            <TableCell className="py-[.75rem] text-center">
               {formatCurrency(order.totalPrice)}
             </TableCell>
-            <TableCell className="text-center">
+            <TableCell className="py-[.75rem] text-center">
               {order.orderDetailsCount}
             </TableCell>
-            <TableCell className="text-center">
+            <TableCell className="py-[.75rem] text-center">
               {order.totalQuantity}
             </TableCell>
-            <TableCell className="text-center">
+            <TableCell className="py-[.75rem] text-center">
               <Button
                 variant="ghost"
                 size="icon"
@@ -113,7 +113,7 @@ export default function ImportData({ data, table }: ImportDataProps) {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button type="button" onClick={() => closeDialog('delete')} variant="outline">Cancel</Button>
+            <Button className={cn('bg-accent')} type="button" variant="outline" onClick={() => closeDialog('delete')}>Cancel</Button>
             <Button
               type="submit"
               className={`bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary ${deleteImportOrderMutation.isPending ? 'flex items-center gap-3 cursor-not-allowed pointer-events-none' : ''}`}

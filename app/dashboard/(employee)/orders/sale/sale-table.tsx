@@ -1,11 +1,17 @@
 'use client'
 
+import { rankItem } from '@tanstack/match-sorter-utils'
 import { useQueryErrorResetBoundary } from '@tanstack/react-query'
 import {
   getCoreRowModel,
   getPaginationRowModel,
   useReactTable,
-  PaginationState
+  PaginationState,
+  FilterFn,
+  getFilteredRowModel,
+  getSortedRowModel,
+  SortingState,
+  flexRender
 } from '@tanstack/react-table'
 import { ArrowUpAZ, ArrowDownAZ, ArrowUpDown, CirclePlus } from 'lucide-react'
 import dynamic from 'next/dynamic'
@@ -22,16 +28,8 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
+import { Loader } from '@/components/ui/loader'
 import {
   Table,
   TableBody,
@@ -41,6 +39,7 @@ import {
   TableCell
 } from '@/components/ui/table'
 import { useGetSaleOrderList } from '@/hooks/order'
+import { useDebounce } from '@/hooks/useDebounce'
 import { useDialog } from '@/hooks/useDialog'
 
 import AddOrderForm from '../add-order-form'
@@ -66,53 +65,232 @@ export default function SaleTable() {
   const [totalElements, setTotalElements] = useState<number>(0)
   const [data, setData] = useState<any[]>([])
 
-  const { data: orderData } = useGetSaleOrderList(
-    pagination.pageIndex,
-    pagination.pageSize
+  const [searchValue, setSearchValue] = useState<string>('')
+  const debouncedSearchValue = useDebounce(searchValue, 500)
+  const [sorting, setSorting] = useState<SortingState>([])
+
+  const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+    const itemRank = rankItem(row.getValue(columnId), value)
+    addMeta({ itemRank })
+    return itemRank.passed
+  }
+
+  const { data: orderData, isFetching } = useGetSaleOrderList(
+    debouncedSearchValue ? 0 : pagination.pageIndex,
+    debouncedSearchValue ? 1000 : pagination.pageSize
   )
+
+  const handleSearch = (value: string) => {
+    setSearchValue(value)
+    setPagination(prev => ({ ...prev, pageIndex: 0 }))
+  }
 
   useEffect(() => {
     if (orderData?.orders) {
       setData(orderData.orders)
-      setTotalElements(orderData.page?.totalElements ?? 0)
-      setTotalPages(orderData.page?.totalPages ?? 0)
+
+      let filteredData = [...orderData.orders]
+
+      if (debouncedSearchValue) {
+        filteredData = filteredData.filter(item => {
+          const matchesId = item.orderId?.toLowerCase().includes(debouncedSearchValue.toLowerCase())
+          return matchesId
+        })
+      }
+
+      if (debouncedSearchValue) {
+        if (filteredData.length === 0) {
+          setData([])
+          setTotalElements(0)
+          setTotalPages(0)
+        } else {
+          const startIndex = pagination.pageIndex * pagination.pageSize
+          const endIndex = startIndex + pagination.pageSize
+          setData(filteredData.slice(startIndex, endIndex))
+          setTotalElements(filteredData.length)
+          setTotalPages(Math.ceil(filteredData.length / pagination.pageSize))
+        }
+      } else {
+        setData(filteredData)
+        setTotalElements(orderData.page?.totalElements ?? 0)
+        setTotalPages(orderData.page?.totalPages ?? 0)
+      }
     }
-  }, [orderData])
+  }, [orderData, debouncedSearchValue, pagination])
 
   const table = useReactTable({
     data,
     columns: [
       {
         accessorKey: 'orderId',
-        header: 'Order ID'
+        header: ({ column }) => (
+          <div
+            className="flex items-center justify-center gap-2 cursor-pointer select-none"
+            onClick={column.getToggleSortingHandler()}
+            title={
+              column.getCanSort()
+                ? column.getNextSortingOrder() === 'asc'
+                  ? 'Sort ascending'
+                  : column.getNextSortingOrder() === 'desc'
+                    ? 'Sort descending'
+                    : 'Clear sort'
+                : undefined
+            }
+          >
+            Order ID
+            {{
+              asc: <ArrowUpAZ className="h-4 w-4" />,
+              desc: <ArrowDownAZ className="h-4 w-4" />
+            }[column.getIsSorted() as string] ?? <ArrowUpDown className="h-4 w-4" />}
+          </div>
+        ),
+        filterFn: fuzzyFilter
       },
       {
         accessorKey: 'type',
-        header: 'Type'
+        header: ({ column }) => (
+          <div
+            className="flex items-center justify-center gap-2 cursor-pointer select-none"
+            onClick={column.getToggleSortingHandler()}
+            title={
+              column.getCanSort()
+                ? column.getNextSortingOrder() === 'asc'
+                  ? 'Sort ascending'
+                  : column.getNextSortingOrder() === 'desc'
+                    ? 'Sort descending'
+                    : 'Clear sort'
+                : undefined
+            }
+          >
+            Type
+            {{
+              asc: <ArrowUpAZ className="h-4 w-4" />,
+              desc: <ArrowDownAZ className="h-4 w-4" />
+            }[column.getIsSorted() as string] ?? <ArrowUpDown className="h-4 w-4" />}
+          </div>
+        )
       },
       {
         accessorKey: 'date',
-        header: 'Date'
+        header: ({ column }) => (
+          <div
+            className="flex items-center justify-center gap-2 cursor-pointer select-none"
+            onClick={column.getToggleSortingHandler()}
+            title={
+              column.getCanSort()
+                ? column.getNextSortingOrder() === 'asc'
+                  ? 'Sort ascending'
+                  : column.getNextSortingOrder() === 'desc'
+                    ? 'Sort descending'
+                    : 'Clear sort'
+                : undefined
+            }
+          >
+            Date
+            {{
+              asc: <ArrowUpAZ className="h-4 w-4" />,
+              desc: <ArrowDownAZ className="h-4 w-4" />
+            }[column.getIsSorted() as string] ?? <ArrowUpDown className="h-4 w-4" />}
+          </div>
+        ),
+        sortingFn: 'datetime'
       },
       {
         accessorKey: 'totalPrice',
-        header: 'Total Price'
+        header: ({ column }) => (
+          <div
+            className="flex items-center justify-center gap-2 cursor-pointer select-none"
+            onClick={column.getToggleSortingHandler()}
+            title={
+              column.getCanSort()
+                ? column.getNextSortingOrder() === 'asc'
+                  ? 'Sort ascending'
+                  : column.getNextSortingOrder() === 'desc'
+                    ? 'Sort descending'
+                    : 'Clear sort'
+                : undefined
+            }
+          >
+            Total Price
+            {{
+              asc: <ArrowUpAZ className="h-4 w-4" />,
+              desc: <ArrowDownAZ className="h-4 w-4" />
+            }[column.getIsSorted() as string] ?? <ArrowUpDown className="h-4 w-4" />}
+          </div>
+        )
       },
       {
         accessorKey: 'orderDetailsCount',
-        header: 'Details Count'
+        header: ({ column }) => (
+          <div
+            className="flex items-center justify-center gap-2 cursor-pointer select-none"
+            onClick={column.getToggleSortingHandler()}
+            title={
+              column.getCanSort()
+                ? column.getNextSortingOrder() === 'asc'
+                  ? 'Sort ascending'
+                  : column.getNextSortingOrder() === 'desc'
+                    ? 'Sort descending'
+                    : 'Clear sort'
+                : undefined
+            }
+          >
+            Details Count
+            {{
+              asc: <ArrowUpAZ className="h-4 w-4" />,
+              desc: <ArrowDownAZ className="h-4 w-4" />
+            }[column.getIsSorted() as string] ?? <ArrowUpDown className="h-4 w-4" />}
+          </div>
+        )
       },
       {
         accessorKey: 'totalQuantity',
-        header: 'Total Quantity'
+        header: ({ column }) => (
+          <div
+            className="flex items-center justify-center gap-2 cursor-pointer select-none"
+            onClick={column.getToggleSortingHandler()}
+            title={
+              column.getCanSort()
+                ? column.getNextSortingOrder() === 'asc'
+                  ? 'Sort ascending'
+                  : column.getNextSortingOrder() === 'desc'
+                    ? 'Sort descending'
+                    : 'Clear sort'
+                : undefined
+            }
+          >
+            Total Quantity
+            {{
+              asc: <ArrowUpAZ className="h-4 w-4" />,
+              desc: <ArrowDownAZ className="h-4 w-4" />
+            }[column.getIsSorted() as string] ?? <ArrowUpDown className="h-4 w-4" />}
+          </div>
+        )
+      },
+      {
+        accessorKey: 'action',
+        header: 'Action'
       }
     ],
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     state: {
-      pagination
+      pagination,
+      columnFilters: debouncedSearchValue ? [
+        {
+          id: 'orderId',
+          value: debouncedSearchValue
+        }
+      ] : [],
+      sorting
+    },
+    filterFns: {
+      fuzzy: fuzzyFilter
     },
     onPaginationChange: setPagination,
+    onSortingChange: setSorting,
     manualPagination: true,
     pageCount: totalPages
   })
@@ -125,7 +303,14 @@ export default function SaleTable() {
             <Input
               placeholder="Search order by ID..."
               className="min-w-[20rem]"
+              value={searchValue}
+              onChange={(e) => handleSearch(e.target.value)}
             />
+            {isFetching && (
+              <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                <Loader color="#fff" size="1.15rem" />
+              </div>
+            )}
           </div>
         </div>
         <div>
@@ -151,209 +336,65 @@ export default function SaleTable() {
       <div className="rounded-md border">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>
-                <div className="flex justify-center items-center gap-2">
-                  Order ID
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <ArrowUpDown className="h-4 w-4 cursor-pointer" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="min-w-[10rem]">
-                      <DropdownMenuLabel>
-                        Sort by
-                      </DropdownMenuLabel>
-                      <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727] mb-2" />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                          <ArrowUpAZ className="mr-2 h-4 w-4" />
-                          <span>Ascending</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <ArrowDownAZ className="mr-2 h-4 w-4" />
-                          <span>Descending</span>
-                        </DropdownMenuItem>
-                        {/* <DropdownMenuItem>
-                          <Input placeholder="Search..." className="w-full" />
-                        </DropdownMenuItem> */}
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="flex justify-center items-center gap-2">
-                  Type
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <ArrowUpDown className="h-4 w-4 cursor-pointer" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="min-w-[10rem]">
-                      <DropdownMenuLabel>
-                        Sort by
-                      </DropdownMenuLabel>
-                      <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727] mb-2" />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                          <ArrowUpAZ className="mr-2 h-4 w-4" />
-                          <span>Ascending</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <ArrowDownAZ className="mr-2 h-4 w-4" />
-                          <span>Descending</span>
-                        </DropdownMenuItem>
-                        {/* <DropdownMenuItem>
-                          <Input placeholder="Search..." className="w-full" />
-                        </DropdownMenuItem> */}
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="flex justify-center items-center gap-2">
-                  Date
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <ArrowUpDown className="h-4 w-4 cursor-pointer" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="min-w-[10rem]">
-                      <DropdownMenuLabel>
-                        Sort by
-                      </DropdownMenuLabel>
-                      <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727] mb-2" />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                          <ArrowUpAZ className="mr-2 h-4 w-4" />
-                          <span>Ascending</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <ArrowDownAZ className="mr-2 h-4 w-4" />
-                          <span>Descending</span>
-                        </DropdownMenuItem>
-                        {/* <DropdownMenuItem>
-                          <Input placeholder="Search..." className="w-full" />
-                        </DropdownMenuItem> */}
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="flex justify-center items-center gap-2">
-                  Total Price
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <ArrowUpDown className="h-4 w-4 cursor-pointer" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="min-w-[10rem]">
-                      <DropdownMenuLabel>
-                        Sort by
-                      </DropdownMenuLabel>
-                      <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727] mb-2" />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                          <ArrowUpAZ className="mr-2 h-4 w-4" />
-                          <span>Ascending</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <ArrowDownAZ className="mr-2 h-4 w-4" />
-                          <span>Descending</span>
-                        </DropdownMenuItem>
-                        {/* <DropdownMenuItem>
-                          <Input placeholder="Search..." className="w-full" />
-                        </DropdownMenuItem> */}
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="flex justify-center items-center gap-2">
-                  Details Count
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <ArrowUpDown className="h-4 w-4 cursor-pointer" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="min-w-[10rem]">
-                      <DropdownMenuLabel>
-                        Sort by
-                      </DropdownMenuLabel>
-                      <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727] mb-2" />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                          <ArrowUpAZ className="mr-2 h-4 w-4" />
-                          <span>Ascending</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <ArrowDownAZ className="mr-2 h-4 w-4" />
-                          <span>Descending</span>
-                        </DropdownMenuItem>
-                        {/* <DropdownMenuItem>
-                          <Input placeholder="Search..." className="w-full" />
-                        </DropdownMenuItem> */}
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="flex justify-center items-center gap-2">
-                  Total Quantity
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <ArrowUpDown className="h-4 w-4 cursor-pointer" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="min-w-[10rem]">
-                      <DropdownMenuLabel>
-                        Sort by
-                      </DropdownMenuLabel>
-                      <DropdownMenuSeparator className="bg-gray-200 dark:bg-[#272727] mb-2" />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                          <ArrowUpAZ className="mr-2 h-4 w-4" />
-                          <span>Ascending</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <ArrowDownAZ className="mr-2 h-4 w-4" />
-                          <span>Descending</span>
-                        </DropdownMenuItem>
-                        {/* <DropdownMenuItem>
-                          <Input placeholder="Search..." className="w-full" />
-                        </DropdownMenuItem> */}
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </TableHead>
-              <TableHead className="text-center">Action</TableHead>
-            </TableRow>
+            {table.getHeaderGroups().map(headerGroup => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map(header => (
+                  <TableHead key={header.id} className="text-center">
+                    {header.isPlaceholder ? null : flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
           </TableHeader>
           <TableBody>
-            <ErrorBoundary
-              onReset={reset}
-              fallbackRender={({ resetErrorBoundary }) => (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <span>There was an error loading the import orders.</span>
-                      <Button
-                        onClick={() => resetErrorBoundary()}
-                        variant="outline"
-                        className="bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary"
-                      >
-                        Try again
-                      </Button>
+            {isFetching ? (
+              <SaleDataLoading />
+            ) : table.getRowModel().rows.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="h-24 text-muted-foreground text-center">
+                  {debouncedSearchValue ? (
+                    <div className="flex flex-col items-center gap-1">
+                      <span>
+                        No orders found matching &quot;<span className="font-medium">{debouncedSearchValue}</span>&quot;
+                      </span>
+                      <span className="text-sm">
+                        Try adjusting your search to find what you&apos;re looking for.
+                      </span>
                     </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            >
-              <SaleData
-                data={data}
-                table={table}
-              />
-            </ErrorBoundary>
+                  ) : (
+                    'No orders available.'
+                  )}
+                </TableCell>
+              </TableRow>
+            ) : (
+              <ErrorBoundary
+                onReset={reset}
+                fallbackRender={({ resetErrorBoundary }) => (
+                  <TableRow>
+                    <TableCell colSpan={7} className="h-24 text-center">
+                      <div className="flex flex-col items-center gap-2">
+                        <span>There was an error loading the sale orders.</span>
+                        <Button
+                          onClick={() => resetErrorBoundary()}
+                          variant="outline"
+                          className="bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary"
+                        >
+                          Try again
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+              >
+                <SaleData
+                  data={data}
+                  table={table}
+                />
+              </ErrorBoundary>
+            )}
           </TableBody>
         </Table>
       </div>

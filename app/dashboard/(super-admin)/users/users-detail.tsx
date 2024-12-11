@@ -198,9 +198,10 @@ export default function UsersDetail({ user, onClose }: { user: UserDetail, onClo
       <DialogFooter>
         <Button
           onClick={onClose}
-          className="bg-black text-white hover:bg-black dark:bg-primary/10 dark:text-primary"
+          className="bg-accent"
+          variant="outline"
         >
-          Close
+          Cancel
         </Button>
       </DialogFooter>
     </div>

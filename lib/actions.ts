@@ -51,3 +51,33 @@ export async function checkAuth() {
     return { isAuthenticated: false }
   }
 }
+
+export async function resetPassword(token: string, newPassword: string) {
+  try {
+    const response = await ApiClientService.resetPassword(token, newPassword)
+    if (response.statusCode === 200) {
+      return { success: true }
+    }
+    return { success: false, error: 'Failed to reset password' }
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'An unexpected error occurred' }
+  }
+}
+
+export async function validateResetToken(token: string) {
+  try {
+    const isValid = await ApiClientService.validateResetToken(token)
+    return { success: isValid }
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Invalid or expired token' }
+  }
+}
+
+export async function checkEmailExists(email: string) {
+  try {
+    const exists = await ApiClientService.checkEmail(email)
+    return { success: true, exists }
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to check email' }
+  }
+}

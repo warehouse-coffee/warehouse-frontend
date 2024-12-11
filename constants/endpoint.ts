@@ -27,17 +27,24 @@ export const API_ENDPOINTS = {
   DELETE_STORAGE: '/api/dashboard/admin/storages/delete',
   UPDATE_STORAGE: '/api/dashboard/admin/storages/update',
   GET_REPORT_STORAGE: '/api/dashboard/admin/reports',
+  GET_PRODUCT_LIST: '/api/dashboard/product/list',
   GET_PRODUCT_ORDER: '/api/dashboard/product/product-order',
   GET_TOP_ORDERS: '/api/dashboard/employee/orders/top5',
   GET_SALE_ORDERS: '/api/dashboard/employee/orders/sale/list',
   CREATE_SALE_ORDER: '/api/dashboard/employee/orders/sale/create',
   GET_CUSTOMER_LIST: '/api/dashboard/customer/list',
   GET_CATEGORY_LIST: '/api/dashboard/category/list',
+  CREATE_CATEGORY: '/api/dashboard/category/create',
+  DELETE_CATEGORY: '/api/dashboard/category/delete',
   GET_STORAGE_LIST: '/api/dashboard/storage/list',
   CREATE_COMPANY: '/api/dashboard/superadmin/companies/create',
   UPDATE_COMPANY: '/api/dashboard/superadmin/companies/update',
   DELETE_COMPANY: '/api/dashboard/superadmin/companies/delete',
-  GET_COMPANY_DETAIL: '/api/dashboard/superadmin/companies/detail'
+  GET_COMPANY_DETAIL: '/api/dashboard/superadmin/companies/detail',
+  GET_INVENTORY_LIST_BY_STORAGE: '/api/dashboard/employee/inventory/list',
+  ACTIVATE_EMPLOYEE: '/api/dashboard/admin/employees/activate',
+  GET_SAFE_STOCK: '/api/dashboard/employee/inventory/safe-stock/get',
+  UPDATE_SAFE_STOCK: '/api/dashboard/employee/inventory/safe-stock/update'
 } as const
 
 export type ApiEndpoint = typeof API_ENDPOINTS[keyof typeof API_ENDPOINTS]

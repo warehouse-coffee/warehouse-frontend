@@ -28,6 +28,8 @@ export const useUpdateStorage = (onComplete: () => void) => {
     mutationFn: updateStorage,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['storages'] })
+
+      queryClient.invalidateQueries({ queryKey: ['userStorageList'] })
       toast.success('Storage updated successfully')
     },
     onError: (error) => {

@@ -1,7 +1,7 @@
 import {
   IdentityUserClient,
-  Client,
   SignInCommand,
+  ResetPasswordCommand,
   SwaggerException
 } from '@/app/api/web-api-client'
 
@@ -69,42 +69,41 @@ export class ApiClientService {
 
   static async validateResetToken(token: string) {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/auth/validate-reset-token`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ token })
-      })
-
-      if (!response.ok) {
-        throw new Error('Invalid or expired token')
-      }
-
-      const data = await response.json()
-      return data
+      const client = this.createClient(IdentityUserClient, {})
+      const response = await client.checkEmail(token)
+      return response
     } catch (error) {
+      if (error instanceof SwaggerException) {
+        throw new Error(error.message)
+      }
       throw new Error('Failed to validate reset token')
     }
   }
 
   static async resetPassword(token: string, newPassword: string) {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/auth/reset-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ token, newPassword })
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to reset password')
-      }
-
-      return true
+      const client = this.createClient(IdentityUserClient, {})
+      const command = new ResetPasswordCommand()
+      command.init({ token, newPassword })
+      const response = await client.resetPassword(command)
+      return response
     } catch (error) {
+      if (error instanceof SwaggerException) {
+        throw new Error(error.message)
+      }
       throw new Error('Failed to reset password')
+    }
+  }
+
+  static async checkEmail(email: string) {
+    try {
+      const client = this.createClient(IdentityUserClient, {})
+      return await client.checkEmail(email)
+    } catch (error) {
+      if (error instanceof SwaggerException) {
+        throw new Error(error.message)
+      }
+      throw new Error('Failed to check email')
     }
   }
 }

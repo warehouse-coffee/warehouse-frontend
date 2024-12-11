@@ -68,7 +68,7 @@ export function DashboardCards({ id, userRole }: DashboardCardsProps) {
         <Card id={`${id}-total-employees`} className="hover:bg-accent/50 transition-colors">
           <CardHeader>
             <CardTitle>Total Employees</CardTitle>
-            <CardDescription>All employees registered in system</CardDescription>
+            <CardDescription>All activate employees in system</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">
@@ -79,12 +79,12 @@ export function DashboardCards({ id, userRole }: DashboardCardsProps) {
 
         <Card id={`${id}-total-orders`} className="hover:bg-accent/50 transition-colors">
           <CardHeader>
-            <CardTitle>Total Orders</CardTitle>
-            <CardDescription>All orders registered in system</CardDescription>
+            <CardTitle>Order Completion</CardTitle>
+            <CardDescription>Rate orders have been completed</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">
-              <NumberTicker value={stats.orderCompletionRate} />
+              <NumberTicker value={stats.orderCompletionRate}/>%
             </p>
           </CardContent>
         </Card>
@@ -104,18 +104,18 @@ export function DashboardCards({ id, userRole }: DashboardCardsProps) {
         <Card id={`${id}-high-demand`} className="hover:bg-accent/50 transition-colors">
           <CardHeader>
             <CardTitle>High Demand Items</CardTitle>
-            <CardDescription>Current top-selling items</CardDescription>
+            <CardDescription>Current top-ordered items</CardDescription>
           </CardHeader>
           <CardContent>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <p className="text-2xl font-bold cursor-help">
-                    <NumberTicker value={stats.highDemandItemCount} />
+                    {stats.highDemandItemName}
                   </p>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{stats.highDemandItemName}</p>
+                  <p>{stats.highDemandItemCount} Units</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

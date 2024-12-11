@@ -1,33 +1,15 @@
 'use client'
 
-import { format } from 'date-fns'
-import { CalendarIcon } from 'lucide-react'
-import { useEffect, useState, useMemo } from 'react'
+import { DollarSign, Package, ShoppingCart } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 import { DateRange } from 'react-day-picker'
 
 import { ReportVM, WarehousePerformance, ImportSummary, ProductPerformance } from '@/app/api/web-api-client'
+import NumberTicker from '@/components/magicui/number-ticker'
 import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from '@/components/ui/popover'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from '@/components/ui/tooltip'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { DateTimeRangePicker24h } from '@/components/ui/date-time-picker'
+import { TransitionPanel } from '@/components/ui/transition-panel'
 import { useReportStorage } from '@/hooks/report'
 import { cn } from '@/lib/utils'
 
@@ -35,18 +17,21 @@ import { ImportStatistics } from './import-statistics'
 import { ProductComparison } from './product-comparison'
 import { WarehouseStatistics } from './warehouse-statistics'
 
+const TABS = [
+  { id: 0, label: 'Warehouse Statistics' },
+  { id: 1, label: 'Import Statistics' },
+  { id: 2, label: 'Product Comparison' }
+] as const
+
 export default function ReportStorages() {
-  const [startDate, setStartDate] = useState<Date>(() => {
-    const now = new Date()
-    return new Date(now.getFullYear(), now.getMonth(), 1)
+  const [dateRange, setDateRange] = useState<DateRange>({
+    from: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+    to: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)
   })
 
-  const [endDate, setEndDate] = useState<Date>(() => {
-    const now = new Date()
-    return new Date(now.getFullYear(), now.getMonth() + 1, 0)
-  })
+  const [activeTab, setActiveTab] = useState(0)
 
-  const { data }: { data: ReportVM } = useReportStorage(startDate, endDate)
+  const { data }: { data: ReportVM } = useReportStorage(dateRange.from as Date, dateRange.to as Date)
   const [warehouseStatistics, setWarehouseStatistics] = useState<WarehousePerformance[]>([])
   const [importStatistics, setImportStatistics] = useState<ImportSummary[]>([])
   const [topProducts, setTopProducts] = useState<ProductPerformance[]>([])
@@ -61,125 +46,100 @@ export default function ReportStorages() {
     }
   }, [data])
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value)
-  }
-
-  const formatNumber = (value: number) => {
-    return new Intl.NumberFormat('en-US').format(value)
-  }
-
-  const truncateValue = (value: string, maxLength: number = 8) => {
-    return value.length > maxLength ? value.slice(0, 4) + '...' : value
-  }
-
-  const renderSummaryItem = (label: string, value: number, isCurrency: boolean = true) => {
-    const formattedValue = isCurrency ? formatCurrency(value) : formatNumber(value)
-    const displayValue = truncateValue(formattedValue)
-
-    return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="text-center">
-              <p className="text-sm font-medium text-muted-foreground">{label}</p>
-              <p className="text-2xl font-bold">{displayValue}</p>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{formattedValue}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    )
-  }
+  const renderStatCard = (title: string, description: string, value: number, icon: React.ReactNode, delay: number, showCurrency: boolean = true) => (
+    <Card className="hover:bg-accent/50 transition-colors">
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between">
+          {title}
+          <div className="flex items-center justify-center w-8 h-8 rounded-full border">
+            {icon}
+          </div>
+        </CardTitle>
+        <CardDescription>{description}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-baseline">
+          {showCurrency && <span className="text-2xl font-bold">$</span>}
+          <NumberTicker
+            value={value}
+            className="text-2xl font-bold"
+            delay={delay}
+          />
+        </div>
+      </CardContent>
+    </Card>
+  )
 
   return (
-    <div className="container mx-auto p-4">
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Report Storages</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div className="grid grid-cols-3 gap-4">
-              {renderSummaryItem('Total Revenue', data?.totalRevenue ?? 0)}
-              {renderSummaryItem('Total Import Cost', data?.totalImportCost ?? 0)}
-              {renderSummaryItem('Total Orders', data?.totalOrders ?? 0, false)}
-            </div>
-            <div className="flex gap-4">
-              <div>
-                <p className="mb-2 text-sm font-medium">Start Date</p>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        'w-[200px] justify-start text-left font-normal'
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {format(startDate, 'dd/MM/yyyy')}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={startDate}
-                      onSelect={(date) => date && setStartDate(date)}
-                      initialFocus
-                      disabled={(date) => date > endDate}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
+    <section className="w-full mt-[1.5rem]">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+        {renderStatCard(
+          'Total Sale Cost',
+          'Total revenue generated from sales',
+          data?.totalRevenue ?? 0,
+          <DollarSign className="h-4 w-4 text-muted-foreground" />,
+          0
+        )}
+        {renderStatCard(
+          'Total Import Cost',
+          'Total cost of imports',
+          data?.totalImportCost ?? 0,
+          <Package className="h-4 w-4 text-muted-foreground" />,
+          0.2
+        )}
+        {renderStatCard(
+          'Total Completed Orders',
+          'Total number of orders completed',
+          data?.totalOrders ?? 0,
+          <ShoppingCart className="h-4 w-4 text-muted-foreground" />,
+          0.4,
+          false
+        )}
+      </div>
 
-              <div>
-                <p className="mb-2 text-sm font-medium">End Date</p>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        'w-[200px] justify-start text-left font-normal'
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {format(endDate, 'dd/MM/yyyy')}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={endDate}
-                      onSelect={(date) => date && setEndDate(date)}
-                      initialFocus
-                      disabled={(date) => date < startDate}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
+      <div className="max-w-[20rem] mb-5">
+        <DateTimeRangePicker24h
+          dateRange={dateRange}
+          onChange={setDateRange}
+        />
+      </div>
+
+      <div className="inline-flex h-9 items-center w-full p-1 text-muted-foreground mb-5 gap-x-3">
+        {TABS.map((tab) => (
+          <Button
+            key={tab.id}
+            className={cn(
+              'w-1/3 px-3 bg-transparent hover:bg-primary hover:text-white hover:dark:bg-primary/10 hover:dark:text-primary text-muted-foreground',
+              activeTab === tab.id && 'bg-black text-white dark:bg-primary/10 dark:text-primary'
+            )}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label}
+          </Button>
+        ))}
+      </div>
+
+      <TransitionPanel
+        activeIndex={activeTab}
+        transition={{ duration: 0.3 }}
+        variants={{
+          enter: { opacity: 0, x: 20 },
+          center: { opacity: 1, x: 0 },
+          exit: { opacity: 0, x: -20 }
+        }}
+      >
+        {[
+          <div key="warehouse" className="space-y-6">
+            <WarehouseStatistics data={warehouseStatistics} />
+          </div>,
+          <div key="import" className="space-y-6">
+            <ImportStatistics data={importStatistics} />
+          </div>,
+          <div key="products" className="space-y-6">
+            <ProductComparison topProducts={topProducts} slowMovingProducts={slowMovingProducts} />
           </div>
-        </CardContent>
-      </Card>
-
-      <Tabs defaultValue="warehouse" className="mb-6">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
-          <TabsTrigger value="warehouse">Warehouse Statistics</TabsTrigger>
-          <TabsTrigger value="import">Import Statistics</TabsTrigger>
-          <TabsTrigger value="products">Product Comparison</TabsTrigger>
-        </TabsList>
-        <TabsContent value="warehouse">
-          <WarehouseStatistics {...warehouseStatistics} />
-        </TabsContent>
-        <TabsContent value="import">
-          <ImportStatistics {...importStatistics} />
-        </TabsContent>
-        <TabsContent value="products">
-          <ProductComparison topProducts={topProducts} slowMovingProducts={slowMovingProducts} />
-        </TabsContent>
-      </Tabs>
-    </div>
+        ]}
+      </TransitionPanel>
+    </section>
   )
 }

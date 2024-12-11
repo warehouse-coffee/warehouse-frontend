@@ -1,10 +1,10 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 import { cookieStore, tokenUtils } from '@/lib/auth'
 
 import { OrdersClient, GetImportOrderListQuery, Page } from '../../../../../web-api-client'
 
-export async function GET(request: Request) {
+export async function POST(request: NextRequest) {
   const token = cookieStore.get('auth_token')
 
   if (!token || !tokenUtils.isValid(token)) {

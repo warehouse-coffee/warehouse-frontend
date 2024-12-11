@@ -21,10 +21,10 @@ export type TopOrder = {
 
 export type TopOrderResponse = {
   saleOrders: TopOrder[]
-  importOrders: TopOrder[]
+  importOrder: TopOrder[]
 }
 
-export interface ImportOrderFormData {
+export type ImportOrderFormData = {
   totalPrice: number
   customerName: string
   customerPhoneNumber: string
@@ -41,7 +41,7 @@ export interface ImportOrderFormData {
   }[]
 }
 
-export interface SaleOrderFormData {
+export type SaleOrderFormData = {
   totalPrice: number
   customerId: number
   dateExport: string
