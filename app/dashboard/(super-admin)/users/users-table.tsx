@@ -277,7 +277,7 @@ export default function UsersTable() {
             />
             {isFetching && (
               <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                <Loader color="#fff" size="1.15rem" />
+                <Loader className="dark:stroke-white" size="1.15rem" />
               </div>
             )}
           </div>
@@ -337,7 +337,7 @@ export default function UsersTable() {
                           />
                           {isFilteringUsername && (
                             <div className="absolute right-2.5 top-1/2 -translate-y-1/2">
-                              <Loader color="#fff" size="1.15rem" />
+                              <Loader className="dark:stroke-white" size="1.15rem" />
                             </div>
                           )}
                         </div>

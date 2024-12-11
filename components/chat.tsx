@@ -122,6 +122,8 @@ export default function ChatBox() {
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
     if (inputMessage.trim()) {
+      setShowSuggestions(false)
+
       const newMessage: Message = { role: 'user', content: inputMessage.trim() }
       setMessages(prevMessages => [...prevMessages, newMessage])
       setInputMessage('')
@@ -178,6 +180,7 @@ export default function ChatBox() {
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (textareaRef.current) {
       setInputMessage(e.target.value)
+
       const textarea = textareaRef.current
       textarea.style.height = 'auto'
 
@@ -264,7 +267,7 @@ export default function ChatBox() {
           {isMinimized ? (
             <motion.div
               className="relative w-full h-full flex items-center justify-center cursor-pointer
-                bg-gradient-to-r from-[#4DA6FF] to-[#65B1FF] group"
+                dark:bg-gradient-to-r dark:from-[#4DA6FF] dark:to-[#65B1FF] group"
               onClick={toggleMinimize}
               initial={{ width: '3rem' }}
               whileHover={{
@@ -291,7 +294,7 @@ export default function ChatBox() {
 
               <motion.div
                 className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100
-                  bg-gradient-to-r from-[#4DA6FF]/20 to-[#65B1FF]/20 blur-md -z-10"
+                  dark:bg-gradient-to-r dark:from-[#4DA6FF]/20 dark:to-[#65B1FF]/20 dark:blur-md -z-10"
                 initial={{ scale: 0.8 }}
                 whileHover={{
                   scale: 1.2,
@@ -305,8 +308,8 @@ export default function ChatBox() {
             </motion.div>
           ) : (
             <>
-              <CardHeader className="px-4 py-3 flex-shrink-0 border-b border-[#222222] bg-gradient-to-r
-                from-[#4DA6FF] to-[#65B1FF]">
+              <CardHeader className="px-4 py-3 flex-shrink-0 border-b border-b-gray-500 dark:border-[#222222]
+                dark:bg-gradient-to-r dark:from-[#4DA6FF] dark:to-[#65B1FF]">
                 <div className="flex justify-between items-center">
                   <CardTitle className="text-white flex items-center gap-1.5">
                     <Bot className="h-[1.4rem] w-[1.4rem]" />
@@ -333,7 +336,7 @@ export default function ChatBox() {
                 </div>
               </CardHeader>
 
-              <CardContent className="px-3.5 pt-4 pb-0 flex-grow overflow-hidden bg-[#111111] h-[400px]">
+              <CardContent className="px-3.5 pt-4 pb-0 flex-grow overflow-hidden bg-card dark:bg-[#111111] h-[400px]">
                 <ScrollArea className="h-full pr-3">
                   {showSuggestions && !isMinimized && (
                     <motion.div
@@ -351,7 +354,7 @@ export default function ChatBox() {
                       </motion.div>
 
                       <motion.div
-                        className="max-w-[85%] inline-block px-3 py-2 shadow-sm bg-[#1A1A1A] text-gray-100 rounded-[.75rem] rounded-tl-sm border border-[#2A2A2A]"
+                        className="max-w-[85%] inline-block px-3 py-2 shadow-sm bg-black text-white dark:bg-[#1A1A1A] dark:text-gray-100 rounded-[.75rem] rounded-tl-sm dark:border dark:border-[#2A2A2A]"
                       >
                         <motion.p className="text-sm leading-relaxed whitespace-pre-wrap">
                           Here are some frequently asked questions you might be interested in:
@@ -363,7 +366,7 @@ export default function ChatBox() {
                           <Button
                             key={index}
                             variant="outline"
-                            className="w-full text-sm py-2 px-3 h-auto whitespace-normal text-left bg-[#1A1A1A] border-[#2A2A2A] hover:bg-[#2A2A2A] text-gray-100"
+                            className="w-full text-sm py-2 px-3 h-auto whitespace-normal text-left bg-black text-white dark:bg-[#1A1A1A] dark:text-gray-100 hover:bg-[#2A2A2A] dark:hover:bg-[#2A2A2A] dark:border dark:border-[#2A2A2A]"
                             onClick={() => handleSuggestionClick(button.prompt)}
                           >
                             {button.text}
@@ -396,8 +399,8 @@ export default function ChatBox() {
                         >
                           <div className={`max-w-[85%] inline-block px-3 py-2 shadow-sm
                             ${message.role === 'user'
-                          ? 'bg-gradient-to-r from-[#4DA6FF] to-[#65B1FF] text-white rounded-[.75rem] rounded-br-sm'
-                          : 'bg-[#1A1A1A] text-gray-100 rounded-[.75rem] rounded-tl-sm border border-[#2A2A2A]'
+                          ? 'dark:bg-gradient-to-r dark:from-[#4DA6FF] dark:to-[#65B1FF] bg-black text-white rounded-[.75rem] rounded-br-sm'
+                          : 'bg-black text-white dark:bg-[#1A1A1A] dark:text-gray-100 rounded-[.75rem] rounded-tl-sm dark:border dark:border-[#2A2A2A]'
                         }`}
                           >
                             <motion.p
@@ -425,7 +428,7 @@ export default function ChatBox() {
                       className="flex items-center space-x-1.5 ml-2 mb-5"
                     >
                       <motion.div
-                        className="w-2 h-2 bg-[#4DA6FF] rounded-full"
+                        className="w-2 h-2 bg-black text-white dark:bg-[#4DA6FF] rounded-full"
                         animate={{
                           y: [0, -6, 0]
                         }}
@@ -437,7 +440,7 @@ export default function ChatBox() {
                         }}
                       />
                       <motion.div
-                        className="w-2 h-2 bg-[#4DA6FF] rounded-full"
+                        className="w-2 h-2 bg-black text-white dark:bg-[#4DA6FF] rounded-full"
                         animate={{
                           y: [0, -6, 0]
                         }}
@@ -450,7 +453,7 @@ export default function ChatBox() {
                         }}
                       />
                       <motion.div
-                        className="w-2 h-2 bg-[#4DA6FF] rounded-full"
+                        className="w-2 h-2 bg-black text-white dark:bg-[#4DA6FF] rounded-full"
                         animate={{
                           y: [0, -6, 0]
                         }}
@@ -477,17 +480,17 @@ export default function ChatBox() {
                     value={inputMessage}
                     onChange={handleChange}
                     onKeyDown={handleKeyDown}
-                    className="flex-1 min-h-10 max-h-32 bg-[#1A1A1A] border border-[#2A2A2A] resize-none overflow-y-auto rounded-[.65rem] text-sm text-gray-100 placeholder:text-gray-500"
+                    className="flex-1 min-h-10 max-h-32 dark:bg-[#1A1A1A] border dark:border-[#2A2A2A] resize-none overflow-y-auto rounded-[.65rem] text-sm dark:text-gray-100 placeholder:text-gray-500"
                     rows={1}
                   />
                   <Button
                     variant='ghost'
-                    className='group bg-[#4DA6FF] hover:bg-[#3d96ff] rounded-[.65rem] transition-colors'
+                    className='group bg-white text-black dark:text-white dark:bg-[#4DA6FF] dark:hover:bg-[#3d96ff] rounded-[.65rem] transition-colors'
                     type="submit"
                     size="icon"
                     aria-label="Send message"
                   >
-                    <Send className="h-4 w-4 scale-110 group-hover:scale-125 text-white" />
+                    <Send className="h-4 w-4 scale-110 group-hover:scale-125" />
                   </Button>
                 </form>
               </CardFooter>

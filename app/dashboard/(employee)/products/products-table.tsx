@@ -331,7 +331,7 @@ export default function ProductsTable() {
             />
             {isFetching && (
               <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                <Loader color="#fff" size="1.15rem" />
+                <Loader className="dark:stroke-white" size="1.15rem" />
               </div>
             )}
           </div>

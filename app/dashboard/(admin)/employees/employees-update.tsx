@@ -256,7 +256,7 @@ export default function EmployeesUpdatePage({ id, onClose, isOpen }: { id: strin
               {updateEmployeeMutation.isPending ? (
                 <>
                   Saving...
-                  <Loader color="#62c5ff" size="1.25rem" />
+                  <Loader size="1.25rem" />
                 </>
               ) : (
                 'Save Changes'
@@ -326,8 +326,8 @@ export default function EmployeesUpdatePage({ id, onClose, isOpen }: { id: strin
               key={tab.id}
               variant={activeTab === tab.id ? 'default' : 'outline'}
               className={cn(
-                'transition-all duration-250',
-                activeTab === tab.id && 'bg-primary text-primary-foreground dark:bg-primary/10 dark:text-primary'
+                'transition-all duration-250 hover:bg-black hover:text-white hover:dark:bg-primary/10 hover:dark:text-primary',
+                activeTab === tab.id && 'bg-black text-white dark:bg-primary/10 dark:text-primary'
               )}
               onClick={() => setActiveTab(tab.id)}
             >

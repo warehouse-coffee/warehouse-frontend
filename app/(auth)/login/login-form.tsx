@@ -122,7 +122,7 @@ export default function LoginForm() {
           {isSubmitting ? (
             <>
               Logging in...
-              <Loader size='1.35rem' />
+              <Loader size='1.35rem' className='dark:stroke-white' />
             </>
           ) : (
             'Login'

@@ -28,7 +28,7 @@ export function TopOrders({ id }: { id: string }) {
           <Button
             variant={activeTab === 0 ? 'default' : 'ghost'}
             onClick={() => setActiveTab(0)}
-            className={`${activeTab === 0 ? 'text-white' : 'text-muted-foreground'}
+            className={`${activeTab === 0 ? 'text-black dark:text-white' : 'text-muted-foreground'}
               relative bg-transparent h-9 text-sm hover:bg-transparent px-4`}
           >
             Sale Orders
@@ -42,7 +42,7 @@ export function TopOrders({ id }: { id: string }) {
           <Button
             variant={activeTab === 1 ? 'default' : 'ghost'}
             onClick={() => setActiveTab(1)}
-            className={`${activeTab === 1 ? 'text-white' : 'text-muted-foreground'}
+            className={`${activeTab === 1 ? 'text-black dark:text-white' : 'text-muted-foreground'}
               relative bg-transparent h-9 text-sm hover:bg-transparent px-4`}
           >
             Import Orders

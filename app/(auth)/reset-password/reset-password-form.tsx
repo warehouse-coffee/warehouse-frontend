@@ -162,7 +162,7 @@ export default function ResetPasswordForm({ resetToken, email, tempPass, error: 
           {isLoading ? (
             <>
               Processing...
-              <Loader size='1.35rem' />
+              <Loader size='1.35rem' className='dark:stroke-white' />
             </>
           ) : (
             'Reset Password'

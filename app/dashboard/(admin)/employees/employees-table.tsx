@@ -265,7 +265,7 @@ export default function EmployeesTable() {
             />
             {isFetching && (
               <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                <Loader color="#fff" size="1.15rem" />
+                <Loader size="1.15rem" className='dark:stroke-white' />
               </div>
             )}
           </div>

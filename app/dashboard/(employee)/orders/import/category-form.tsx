@@ -117,7 +117,7 @@ export default function CategoryForm({ onClose }: { onClose: () => void }) {
                     {createCategoryMutation.isPending ? (
                       <>
                         Creating...
-                        <Loader color="#62c5ff" size="1.25rem" />
+                        <Loader size="1.25rem" />
                       </>
                     ) : (
                       'Add Category'
@@ -199,7 +199,7 @@ export default function CategoryForm({ onClose }: { onClose: () => void }) {
               {deleteCategoryMutation.isPending ? (
                 <>
                   Deleting...
-                  <Loader color="#62c5ff" size="1.25rem" />
+                  <Loader size="1.25rem" />
                 </>
               ) : (
                 'Delete'

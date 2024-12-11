@@ -110,7 +110,7 @@ export default function SafeStockForm({
           {updateSafeStockMutation.isPending ? (
             <>
               Saving...
-              <Loader color="#62c5ff" size="1.25rem" />
+              <Loader size="1.25rem" />
             </>
           ) : (
             'Save changes'

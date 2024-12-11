@@ -1,6 +1,8 @@
 import { keyframes } from '@emotion/react'
 import styled from '@emotion/styled'
 
+import { cn } from '@/lib/utils'
+
 const rotate = keyframes`
   100% {
     transform: rotate(360deg);
@@ -28,9 +30,8 @@ const StyledSvg = styled.svg<{ size: string }>`
   animation: ${rotate} 2s linear infinite;
 `
 
-const StyledCircle = styled.circle<{ color: string }>`
+const StyledCircle = styled.circle`
   fill: none;
-  stroke: ${props => props.color};
   stroke-width: 3;
   stroke-dasharray: 1, 200;
   stroke-dashoffset: 0;
@@ -40,14 +41,19 @@ const StyledCircle = styled.circle<{ color: string }>`
 `
 
 interface LoaderProps {
-  color?: string;
   size?: string;
+  className?: string;
 }
 
-export function Loader({ color = 'currentColor', size = '2rem' }: LoaderProps) {
+export function Loader({ size = '2rem', className }: LoaderProps) {
   return (
     <StyledSvg viewBox="25 25 50 50" size={size}>
-      <StyledCircle r="20" cy="50" cx="50" color={color} />
+      <StyledCircle
+        r="20"
+        cy="50"
+        cx="50"
+        className={cn('stroke-black dark:stroke-[#62c5ff]', className)}
+      />
     </StyledSvg>
   )
 }

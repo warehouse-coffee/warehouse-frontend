@@ -311,7 +311,7 @@ export default function ImportTable() {
             />
             {isFetching && (
               <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                <Loader color="#fff" size="1.15rem" />
+                <Loader className="dark:stroke-white" size="1.15rem" />
               </div>
             )}
           </div>
@@ -319,7 +319,7 @@ export default function ImportTable() {
         <div className="flex items-center gap-3">
           <Dialog open={dialogsOpen.manageCategory} onOpenChange={(open) => setDialogsOpen(prev => ({ ...prev, manageCategory: open }))}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="bg-gray-600/10 text-white dark:bg-gray-600/30 dark:text-white">
+              <Button variant="outline" className="bg-black text-white hover:bg-black hover:text-white dark:bg-primary/10 dark:text-primary">
                 <FolderKanban className="mr-2 h-4 w-4" />
                 <span>Manage Category</span>
               </Button>

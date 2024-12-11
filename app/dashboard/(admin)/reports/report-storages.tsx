@@ -163,12 +163,12 @@ export default function ReportStorages() {
         </div>
       </div>
 
-      <div className="inline-flex h-9 items-center w-full p-1 text-muted-foreground mb-5">
+      <div className="inline-flex h-9 items-center w-full p-1 text-muted-foreground mb-5 gap-x-3">
         {TABS.map((tab) => (
           <Button
             key={tab.id}
             className={cn(
-              'w-1/3 px-3 bg-transparent hover:dark:bg-primary/10 hover:dark:text-primary text-muted-foreground',
+              'w-1/3 px-3 bg-transparent hover:bg-black hover:text-white hover:dark:bg-primary/10 hover:dark:text-primary text-muted-foreground',
               activeTab === tab.id && 'bg-black text-white dark:bg-primary/10 dark:text-primary'
             )}
             onClick={() => setActiveTab(tab.id)}

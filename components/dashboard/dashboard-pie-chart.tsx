@@ -111,6 +111,14 @@ export function DashboardPieChart({ id, userRole }: DashboardPieChartProps) {
   tomorrowDate.setDate(tomorrowDate.getDate() + 1)
   const formattedTomorrowDate = tomorrowDate.toLocaleDateString('en-US', dateFormatOptions)
 
+  let tommorowDate = new Date(predictionData.date)
+  tommorowDate.setDate(tommorowDate.getDate() + 1)
+  const formattedtommorowDate = tommorowDate.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
+
   return (
     <Card className="flex flex-col" id={id}>
       <CardHeader className="items-center pb-0">
