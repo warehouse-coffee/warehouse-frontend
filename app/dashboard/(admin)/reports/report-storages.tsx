@@ -1,14 +1,21 @@
 'use client'
 
+import { format } from 'date-fns'
 import { DollarSign, Package, ShoppingCart } from 'lucide-react'
+import { CalendarIcon } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { DateRange } from 'react-day-picker'
 
 import { ReportVM, WarehousePerformance, ImportSummary, ProductPerformance } from '@/app/api/web-api-client'
 import NumberTicker from '@/components/magicui/number-ticker'
 import { Button } from '@/components/ui/button'
+import { Calendar } from '@/components/ui/calendar'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { DateTimeRangePicker24h } from '@/components/ui/date-time-picker'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from '@/components/ui/popover'
 import { TransitionPanel } from '@/components/ui/transition-panel'
 import { useReportStorage } from '@/hooks/report'
 import { cn } from '@/lib/utils'
@@ -24,14 +31,19 @@ const TABS = [
 ] as const
 
 export default function ReportStorages() {
-  const [dateRange, setDateRange] = useState<DateRange>({
-    from: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-    to: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)
+  const [startDate, setStartDate] = useState<Date>(() => {
+    const now = new Date()
+    return new Date(now.getFullYear(), now.getMonth(), 1)
+  })
+
+  const [endDate, setEndDate] = useState<Date>(() => {
+    const now = new Date()
+    return new Date(now.getFullYear(), now.getMonth() + 1, 0)
   })
 
   const [activeTab, setActiveTab] = useState(0)
 
-  const { data }: { data: ReportVM } = useReportStorage(dateRange.from as Date, dateRange.to as Date)
+  const { data }: { data: ReportVM } = useReportStorage(startDate, endDate)
   const [warehouseStatistics, setWarehouseStatistics] = useState<WarehousePerformance[]>([])
   const [importStatistics, setImportStatistics] = useState<ImportSummary[]>([])
   const [topProducts, setTopProducts] = useState<ProductPerformance[]>([])
@@ -97,11 +109,58 @@ export default function ReportStorages() {
         )}
       </div>
 
-      <div className="max-w-[20rem] mb-5">
-        <DateTimeRangePicker24h
-          dateRange={dateRange}
-          onChange={setDateRange}
-        />
+      <div className="max-w-[20rem] mb-5 flex gap-4">
+        <div>
+          <p className="mb-2 text-sm font-medium">Start Date</p>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  'w-[200px] justify-start text-left font-normal'
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {format(startDate, 'dd/MM/yyyy')}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={startDate}
+                onSelect={(date) => date && setStartDate(date)}
+                initialFocus
+                disabled={(date) => date > endDate}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        <div>
+          <p className="mb-2 text-sm font-medium">End Date</p>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  'w-[200px] justify-start text-left font-normal'
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {format(endDate, 'dd/MM/yyyy')}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={endDate}
+                onSelect={(date) => date && setEndDate(date)}
+                initialFocus
+                disabled={(date) => date < startDate}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
       </div>
 
       <div className="inline-flex h-9 items-center w-full p-1 text-muted-foreground mb-5 gap-x-3">
