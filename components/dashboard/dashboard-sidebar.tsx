@@ -15,7 +15,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
 import { DashboardSidebarItems } from '@/types'
 
-const sidebarItems: DashboardSidebarItems[] = [
+export const sidebarItems: DashboardSidebarItems[] = [
   { name: 'Dashboard', href: '/dashboard', icon: Home, requiredRoles: ['Super-Admin', 'Admin', 'Employee'] },
   { name: 'Storages', href: '/dashboard/storages', icon: Warehouse, requiredRoles: ['Admin'] },
   { name: 'Inventory', href: '/dashboard/inventory', icon: Warehouse, requiredRoles: ['Employee'] },

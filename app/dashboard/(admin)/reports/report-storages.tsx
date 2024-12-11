@@ -110,8 +110,8 @@ export default function ReportStorages() {
       </div>
 
       <div className="max-w-[20rem] mb-5 flex gap-4">
-        <div>
-          <p className="mb-2 text-sm font-medium">Start Date</p>
+        <div className="flex items-center gap-4">
+          <p className="text-sm font-medium">From</p>
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -136,8 +136,8 @@ export default function ReportStorages() {
           </Popover>
         </div>
 
-        <div>
-          <p className="mb-2 text-sm font-medium">End Date</p>
+        <div className="flex items-center gap-4">
+          <p className="text-sm font-medium">To</p>
           <Popover>
             <PopoverTrigger asChild>
               <Button

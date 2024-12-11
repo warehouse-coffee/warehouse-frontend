@@ -34,7 +34,7 @@ export function TopOrders({ id }: { id: string }) {
             Sale Orders
             {activeTab === 0 && (
               <motion.div
-                className="absolute bottom-0 left-0 right-0 h-[.1rem] bg-primary"
+                className="absolute bottom-0 left-0 right-0 h-[.1rem] dark:bg-primary bg-black"
                 layoutId="activeTab"
               />
             )}

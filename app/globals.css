@@ -83,10 +83,10 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-primary/75 rounded-[.5rem];
+    @apply dark:bg-primary/75 bg-black/75 rounded-[.5rem];
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-gray-400/20;
+    @apply dark:bg-gray-400/20 bg-gray-400/20;
   }
 }

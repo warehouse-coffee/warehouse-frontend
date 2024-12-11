@@ -319,7 +319,7 @@ export default function ImportTable() {
         <div className="flex items-center gap-3">
           <Dialog open={dialogsOpen.manageCategory} onOpenChange={(open) => setDialogsOpen(prev => ({ ...prev, manageCategory: open }))}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="bg-black text-white hover:bg-black hover:text-white dark:bg-primary/10 dark:text-primary">
+              <Button variant="outline" className="bg-black text-white hover:bg-black hover:text-white dark:bg-gray-600/30 dark:text-white">
                 <FolderKanban className="mr-2 h-4 w-4" />
                 <span>Manage Category</span>
               </Button>

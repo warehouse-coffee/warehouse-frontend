@@ -1,6 +1,7 @@
 import { PanelRight, PanelLeftClose, Bell, LogOut, User, Settings } from 'lucide-react'
 import React from 'react'
 
+import { CommandMenu } from '@/components/command-menu'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -12,7 +13,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { Input } from '@/components/ui/input'
 import { useAuth } from '@/hooks/useAuth'
 
 interface DashboardHeaderProps {
@@ -30,11 +30,7 @@ export default function DashboardHeader({ toggleSidebar, sidebarOpen, onLogout }
         <Button variant="ghost" size="icon" className='rounded-full hover:bg-[#dbdbdb7a] dark:hover:bg-[#272727] cursor-pointer' onClick={toggleSidebar}>
           {sidebarOpen ? <PanelLeftClose className="h-5 w-5 text-black dark:text-white" /> : <PanelRight className="h-5 w-5 text-black dark:text-white" />}
         </Button>
-        <Input
-          type="search"
-          placeholder="Search..."
-          className="md:w-[300px] lg:w-[400px]"
-        />
+        <CommandMenu />
       </div>
       <div className="flex items-center space-x-3">
         <ThemeToggle storageKey="dashboard-theme" />
