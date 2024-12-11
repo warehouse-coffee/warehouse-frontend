@@ -128,7 +128,7 @@ export default function ForgotPasswordForm() {
           {isLoading ? (
             <>
               Processing...
-              <Loader size='1.35rem' />
+              <Loader size='1.35rem' className='dark:stroke-white' />
             </>
           ) : (
             'Send Reset Link'

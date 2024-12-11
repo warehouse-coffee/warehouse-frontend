@@ -109,7 +109,7 @@ export default function ReportStorages() {
           <Button
             key={tab.id}
             className={cn(
-              'w-1/3 px-3 bg-transparent hover:bg-primary hover:text-white hover:dark:bg-primary/10 hover:dark:text-primary text-muted-foreground',
+              'w-1/3 px-3 bg-transparent hover:bg-black hover:text-white hover:dark:bg-primary/10 hover:dark:text-primary text-muted-foreground',
               activeTab === tab.id && 'bg-black text-white dark:bg-primary/10 dark:text-primary'
             )}
             onClick={() => setActiveTab(tab.id)}

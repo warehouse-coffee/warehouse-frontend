@@ -149,7 +149,7 @@ export default function AddUserForm({ onClose }: { onClose: () => void }) {
           {createUserMutation.isPending ? (
             <>
               Adding...
-              <Loader color="#62c5ff" size="1.25rem" />
+              <Loader size="1.25rem" />
             </>
           ) : (
             'Add user'

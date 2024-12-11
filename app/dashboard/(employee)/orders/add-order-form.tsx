@@ -394,7 +394,7 @@ const ImportOrderForm = ({ onClose }: { onClose: () => void }) => {
           {createImportOrderMutation.isPending ? (
             <>
               Creating...
-              <Loader color="#62c5ff" size="1.25rem" />
+              <Loader size="1.25rem" />
             </>
           ) : (
             'Add Import Order'
@@ -698,7 +698,7 @@ const SaleOrderForm = ({ onClose }: { onClose: () => void }) => {
           {createSaleOrderMutation.isPending ? (
             <>
               Creating...
-              <Loader color="#62c5ff" size="1.25rem" />
+              <Loader size="1.25rem" />
             </>
           ) : (
             'Add Sale Order'

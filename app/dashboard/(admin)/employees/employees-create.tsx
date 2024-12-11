@@ -14,14 +14,14 @@ import {
   PaginationContent,
   PaginationItem,
   PaginationNext,
-  PaginationPrevious,
+  PaginationPrevious
 } from '@/components/ui/pagination'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
-  TooltipTrigger,
+  TooltipTrigger
 } from '@/components/ui/tooltip'
 import { useCreateEmployee } from '@/hooks/employee'
 import { useUserStorageList } from '@/hooks/storage'
@@ -243,7 +243,7 @@ export default function EmployeesCreate({ onClose }: EmployeesCreateProps) {
           {createEmployeeMutation.isPending ? (
             <>
               Creating...
-              <Loader color="#62c5ff" size="1.25rem" />
+              <Loader size="1.25rem" />
             </>
           ) : (
             'Create Employee'

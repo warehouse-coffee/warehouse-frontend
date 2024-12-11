@@ -8,7 +8,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 
-
 export default function AboutUs() {
   const [isSubmitted, setIsSubmitted] = useState(false)
 

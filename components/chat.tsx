@@ -122,6 +122,8 @@ export default function ChatBox() {
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
     if (inputMessage.trim()) {
+      setShowSuggestions(false)
+
       const newMessage: Message = { role: 'user', content: inputMessage.trim() }
       setMessages(prevMessages => [...prevMessages, newMessage])
       setInputMessage('')
@@ -178,22 +180,23 @@ export default function ChatBox() {
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (textareaRef.current) {
       setInputMessage(e.target.value)
+
       const textarea = textareaRef.current
       textarea.style.height = 'auto'
 
       const scrollHeight = textarea.scrollHeight
       const maxHeight = 3 * parseFloat(getComputedStyle(textarea).lineHeight)
 
-            textarea.style.height = `${Math.min(scrollHeight, maxHeight)}px`
-        }
+      textarea.style.height = `${Math.min(scrollHeight, maxHeight)}px`
     }
+  }
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault()
-            handleSendMessage(e)
-        }
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSendMessage(e)
     }
+  }
 
   const handleSuggestionClick = async (prompt: string) => {
     setShowSuggestions(false)
@@ -264,76 +267,76 @@ export default function ChatBox() {
           {isMinimized ? (
             <motion.div
               className="relative w-full h-full flex items-center justify-center cursor-pointer
-                bg-gradient-to-r from-[#4DA6FF] to-[#65B1FF] group"
-                            onClick={toggleMinimize}
-                            initial={{ width: '3rem' }}
-                            whileHover={{
-                                width: '9rem',
-                                transition: {
-                                    type: 'spring',
-                                    stiffness: 400,
-                                    damping: 25
-                                }
-                            }}
-                            whileTap={{ scale: 0.95 }}
-                        >
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-12 flex justify-center flex-shrink-0">
-                                    <MessageCircle className="h-5 w-5 text-white" />
-                                </div>
-                                <span
-                                    className="text-white text-sm font-medium -ml-1 whitespace-nowrap overflow-hidden w-0
+                dark:bg-gradient-to-r dark:from-[#4DA6FF] dark:to-[#65B1FF] group"
+              onClick={toggleMinimize}
+              initial={{ width: '3rem' }}
+              whileHover={{
+                width: '9rem',
+                transition: {
+                  type: 'spring',
+                  stiffness: 400,
+                  damping: 25
+                }
+              }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-12 flex justify-center flex-shrink-0">
+                  <MessageCircle className="h-5 w-5 text-white" />
+                </div>
+                <span
+                  className="text-white text-sm font-medium -ml-1 whitespace-nowrap overflow-hidden w-0
                     group-hover:w-auto transition-all duration-250 opacity-0 group-hover:opacity-100"
                 >
                   Chat with AI
                 </span>
               </div>
 
-                            <motion.div
-                                className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100
-                  bg-gradient-to-r from-[#4DA6FF]/20 to-[#65B1FF]/20 blur-md -z-10"
-                                initial={{ scale: 0.8 }}
-                                whileHover={{
-                                    scale: 1.2,
-                                    transition: {
-                                        repeat: Infinity,
-                                        repeatType: 'reverse',
-                                        duration: 1
-                                    }
-                                }}
-                            />
-                        </motion.div>
-                    ) : (
-                        <>
-                            <CardHeader className="px-4 py-3 flex-shrink-0 border-b border-[#222222] bg-gradient-to-r
-                from-[#4DA6FF] to-[#65B1FF]">
-                                <div className="flex justify-between items-center">
-                                    <CardTitle className="text-white flex items-center gap-1.5">
-                                        <Bot className="h-[1.4rem] w-[1.4rem]" />
-                                        <span className="text-[1.1rem] font-medium">AI Assistant</span>
-                                    </CardTitle>
-                                    <div className="flex space-x-1">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={resetChat}
-                                            className="hover:bg-white/20 text-white/90 h-8 w-8"
-                                        >
-                                            <RotateCcw className="h-4 w-4" />
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={toggleMinimize}
-                                            className="hover:bg-white/20 text-white/90 h-8 w-8"
-                                        >
-                                            <Minimize2 className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                </div>
-                            </CardHeader>
+              <motion.div
+                className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100
+                  dark:bg-gradient-to-r dark:from-[#4DA6FF]/20 dark:to-[#65B1FF]/20 dark:blur-md -z-10"
+                initial={{ scale: 0.8 }}
+                whileHover={{
+                  scale: 1.2,
+                  transition: {
+                    repeat: Infinity,
+                    repeatType: 'reverse',
+                    duration: 1
+                  }
+                }}
+              />
+            </motion.div>
+          ) : (
+            <>
+              <CardHeader className="px-4 py-3 flex-shrink-0 border-b border-b-gray-500 dark:border-[#222222]
+                dark:bg-gradient-to-r dark:from-[#4DA6FF] dark:to-[#65B1FF]">
+                <div className="flex justify-between items-center">
+                  <CardTitle className="text-white flex items-center gap-1.5">
+                    <Bot className="h-[1.4rem] w-[1.4rem]" />
+                    <span className="text-[1.1rem] font-medium">AI Assistant</span>
+                  </CardTitle>
+                  <div className="flex space-x-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={resetChat}
+                      className="hover:bg-white/20 text-white/90 h-8 w-8"
+                    >
+                      <RotateCcw className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={toggleMinimize}
+                      className="hover:bg-white/20 text-white/90 h-8 w-8"
+                    >
+                      <Minimize2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
 
-              <CardContent className="px-3.5 pt-4 pb-0 flex-grow overflow-hidden bg-[#111111] h-[400px]">
+              <CardContent className="px-3.5 pt-4 pb-0 flex-grow overflow-hidden bg-card dark:bg-[#111111] h-[400px]">
                 <ScrollArea className="h-full pr-3">
                   {showSuggestions && !isMinimized && (
                     <motion.div
@@ -351,7 +354,7 @@ export default function ChatBox() {
                       </motion.div>
 
                       <motion.div
-                        className="max-w-[85%] inline-block px-3 py-2 shadow-sm bg-[#1A1A1A] text-gray-100 rounded-[.75rem] rounded-tl-sm border border-[#2A2A2A]"
+                        className="max-w-[85%] inline-block px-3 py-2 shadow-sm bg-black text-white dark:bg-[#1A1A1A] dark:text-gray-100 rounded-[.75rem] rounded-tl-sm dark:border dark:border-[#2A2A2A]"
                       >
                         <motion.p className="text-sm leading-relaxed whitespace-pre-wrap">
                           Here are some frequently asked questions you might be interested in:
@@ -363,7 +366,7 @@ export default function ChatBox() {
                           <Button
                             key={index}
                             variant="outline"
-                            className="w-full text-sm py-2 px-3 h-auto whitespace-normal text-left bg-[#1A1A1A] border-[#2A2A2A] hover:bg-[#2A2A2A] text-gray-100"
+                            className="w-full text-sm py-2 px-3 h-auto whitespace-normal text-left bg-black text-white dark:bg-[#1A1A1A] dark:text-gray-100 hover:bg-[#2A2A2A] dark:hover:bg-[#2A2A2A] dark:border dark:border-[#2A2A2A]"
                             onClick={() => handleSuggestionClick(button.prompt)}
                           >
                             {button.text}
@@ -396,8 +399,8 @@ export default function ChatBox() {
                         >
                           <div className={`max-w-[85%] inline-block px-3 py-2 shadow-sm
                             ${message.role === 'user'
-                          ? 'bg-gradient-to-r from-[#4DA6FF] to-[#65B1FF] text-white rounded-[.75rem] rounded-br-sm'
-                          : 'bg-[#1A1A1A] text-gray-100 rounded-[.75rem] rounded-tl-sm border border-[#2A2A2A]'
+                          ? 'dark:bg-gradient-to-r dark:from-[#4DA6FF] dark:to-[#65B1FF] bg-black text-white rounded-[.75rem] rounded-br-sm'
+                          : 'bg-black text-white dark:bg-[#1A1A1A] dark:text-gray-100 rounded-[.75rem] rounded-tl-sm dark:border dark:border-[#2A2A2A]'
                         }`}
                           >
                             <motion.p
@@ -416,58 +419,58 @@ export default function ChatBox() {
                     </AnimatePresence>
                   )}
 
-                                    {isThinking && (
-                                        <motion.div
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            transition={{ duration: 0.3 }}
-                                            className="flex items-center space-x-1.5 ml-2 mb-5"
-                                        >
-                                            <motion.div
-                                                className="w-2 h-2 bg-[#4DA6FF] rounded-full"
-                                                animate={{
-                                                    y: [0, -6, 0]
-                                                }}
-                                                transition={{
-                                                    duration: 0.6,
-                                                    repeat: Infinity,
-                                                    ease: 'easeInOut',
-                                                    times: [0, 0.5, 1]
-                                                }}
-                                            />
-                                            <motion.div
-                                                className="w-2 h-2 bg-[#4DA6FF] rounded-full"
-                                                animate={{
-                                                    y: [0, -6, 0]
-                                                }}
-                                                transition={{
-                                                    duration: 0.6,
-                                                    repeat: Infinity,
-                                                    ease: 'easeInOut',
-                                                    times: [0, 0.5, 1],
-                                                    delay: 0.15
-                                                }}
-                                            />
-                                            <motion.div
-                                                className="w-2 h-2 bg-[#4DA6FF] rounded-full"
-                                                animate={{
-                                                    y: [0, -6, 0]
-                                                }}
-                                                transition={{
-                                                    duration: 0.6,
-                                                    repeat: Infinity,
-                                                    ease: 'easeInOut',
-                                                    times: [0, 0.5, 1],
-                                                    delay: 0.3
-                                                }}
-                                            />
-                                        </motion.div>
-                                    )}
+                  {isThinking && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="flex items-center space-x-1.5 ml-2 mb-5"
+                    >
+                      <motion.div
+                        className="w-2 h-2 bg-black text-white dark:bg-[#4DA6FF] rounded-full"
+                        animate={{
+                          y: [0, -6, 0]
+                        }}
+                        transition={{
+                          duration: 0.6,
+                          repeat: Infinity,
+                          ease: 'easeInOut',
+                          times: [0, 0.5, 1]
+                        }}
+                      />
+                      <motion.div
+                        className="w-2 h-2 bg-black text-white dark:bg-[#4DA6FF] rounded-full"
+                        animate={{
+                          y: [0, -6, 0]
+                        }}
+                        transition={{
+                          duration: 0.6,
+                          repeat: Infinity,
+                          ease: 'easeInOut',
+                          times: [0, 0.5, 1],
+                          delay: 0.15
+                        }}
+                      />
+                      <motion.div
+                        className="w-2 h-2 bg-black text-white dark:bg-[#4DA6FF] rounded-full"
+                        animate={{
+                          y: [0, -6, 0]
+                        }}
+                        transition={{
+                          duration: 0.6,
+                          repeat: Infinity,
+                          ease: 'easeInOut',
+                          times: [0, 0.5, 1],
+                          delay: 0.3
+                        }}
+                      />
+                    </motion.div>
+                  )}
 
-                                    <div ref={messagesEndRef} />
-                                </ScrollArea>
-                            </CardContent>
+                  <div ref={messagesEndRef} />
+                </ScrollArea>
+              </CardContent>
 
               <CardFooter className="p-4 border-t border-[#222222] bg-[#111111]">
                 <form onSubmit={handleSendMessage} className="flex w-full gap-2">
@@ -477,17 +480,17 @@ export default function ChatBox() {
                     value={inputMessage}
                     onChange={handleChange}
                     onKeyDown={handleKeyDown}
-                    className="flex-1 min-h-10 max-h-32 bg-[#1A1A1A] border border-[#2A2A2A] resize-none overflow-y-auto rounded-[.65rem] text-sm text-gray-100 placeholder:text-gray-500"
+                    className="flex-1 min-h-10 max-h-32 dark:bg-[#1A1A1A] border dark:border-[#2A2A2A] resize-none overflow-y-auto rounded-[.65rem] text-sm dark:text-gray-100 placeholder:text-gray-500"
                     rows={1}
                   />
                   <Button
                     variant='ghost'
-                    className='group bg-[#4DA6FF] hover:bg-[#3d96ff] rounded-[.65rem] transition-colors'
+                    className='group bg-white text-black dark:text-white dark:bg-[#4DA6FF] dark:hover:bg-[#3d96ff] rounded-[.65rem] transition-colors'
                     type="submit"
                     size="icon"
                     aria-label="Send message"
                   >
-                    <Send className="h-4 w-4 scale-110 group-hover:scale-125 text-white" />
+                    <Send className="h-4 w-4 scale-110 group-hover:scale-125" />
                   </Button>
                 </form>
               </CardFooter>

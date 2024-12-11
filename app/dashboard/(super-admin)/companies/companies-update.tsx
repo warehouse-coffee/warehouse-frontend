@@ -155,7 +155,7 @@ export default function CompaniesUpdate({ companyId, onSuccess }: CompanyUpdateP
             {updateCompanyMutation.isPending ? (
               <>
               Saving...
-                <Loader color="#62c5ff" size="1.25rem" />
+                <Loader size="1.25rem" />
               </>
             ) : (
               'Save changes'

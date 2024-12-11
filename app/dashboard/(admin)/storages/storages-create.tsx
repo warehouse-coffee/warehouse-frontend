@@ -260,7 +260,7 @@ export default function StoragesCreatePage({ onClose }: StoragesCreatePageProps)
           {createStorageMutation.isPending ? (
             <>
               Creating...
-              <Loader color="#62c5ff" size="1.25rem" />
+              <Loader size="1.25rem" />
             </>
           ) : (
             'Create Storage'

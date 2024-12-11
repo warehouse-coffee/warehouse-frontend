@@ -161,7 +161,7 @@ export default function StorageData({
               {deleteStorageMutation.isPending ? (
                 <>
                   Deleting...
-                  <Loader color="#62c5ff" size="1.25rem" />
+                  <Loader size="1.25rem" />
                 </>
               ) : (
                 'Delete'

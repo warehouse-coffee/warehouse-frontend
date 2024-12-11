@@ -256,7 +256,7 @@ export default function EmployeesUpdatePage({ id, onClose, isOpen }: { id: strin
               {updateEmployeeMutation.isPending ? (
                 <>
                   Saving...
-                  <Loader color="#62c5ff" size="1.25rem" />
+                  <Loader size="1.25rem" />
                 </>
               ) : (
                 'Save Changes'

@@ -140,7 +140,7 @@ export default function CompaniesCreate({ onClose }: CompanyCreateProps) {
           {createCompanyMutation.isPending ? (
             <>
               Creating...
-              <Loader color="#62c5ff" size="1.25rem" />
+              <Loader size="1.25rem" />
             </>
           ) : (
             'Create Company'
