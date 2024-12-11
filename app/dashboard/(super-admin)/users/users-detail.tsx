@@ -123,7 +123,7 @@ const TabButtons = React.memo(({ items, activeIndex, setActiveIndex }: {
         className={`rounded-md w-1/2 h-[2rem] text-[.75rem] font-medium ${
           activeIndex === index
             ? 'bg-black text-white dark:bg-primary/10 dark:text-primary'
-            : 'bg-transparent hover:dark:bg-primary/10 hover:dark:text-primary text-muted-foreground'
+            : 'bg-transparent hover:bg-black hover:text-white hover:dark:bg-primary/10 hover:dark:text-primary text-muted-foreground'
         }`}
       >
         {item.title}
