@@ -80,11 +80,15 @@ export class ApiClientService {
     }
   }
 
-  static async resetPassword(token: string, newPassword: string) {
+  static async resetPassword(email: string, currentPassword: string, newPassword: string) {
     try {
       const client = this.createClient(IdentityUserClient, {})
       const command = new ResetPasswordCommand()
-      command.init({ token, newPassword })
+      command.init({
+        email,
+        currentPassword,
+        newPassword
+      })
       const response = await client.resetPassword(command)
       return response
     } catch (error) {

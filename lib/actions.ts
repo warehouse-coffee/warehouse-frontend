@@ -52,15 +52,21 @@ export async function checkAuth() {
   }
 }
 
-export async function resetPassword(token: string, newPassword: string) {
+export async function resetPassword(email: string, currentPassword: string, newPassword: string) {
   try {
-    const response = await ApiClientService.resetPassword(token, newPassword)
+    const response = await ApiClientService.resetPassword(email, currentPassword, newPassword)
     if (response.statusCode === 200) {
-      return { success: true }
+      return {
+        success: true,
+        token: response.token
+      }
     }
     return { success: false, error: 'Failed to reset password' }
   } catch (error) {
-    return { success: false, error: error instanceof Error ? error.message : 'An unexpected error occurred' }
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'An unexpected error occurred'
+    }
   }
 }
 

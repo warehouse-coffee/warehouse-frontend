@@ -14,16 +14,17 @@ export const forgotPasswordSchema = z.object({
 })
 
 export const resetPasswordSchema = z.object({
+  currentPassword: z.string().min(6, 'Current password must be at least 6 characters'),
   password: z
     .string()
-    .min(8, 'Password must be at least 8 characters')
+    .min(6, 'Password must be at least 6 characters')
     .regex(/[A-Z]/, 'Password must contain at least 1 uppercase letter')
     .regex(/[a-z]/, 'Password must contain at least 1 lowercase letter')
     .regex(/[0-9]/, 'Password must contain at least 1 number')
     .regex(/[^A-Za-z0-9]/, 'Password must contain at least 1 special character'),
-  confirmPassword: z.string()
+  confirmPassword: z.string().min(6)
 }).refine((data) => data.password === data.confirmPassword, {
-  message: 'Passwords do not match',
+  message: 'Passwords don\'t match',
   path: ['confirmPassword']
 })
 

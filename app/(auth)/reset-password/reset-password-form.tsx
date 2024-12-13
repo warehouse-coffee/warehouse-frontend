@@ -43,13 +43,12 @@ const BottomGradient = () => {
 }
 
 interface ResetPasswordFormProps {
-  resetToken: string
-  email?: string
+  email: string
   tempPass?: string
   error?: string
 }
 
-export default function ResetPasswordForm({ resetToken, email, tempPass, error: initialError }: ResetPasswordFormProps) {
+export default function ResetPasswordForm({ email, tempPass, error: initialError }: ResetPasswordFormProps) {
   const [error, setError] = useState(initialError || '')
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
@@ -75,7 +74,11 @@ export default function ResetPasswordForm({ resetToken, email, tempPass, error: 
   async function onSubmit(values: z.infer<typeof resetPasswordSchema>) {
     try {
       setIsLoading(true)
-      const result = await resetPassword(resetToken, values.password)
+      const result = await resetPassword(
+        email,
+        values.currentPassword,
+        values.password
+      )
 
       if (result.success) {
         toast.success('Password reset successfully')
@@ -93,7 +96,7 @@ export default function ResetPasswordForm({ resetToken, email, tempPass, error: 
   }
 
   return (
-    <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-7 shadow-input bg-transparent backdrop-filter backdrop-blur-lg bg-opacity-30 border border-gray-200 dark:border-gray-800 relative z-10">
+    <div className="min-w-[25rem] mx-auto rounded-none md:rounded-2xl p-7 shadow-input bg-transparent backdrop-filter backdrop-blur-lg bg-opacity-30 border border-gray-200 dark:border-gray-800 relative z-10">
       <div className="flex flex-col space-y-2">
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-800 dark:text-neutral-200">
           Reset Password
@@ -123,6 +126,20 @@ export default function ResetPasswordForm({ resetToken, email, tempPass, error: 
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-4">
+        <LabelInputContainer>
+          <Label htmlFor="currentPassword">Current Password</Label>
+          <Input
+            id="currentPassword"
+            type="password"
+            defaultValue={tempPass}
+            {...register('currentPassword')}
+            disabled={isLoading}
+          />
+          {errors.currentPassword && (
+            <p className="text-red-500 text-sm">{errors.currentPassword.message}</p>
+          )}
+        </LabelInputContainer>
+
         <LabelInputContainer>
           <Label htmlFor="password">New Password</Label>
           <Input
